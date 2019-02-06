@@ -1,1 +1,12 @@
 6 Feb 2019 1104
+Steps Followed
+1. git init
+2. git add *
+3. git commit -m
+4. add project to github. To avoid errors, do not initialize the new repository with README, license, or gitignore files. You can add these files after your project has been pushed to GitHub.
+4. git remote add origin https://github.com/javaSingh/ionicProject2.git
+5. git remote -v 
+	to verify the remote
+6. git push origin master
+
+https://help.github.com/articles/adding-an-existing-project-to-github-using-the-command-line/
