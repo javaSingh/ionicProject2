@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>QBEDemo</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+
+
+  <form>
+    <ion-input placeholder='Name' [(ngModel)]='name' name='name' required></ion-input>
+    <ion-input placeholder='your_email@some.com' [(ngModel)]='email' name='email' required></ion-input>
+    <ion-input placeholder='Some Line/s of text' [(ngModel)]='msg' name='msg  '></ion-input>
+    <ion-row>
+
+      <ion-col>
+        <ion-button (click)='trashClicked(name,email)' [disabled]='!trashAfterSelect'>
+          <ion-icon name="trash"></ion-icon>
+        </ion-button>
+      </ion-col>
+      <ion-col>
+        <ion-button (click)='save()' [disabled]="!(name!=='') || !(email !=='')">Save</ion-button>
+      </ion-col>
+      <ion-col>
+          <ion-button (click)='searchButtonClicked()'>
+            <ion-icon name="search"></ion-icon>
+          </ion-button>
+        </ion-col>
+
+    </ion-row>
+  </form>
+
+
+  <!-- <ion-button (click)='searchButtonClicked()'  name='Search'></ion-button> -->
+  <p *ngIf='searchRequired'>Select From the below:</p>
+  <ion-virtual-scroll [items]="list" *ngIf='searchRequired'>
+    <ion-item *virtualItem="let data">
+      <ion-icon name="trash" (click)='trashClicked(data.name,data.email)'></ion-icon> <span (click)="selected(data.name,data.email)">{{data.name}}</span>
+    </ion-item>
+
+  </ion-virtual-scroll>
+
+</ion-content>
