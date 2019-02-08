@@ -1,0 +1,13 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>HttpSamples</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+
+<ion-input type='text' name='username' placeholder='username' [(ngModel)]='userName'></ion-input>  
+<ion-input type='text' name='password' placeholder='password' [(ngModel)]='password'></ion-input>  
+    <ion-button type='submit' (click)="submit()">Submit</ion-button>
+
+</ion-content>

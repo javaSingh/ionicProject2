@@ -6,13 +6,25 @@
 
 <ion-content padding>
 
-
+ <!--    <ion-input placeholder='Name Filtering' (ionInput)='startFiltering(this)' [(ngModel)]='nameFilter' name='nameFilter'>
+      </ion-input> -->
   <form>
-    <ion-input placeholder='Name' [(ngModel)]='name' name='name' required></ion-input>
-    <ion-input placeholder='your_email@some.com' [(ngModel)]='email' name='email' required></ion-input>
-    <ion-input placeholder='Some Line/s of text' [(ngModel)]='msg' name='msg  '></ion-input>
-    <ion-row>
+    <ion-item lines='none'>
+      <ion-input placeholder='Enter Name. Type to Filter' [(ngModel)]='name' (ngModelChange)="startFilteringUpdated('name')"  name='name' [disabled]='forUpdate' >
+      </ion-input>
+      <span *ngIf='forUpdate' (click)='clearSearch()'>
+        <ion-icon name="close"></ion-icon>
+      </span>
+    </ion-item>
+    <ion-item lines='none'>
+      <ion-input placeholder='email@a.b. Type to filter' [(ngModel)]='email' (ngModelChange)="startFilteringUpdated('email')" name='email' >
 
+      </ion-input>
+    </ion-item>
+    <ion-item lines='none'>
+      <ion-input placeholder='Some Line/s of text' [(ngModel)]='msg' name='msg  '></ion-input>
+    </ion-item>
+    <!--     <ion-row>
       <ion-col>
         <ion-button (click)='trashClicked(name,email)' [disabled]='!trashAfterSelect'>
           <ion-icon name="trash"></ion-icon>
@@ -22,22 +34,42 @@
         <ion-button (click)='save()' [disabled]="!(name!=='') || !(email !=='')">Save</ion-button>
       </ion-col>
       <ion-col>
-          <ion-button (click)='searchButtonClicked()'>
-            <ion-icon name="search"></ion-icon>
-          </ion-button>
-        </ion-col>
-
-    </ion-row>
+        <ion-button (click)='searchButtonClicked()'>
+          <ion-icon name="search"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row> -->
   </form>
+
+  <ion-list *ngIf='filterRequired'>
+      <ion-item *ngFor="let data of filteredList">
+          <span style="width:90%" (click)="selected(data.name,data.email)"> {{data.name}} @ {{data.email}}</span>
+      </ion-item>
+  </ion-list>
 
 
   <!-- <ion-button (click)='searchButtonClicked()'  name='Search'></ion-button> -->
   <p *ngIf='searchRequired'>Select From the below:</p>
   <ion-virtual-scroll [items]="list" *ngIf='searchRequired'>
     <ion-item *virtualItem="let data">
-      <ion-icon name="trash" (click)='trashClicked(data.name,data.email)'></ion-icon> <span (click)="selected(data.name,data.email)">{{data.name}}</span>
+      <ion-icon name="create"></ion-icon>
+      <span style="width:90%" (click)="selected(data.name,data.email)"> {{data.name}}</span>
+      <ion-icon end name="trash" (click)='trashClicked(data.name,data.email)'></ion-icon>
     </ion-item>
+
 
   </ion-virtual-scroll>
 
 </ion-content>
+<ion-footer no-border text-center>
+  <ion-toolbar>
+    <ion-button (click)='trashClicked(name,email)' [disabled]='!trashAfterSelect'>
+      <ion-icon name="trash"></ion-icon>
+    </ion-button>
+    <ion-button (click)='save()' [disabled]="!(name!=='') || !(email !=='')">Save</ion-button>
+    <ion-button (click)='searchButtonClicked()'>
+      <ion-icon name="search"></ion-icon>
+    </ion-button>
+
+  </ion-toolbar>
+</ion-footer>
