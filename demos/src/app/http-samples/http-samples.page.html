@@ -6,8 +6,19 @@
 
 <ion-content padding>
 
-<ion-input type='text' name='username' placeholder='username' [(ngModel)]='userName'></ion-input>  
-<ion-input type='text' name='password' placeholder='password' [(ngModel)]='password'></ion-input>  
-    <ion-button type='submit' (click)="submit()">Submit</ion-button>
 
+  <ion-input type='text' name='username' placeholder='username' [(ngModel)]='userName'></ion-input>
+  <ion-input type='text' name='password' placeholder='password' [(ngModel)]='password'></ion-input>
+  <ion-button type='submit' (click)="submit()">Submit</ion-button>
+
+
+
+  <ion-list *ngFor='let user of users'>
+    <span (click)='selected(user)'>
+      <ion-item>{{user.name}}</ion-item>
+    </span>
+    <!-- <ion-item>{{user.title}}</ion-item> -->
+
+
+  </ion-list>
 </ion-content>

@@ -5,25 +5,25 @@ import { Routes, RouterModule } from '@angular/router';
 
 import { IonicModule } from '@ionic/angular';
 
-import { HttpSamplesPage } from './http-samples.page';
+import { FormsPage } from './forms.page';
 
-// import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const routes: Routes = [
   {
     path: '',
-    component: HttpSamplesPage
+    component: FormsPage
   }
 ];
 
 @NgModule({
   imports: [
-    // ReactiveFormsModule,
+    ReactiveFormsModule,
     CommonModule,
     FormsModule,
     IonicModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [HttpSamplesPage]
+  declarations: [FormsPage]
 })
-export class HttpSamplesPageModule {}
+export class FormsPageModule {}

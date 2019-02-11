@@ -11,10 +11,12 @@ import { AppRoutingModule } from './app-routing.module';
 
 import {ModalPagePage} from './modal-page/modal-page.page'
 
+import { HttpClientModule } from '@angular/common/http'
+
 @NgModule({
   declarations: [AppComponent,ModalPagePage],
   entryComponents: [ModalPagePage],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule],
+  imports: [HttpClientModule, BrowserModule, IonicModule.forRoot(), AppRoutingModule],
   providers: [
     StatusBar,
     SplashScreen,
