@@ -1,29 +1,45 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"></ion-back-button>
+    </ion-buttons>
     <ion-title>Forms</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content padding>
 
-    <p>Reactive Form (Nested)</p>
+  <p>Reactive Form (Nested)</p>
   <form novalidate [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup)">
     <span *ngIf="formGroup.get('name').hasError('required') && formGroup.get('name').touched">Name is Required</span>
     <ion-input type="text" placeholder="Your full name" formControlName="name" (keydown)="nameKeydown()"></ion-input>
     <ion-input type="email" placeholder="Your email address" formControlName="email"></ion-input>
     <ion-input type="email" placeholder="Confirm your email address" formControlName="confirm"></ion-input>
-    
-    
+    <!-- 
+    <div formArrayName="cities">
+      <div [formGroupName]='i'>
+        <ion-input type="text" placeholder="City" formControlName='city'></ion-input>
+      </div>
+    </div>
+    <ion-button (click)='addNewCity()'>Add City</ion-button> -->
 
 
-    
-    
-    
-    
+
+
+
+
+
+
+
     <ion-button type="submit" [disabled]='!formGroup.valid'>Sign up</ion-button>
   </form>
 
+
+
+
+
   <ion-button (click)='patchValue()'>Patch Value</ion-button>
+  <ion-button (click)='makeExcel()'>Make Excel</ion-button>
   <!-- <p>Reactive Form Ends</p> -->
 
 </ion-content>

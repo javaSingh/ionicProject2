@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Assets</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <!--     <ion-list>
+        <span>
+          <ion-item>Asset Type</ion-item>
+          <ion-item>Year of Manufacture</ion-item>
+          <ion-item>Owner</ion-item>
+          <ion-item>Detailed Vehicle Type</ion-item>
+          <ion-item>Serial No.</ion-item>
+          <ion-item>Date put into Use</ion-item>
+          <ion-item>Vehicle Manu's Code/Vendor Code</ion-item>
+        </span>
+      </ion-list> -->
+
+<!--   <ion-list *ngFor='let item of items'>
+    <span>
+      <ion-item>{{item.assetType}}</ion-item>
+    </span>
+  </ion-list> -->
+
+  <!--   <table>
+    <th>
+      <ion-row>
+        <ion-col>Asset Type</ion-col>
+        <ion-col>Year of Manufacture</ion-col>
+        <ion-col>Owner</ion-col>
+        <ion-col>Detailed Vehicle Type</ion-col>
+        <ion-col>Serial No.</ion-col>
+        <ion-col>Date put into Use</ion-col>
+        <ion-col>Vehicle Manufactire's Code/Vendor Code</ion-col>
+      </ion-row>
+    </th>
+  </table> -->
+  <table>
+    <ion-list>
+      <ion-item>
+        <th>
+          <ion-row>
+              <ion-col><td>Asset Type</td></ion-col>
+              <ion-col><td>Year of Manufacture</td></ion-col>
+              <ion-col><td>Owner</td></ion-col>
+              <ion-col><td>Detailed Vehicle Type</td></ion-col>
+              <ion-col><td>Serial No.</td></ion-col>
+              <ion-col><td>Date put into Use</td></ion-col>
+              <ion-col><td>Vehicle Manufactire's Code/Vendor Code</td></ion-col>
+          </ion-row>
+        </th>
+      </ion-item>
+    </ion-list>
+    <ion-list *ngFor='let item of itemsAPI'>
+      <ion-item>
+        <ion-row>
+          <tr>
+              <ion-col><td>{{item.rardAssetType}}</td></ion-col>
+              <ion-col><td>{{item.rardYearOfManufacture}}</td></ion-col>
+              <ion-col><td>{{item.rardOwner}}</td></ion-col>
+              <ion-col><td>{{item.rardDetailedVehicleType}}</td></ion-col>
+              <ion-col><td>{{item.rardSerialNo}}</td></ion-col>
+              <ion-col><td>{{item.rardDateUse}}</td></ion-col>
+              <ion-col><td>{{item.rardVehicleManufacturerCode}}</td></ion-col>
+          </tr>
+        </ion-row>
+      </ion-item>
+    </ion-list>
+  </table>
+
+
+  <ion-button (click)='makeExcel()'>Make Excel</ion-button>
+</ion-content>

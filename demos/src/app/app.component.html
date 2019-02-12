@@ -1,3 +1,28 @@
 <ion-app>
+
+  <ion-menu side="end" menuId="first" contentId='first'>
+    <ion-header>
+      <ion-toolbar color="primary">
+
+        <!-- <ion-icon (click)='close()' side='end' name="close"></ion-icon> -->
+        <span (click)='close()'>
+          <ion-title>
+            Menu
+          </ion-title>
+        </span>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list>
+        <ion-item (click)='close()' routerLink='/home'>Home</ion-item>
+        <ion-item (click)='close()' routerLink='/qbedemo'>QBEDemo</ion-item>
+        <ion-item (click)='close()' routerLink='/http-samples'>Http Samples</ion-item>
+        <ion-item (click)='close()' routerLink='/forms'>Reactive Nested Forms</ion-item>
+        <ion-item (click)='close()' routerLink='/view-assets'>View Assets</ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+
   <ion-router-outlet></ion-router-outlet>
+  <ion-router-outlet id='first'></ion-router-outlet>
 </ion-app>
