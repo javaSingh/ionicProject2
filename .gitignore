@@ -21,6 +21,7 @@ npm-debug.log*
 coverage/
 dist/
 node_modules/
+_bkp_node_modules/
 tmp/
 temp/
 hooks/
