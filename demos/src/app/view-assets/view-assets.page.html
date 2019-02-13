@@ -8,6 +8,39 @@
 </ion-header>
 
 <ion-content padding>
+
+    <form novalidate [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup)" *ngIf='!showResults'>
+        <!-- <ion-item > 
+            <ion-label>Asset Type</ion-label>
+            <ion-select placeholder="Select One" >
+              <ion-select-option *ngFor='let assetType of uniqueAssetType' value="{{assetType}}">{{assetType}}</ion-select-option>
+            </ion-select>
+          </ion-item> -->
+          <ion-input type="text" formControlName="owner" placeholder="Owner"></ion-input>
+        <ion-input type="text" formControlName="detailedVehicleType" placeholder="Detailed Vehicle Type"></ion-input>
+        <ion-input type="text" formControlName="serialNo" placeholder="Serial No."></ion-input>
+        <ion-input type="text" formControlName="assetType" placeholder="Asset Type"></ion-input>
+        <ion-input type="text" formControlName="yearOfManufacture" placeholder="Year of Manufacture"></ion-input>
+        
+        <ion-input type="text" formControlName="datePutIntoUse" placeholder="Date put into Use"></ion-input>
+        <ion-input type="text" formControlName="vendorCode" placeholder="Vehicle Manufactire's Code/Vendor Code"></ion-input>
+        
+    </form>
+
+    
+    <ngx-datatable *ngIf='showResults'
+
+    [rows]="searchedItems"
+    [columns]="columns"
+    [scrollbarH]="true"
+    [scrollbarV]="true"
+    [rowHeight]="50"
+    [rowHeight]="'auto'"
+    >
+
+  </ngx-datatable>
+
+  <!-- <ion-input clearInput expand='full' placeholder='Filter - Owner || Vehicle No.' [(ngModel)]='filterString' (ngModelChange)='startFilter()' ><ion-icon name="funnel"></ion-icon></ion-input> -->
   <!--     <ion-list>
         <span>
           <ion-item>Asset Type</ion-item>
@@ -20,7 +53,7 @@
         </span>
       </ion-list> -->
 
-<!--   <ion-list *ngFor='let item of items'>
+  <!--   <ion-list *ngFor='let item of items'>
     <span>
       <ion-item>{{item.assetType}}</ion-item>
     </span>
@@ -39,19 +72,33 @@
       </ion-row>
     </th>
   </table> -->
-  <table>
+<!--   <table>
     <ion-list>
       <ion-item>
         <th>
           <ion-row>
-              <ion-col><td>Asset Type</td></ion-col>
-              <ion-col><td>Year of Manufacture</td></ion-col>
-              <ion-col><td>Owner</td></ion-col>
-              <ion-col><td>Detailed Vehicle Type</td></ion-col>
-              <ion-col><td>Serial No.</td></ion-col>
-              <ion-col><td>Date put into Use</td></ion-col>
-              <ion-col><td>Vehicle Manufactire's Code/Vendor Code</td></ion-col>
-          </ion-row>
+            <ion-col>
+        <td>Asset Type</td>
+        </ion-col>
+        <ion-col>
+          <td>Year of Manufacture</td>
+        </ion-col>
+        <ion-col>
+          <td>Owner</td>
+        </ion-col>
+        <ion-col>
+          <td>Detailed Vehicle Type</td>
+        </ion-col>
+        <ion-col>
+          <td>Serial No.</td>
+        </ion-col>
+        <ion-col>
+          <td>Date put into Use</td>
+        </ion-col>
+        <ion-col>
+          <td>Vehicle Manufactire's Code/Vendor Code</td>
+        </ion-col>
+        </ion-row>
         </th>
       </ion-item>
     </ion-list>
@@ -59,19 +106,70 @@
       <ion-item>
         <ion-row>
           <tr>
-              <ion-col><td>{{item.rardAssetType}}</td></ion-col>
-              <ion-col><td>{{item.rardYearOfManufacture}}</td></ion-col>
-              <ion-col><td>{{item.rardOwner}}</td></ion-col>
-              <ion-col><td>{{item.rardDetailedVehicleType}}</td></ion-col>
-              <ion-col><td>{{item.rardSerialNo}}</td></ion-col>
-              <ion-col><td>{{item.rardDateUse}}</td></ion-col>
-              <ion-col><td>{{item.rardVehicleManufacturerCode}}</td></ion-col>
+            <ion-col>
+              <td>{{item.rardAssetType}}</td>
+            </ion-col>
+            <ion-col>
+              <td>{{item.rardYearOfManufacture}}</td>
+            </ion-col>
+            <ion-col>
+              <td>{{item.rardOwner}}</td>
+            </ion-col>
+            <ion-col>
+              <td>{{item.rardDetailedVehicleType}}</td>
+            </ion-col>
+            <ion-col>
+              <td>{{item.rardSerialNo}}</td>
+            </ion-col>
+            <ion-col>
+              <td>{{item.rardDateUse}}</td>
+            </ion-col>
+            <ion-col>
+              <td>{{item.rardVehicleManufacturerCode}}</td>
+            </ion-col>
           </tr>
         </ion-row>
       </ion-item>
     </ion-list>
-  </table>
+  </table> -->
 
 
-  <ion-button (click)='makeExcel()'>Make Excel</ion-button>
+<!-- 
+<span    *ngIf='filterEnabled'>
+   <ngx-datatable
+
+        [rows]="filteredItemsAPI"
+        [columns]="columns"
+        [scrollbarH]="true"
+        [scrollbarV]="true"
+        [rowHeight]="50"
+        [rowHeight]="'auto'"
+
+        >
+      </ngx-datatable>
+    </span> -->
+
+<!--       <ngx-datatable
+
+           [rows]="filteredItemsAPI"
+           [columns]="columns"
+           [scrollbarH]="true"
+           [scrollbarV]="true"
+           [rowHeight]="50"
+           [rowHeight]="'auto'"
+   
+           >
+
+         </ngx-datatable> -->
+
+
+ 
+
 </ion-content>
+
+<ion-footer no-border text-center>
+    <ion-toolbar>
+        <ion-button  (click)='makeExcel()' [disabled]='searchedItems.length<1'><ion-icon name="arrow-round-down" ></ion-icon> </ion-button>
+        <ion-button  type="submit" (click)='onSubmit(formGroup)' ><ion-icon name="search"></ion-icon></ion-button>
+    </ion-toolbar>
+  </ion-footer>

@@ -13,6 +13,8 @@ import {ModalPagePage} from './modal-page/modal-page.page'
 
 import { HttpClientModule } from '@angular/common/http'
 
+
+
 @NgModule({
   declarations: [AppComponent,ModalPagePage],
   entryComponents: [ModalPagePage],

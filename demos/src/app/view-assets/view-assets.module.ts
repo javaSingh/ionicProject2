@@ -6,6 +6,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
 import { ViewAssetsPage } from './view-assets.page';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const routes: Routes = [
   {
@@ -16,6 +18,8 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
+    ReactiveFormsModule,
+    NgxDatatableModule,
     CommonModule,
     FormsModule,
     IonicModule,
