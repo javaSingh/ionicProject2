@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import * as XLSX from 'xlsx';
 // npm i --save xlsx
 import { saveAs } from 'file-saver';
 // npm i file-saver
 import { HttpClient } from '@angular/common/http';
-import {  FormArray,FormGroup, Validators, FormBuilder, FormControl} from '@angular/forms';
+import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 
 
 
@@ -47,85 +47,99 @@ export class ViewAssetsPage implements OnInit {
       { name: 'Company' }
     ]; */
   itemsAPI
-  searchedItems=[]
+  searchedItems = []
   filteredItemsAPI
   data
   filterString
-  uniqueOwner=['PUN','DEL','NNL','DMV','SDAH']
-  uniqueVehicleType=['Coach','Locomotive','Carriage','Gurad Van']
-  uniqueAssetType=['Fan','Tyre','Lock','Overhead']
-uniqueVendorCode=['TCS','TM','Wipro','CRIS','Dell']
-uniqueYearOfManufacure=['2001','2002','2018','2019','2020']
-  formGroup:FormGroup
-  queryURL:string='?filter={"where":{'
-  showResults:boolean=false
-  userHasCancelled:boolean=false
-  showSearchingOverlay:boolean=false
-
-  hideAtLeastOneMsg(){
-    this.userHasCancelled=true
-  }
-
+  formGroup: FormGroup=null
+  uniqueOwner = ['PUN', 'DEL', 'NNL', 'DMV', 'SDAH']
+  uniqueVehicleType = ['Coach', 'Locomotive', 'Carriage', 'Gurad Van']
+  uniqueAssetType = ['Fan', 'Tyre', 'Lock', 'Overhead']
+  uniqueVendorCode = ['TCS', 'TM', 'Wipro', 'CRIS', 'Dell']
+  uniqueYearOfManufacure = ['2001', '2002', '2018', '2019', '2020']
+  controlStrings=['rardOwner','rardDetailedVehicleType','rardSerialNo','rardAssetType','rardYearOfManufacture','rardDateUse','rardVehicleManufacturerCode']
+  queryURL: string = '?filter={"where":{'
   
+  showResults: boolean = false
+  userHasCancelled: boolean = false
+  showSearchingOverlay: boolean = false
+
+  hideAtLeastOneMsg() {
+    this.userHasCancelled = true
+  }
+
+
   onSubmit() {
-    if(this.showResults){
-      this.showResults=false
-      this.searchedItems=[]
+    if (this.showResults) {
+      this.showResults = false
+      this.searchedItems = []
 
-    }else{
-      this.showSearchingOverlay=true
-    console.log(this.formGroup.value, this.formGroup.valid);
-    console.log(this.formGroup.get('assetType').value)
-   if(this.formGroup.controls['assetType'].value){
-      this.queryURL+='"rardAssetType":"'+this.formGroup.controls['assetType'].value+'"'
-    }
- 
-    if(this.formGroup.controls['yearOfManufacture'].value){
-      this.queryURL+='"rardYearOfManufacture":"'+this.formGroup.controls['yearOfManufacture'].value+'"'
-    }
-        
-    if(this.formGroup.controls['owner'].value){
-      this.queryURL+='"rardOwner":"'+this.formGroup.controls['owner'].value+'"'
-    }
-    
-    if(this.formGroup.controls['detailedVehicleType'].value){
-      this.queryURL+='"rardDetailedVehicleType":"'+this.formGroup.controls['detailedVehicleType'].value+'"'
-    }
-    if(this.formGroup.controls['serialNo'].value){
-      this.queryURL+='"rardSerialNo":"'+this.formGroup.controls['serialNo'].value+'"'
-    }
-    if(this.formGroup.controls['datePutIntoUse'].value){
-      this.queryURL+='"rardDateUse":"'+this.formGroup.controls['datePutIntoUse'].value+'"'
-    }
-    if(this.formGroup.controls['vendorCode'].value){
-      this.queryURL+='"rardVehicleManufacturerCode":"'+this.formGroup.controls['vendorCode'].value+'"'
-    } 
-    this.queryURL+='}}'
-    this.queryURL=this.queryURL.split('""').join('","')
-    console.log(this.queryURL)
+    } else {
+      // this.showSearchingOverlay = true
+      console.log(this.formGroup.value, this.formGroup.valid);
+      console.log(this.formGroup.get('rardAssetType').value)
 
-    this.http.get('http://172.16.22.64:3000/api/RollingAssetRfidData'+this.queryURL).subscribe(data => {
-      this.data = data
-      console.log(this.data)
-      this.searchedItems = this.data
-      this.showResults=true
+
       Object.keys(this.formGroup.controls).forEach(key => {
-        // this.formGroup.controls[key].setValue(null)
+        if (this.formGroup.controls[key].value) {
+          this.queryURL += '"'+key+'":"' + this.formGroup.controls[key].value + '"'
+        }
       });
-      this.formGroup.markAsPristine
-      this.formGroup.markAsUntouched
-      // this.formGroup.reset()
-      // this.filteredItemsAPI = this.itemsAPI
-    }, err => {
-      console.log('HTTP ERROR' + err)
-      //Present toast here 
-    }).add(() =>{this.showSearchingOverlay=false})
 
-    this.queryURL='?filter={"where":{'
-  }
+
+      /* if (this.formGroup.controls['rardAssetType'].value) {
+        this.queryURL += '"rardAssetType":"' + this.formGroup.controls['rardAssetType'].value + '"'
+      }
+
+      if (this.formGroup.controls['rardYearOfManufacture'].value) {
+        this.queryURL += '"rardYearOfManufacture":"' + this.formGroup.controls['rardYearOfManufacture'].value + '"'
+      }
+
+      if (this.formGroup.controls['rardOwner'].value) {
+        this.queryURL += '"rardOwner":"' + this.formGroup.controls['rardOwner'].value + '"'
+      }
+
+      if (this.formGroup.controls['rardDetailedVehicleType'].value) {
+        this.queryURL += '"rardDetailedVehicleType":"' + this.formGroup.controls['rardDetailedVehicleType'].value + '"'
+      }
+      if (this.formGroup.controls['rardSerialNo'].value) {
+        this.queryURL += '"rardSerialNo":"' + this.formGroup.controls['rardSerialNo'].value + '"'
+      }
+      if (this.formGroup.controls['rardDateUse'].value) {
+        this.queryURL += '"rardDateUse":"' + this.formGroup.controls['rardDateUse'].value + '"'
+      }
+      if (this.formGroup.controls['rardVehicleManufacturerCode'].value) {
+        this.queryURL += '"rardVehicleManufacturerCode":"' + this.formGroup.controls['rardVehicleManufacturerCode'].value + '"'
+      } */
+
+
+      
+      this.queryURL += '}}'
+      this.queryURL = this.queryURL.split('""').join('","')
+      console.log(this.queryURL)
+
+/*       this.http.get('http://172.16.22.64:3000/api/RollingAssetRfidData' + this.queryURL,).subscribe(data => {
+        this.data = data
+        console.log(this.data)
+        this.searchedItems = this.data
+        this.showResults = true
+        Object.keys(this.formGroup.controls).forEach(key => {
+          // this.formGroup.controls[key].setValue(null)
+        });
+        this.formGroup.markAsPristine
+        this.formGroup.markAsUntouched
+        // this.formGroup.reset()
+        // this.filteredItemsAPI = this.itemsAPI
+      }, err => {
+        console.log('HTTP ERROR' + err)
+        //Present toast here 
+      }).add(() => { this.showSearchingOverlay = false }) */
+
+      this.queryURL = '?filter={"where":{'
+    }
   }
 
-  constructor(public http: HttpClient,public fb:FormBuilder) { 
+  constructor(public http: HttpClient, public fb: FormBuilder) {
 
 
   }
@@ -133,7 +147,7 @@ uniqueYearOfManufacure=['2001','2002','2018','2019','2020']
   startFilter() {
     console.log(this.filterString)
     const filteredItemsAPI = this.itemsAPI.filter((item) => {
-      return item.rardOwner.toLowerCase().indexOf(this.filterString.toLowerCase()) > -1 || item.rardSerialNo.toLowerCase().indexOf(this.filterString.toLowerCase()) > -1 ;
+      return item.rardOwner.toLowerCase().indexOf(this.filterString.toLowerCase()) > -1 || item.rardSerialNo.toLowerCase().indexOf(this.filterString.toLowerCase()) > -1;
     });
     this.filteredItemsAPI = filteredItemsAPI
   }
@@ -153,7 +167,7 @@ uniqueYearOfManufacure=['2001','2002','2018','2019','2020']
     } */
 
   makeExcel() {
-    console.log('Download Start'+new Date())
+    console.log('Download Start' + new Date())
     let sheet = XLSX.utils.json_to_sheet(this.searchedItems);
     // let sheet = XLSX.utils.json_to_sheet(this.testArr);
     let wb = {
@@ -176,19 +190,32 @@ uniqueYearOfManufacure=['2001','2002','2018','2019','2020']
     }
     let blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
     saveAs(blob, "Output.xlsx");
-    console.log('Download End'+new Date())
+    console.log('Download End' + new Date())
   }
-  meraValidator(formGroup:FormGroup){
+
+
+
+  meraValidator(formGroup: FormGroup) {
+
+    Object.keys(formGroup.controls).forEach(key => {
+      if(formGroup.controls[key].value.length < 1)
+      {
+        return { valid: false }
+      }
+    });
+
+
     // this.formGroup.controls['owner'].value.length<1
-    if(formGroup.controls['owner'].value.length<1 &&
-    formGroup.controls['detailedVehicleType'].value.length<1 &&
-    formGroup.controls['serialNo'].value.length<1 &&
-    formGroup.controls['assetType'].value.length<1 &&
-    formGroup.controls['yearOfManufacture'].value.length<1 &&
-    formGroup.controls['datePutIntoUse'].value.length<1 &&
-    formGroup.controls['vendorCode'].value.length<1){
-      return {valid:false}
-    }
+/*     if (formGroup.controls['rardOwner'].value.length < 1 &&
+      formGroup.controls['rardDetailedVehicleType'].value.length < 1 &&
+      formGroup.controls['rardSerialNo'].value.length < 1 &&
+      formGroup.controls['rardAssetType'].value.length < 1 &&
+      formGroup.controls['rardYearOfManufacture'].value.length < 1 &&
+      formGroup.controls['rardDateUse'].value.length < 1 &&
+      formGroup.controls['rardVehicleManufacturerCode'].value.length < 1) {
+      return { valid: false }
+    } */
+
     return null
   }
 
@@ -196,27 +223,27 @@ uniqueYearOfManufacure=['2001','2002','2018','2019','2020']
 
     console.log('Init')
 
-    this.formGroup=this.fb.group(
+    this.formGroup = this.fb.group(
       {
-        owner:[''],
-        detailedVehicleType:[''],
-        serialNo:[''],
-        assetType:[''],
-        yearOfManufacture:[''],
-        datePutIntoUse:[''],
-        vendorCode:['']
-      },{validator:this.meraValidator}
+        'rardOwner': [''],
+        'rardDetailedVehicleType': [''],
+        'rardSerialNo': [''],
+        'rardAssetType': [''],
+        'rardYearOfManufacture': [''],
+        'rardDateUse': [''],
+        'rardVehicleManufacturerCode': ['']
+      }, { validator: this.meraValidator }
     )
     // this.formGroup.
 
- /*    this.http.get('http://172.16.22.64:3000/api/RollingAssetRfidData/rfidData').subscribe(data => {
-      this.data = data
-      console.log(this.data.Result)
-      this.itemsAPI = this.data.Result
-      this.filteredItemsAPI = this.itemsAPI
-    }, err => {
-      console.log('HTTP ERROR' + err)
-    }) */
+    /*    this.http.get('http://172.16.22.64:3000/api/RollingAssetRfidData/rfidData').subscribe(data => {
+         this.data = data
+         console.log(this.data.Result)
+         this.itemsAPI = this.data.Result
+         this.filteredItemsAPI = this.itemsAPI
+       }, err => {
+         console.log('HTTP ERROR' + err)
+       }) */
 
     /* new Promise(resolve => {
               this.http.get('https://jsonplaceholder.typicode.com/users').subscribe(data => {
