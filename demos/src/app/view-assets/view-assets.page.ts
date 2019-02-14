@@ -59,6 +59,12 @@ uniqueYearOfManufacure=['2001','2002','2018','2019','2020']
   formGroup:FormGroup
   queryURL:string='?filter={"where":{'
   showResults:boolean=false
+  userHasCancelled:boolean=false
+  showSearchingOverlay:boolean=false
+
+  hideAtLeastOneMsg(){
+    this.userHasCancelled=true
+  }
 
   
   onSubmit() {
@@ -67,6 +73,7 @@ uniqueYearOfManufacure=['2001','2002','2018','2019','2020']
       this.searchedItems=[]
 
     }else{
+      this.showSearchingOverlay=true
     console.log(this.formGroup.value, this.formGroup.valid);
     console.log(this.formGroup.get('assetType').value)
    if(this.formGroup.controls['assetType'].value){
@@ -102,17 +109,20 @@ uniqueYearOfManufacure=['2001','2002','2018','2019','2020']
       console.log(this.data)
       this.searchedItems = this.data
       this.showResults=true
+      Object.keys(this.formGroup.controls).forEach(key => {
+        // this.formGroup.controls[key].setValue(null)
+      });
+      this.formGroup.markAsPristine
+      this.formGroup.markAsUntouched
+      // this.formGroup.reset()
       // this.filteredItemsAPI = this.itemsAPI
     }, err => {
       console.log('HTTP ERROR' + err)
-    })
+      //Present toast here 
+    }).add(() =>{this.showSearchingOverlay=false})
 
     this.queryURL='?filter={"where":{'
   }
-  }
-
-  validateUrl(control: FormControl) {
-    return false
   }
 
   constructor(public http: HttpClient,public fb:FormBuilder) { 
@@ -143,6 +153,7 @@ uniqueYearOfManufacure=['2001','2002','2018','2019','2020']
     } */
 
   makeExcel() {
+    console.log('Download Start'+new Date())
     let sheet = XLSX.utils.json_to_sheet(this.searchedItems);
     // let sheet = XLSX.utils.json_to_sheet(this.testArr);
     let wb = {
@@ -165,6 +176,20 @@ uniqueYearOfManufacure=['2001','2002','2018','2019','2020']
     }
     let blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
     saveAs(blob, "Output.xlsx");
+    console.log('Download End'+new Date())
+  }
+  meraValidator(formGroup:FormGroup){
+    // this.formGroup.controls['owner'].value.length<1
+    if(formGroup.controls['owner'].value.length<1 &&
+    formGroup.controls['detailedVehicleType'].value.length<1 &&
+    formGroup.controls['serialNo'].value.length<1 &&
+    formGroup.controls['assetType'].value.length<1 &&
+    formGroup.controls['yearOfManufacture'].value.length<1 &&
+    formGroup.controls['datePutIntoUse'].value.length<1 &&
+    formGroup.controls['vendorCode'].value.length<1){
+      return {valid:false}
+    }
+    return null
   }
 
   ngOnInit() {
@@ -173,15 +198,16 @@ uniqueYearOfManufacure=['2001','2002','2018','2019','2020']
 
     this.formGroup=this.fb.group(
       {
-        assetType:[''],
-        yearOfManufacture:[''],
         owner:[''],
         detailedVehicleType:[''],
         serialNo:[''],
+        assetType:[''],
+        yearOfManufacture:[''],
         datePutIntoUse:[''],
         vendorCode:['']
-      }
+      },{validator:this.meraValidator}
     )
+    // this.formGroup.
 
  /*    this.http.get('http://172.16.22.64:3000/api/RollingAssetRfidData/rfidData').subscribe(data => {
       this.data = data

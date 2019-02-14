@@ -1,3 +1,4 @@
+
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -8,37 +9,56 @@
 </ion-header>
 
 <ion-content padding>
+    
 
     <form novalidate [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup)" *ngIf='!showResults'>
-        <!-- <ion-item > 
+        <div id="custom-overlay" [style.display]="showSearchingOverlay ? 'flex': 'none'">
+            <div class="flb">
+              <div class="lds-ellipsis">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
+          </div>  
+      <!-- <ion-item > 
             <ion-label>Asset Type</ion-label>
             <ion-select placeholder="Select One" >
               <ion-select-option *ngFor='let assetType of uniqueAssetType' value="{{assetType}}">{{assetType}}</ion-select-option>
             </ion-select>
           </ion-item> -->
-          <ion-input type="text" formControlName="owner" placeholder="Owner"></ion-input>
-        <ion-input type="text" formControlName="detailedVehicleType" placeholder="Detailed Vehicle Type"></ion-input>
-        <ion-input type="text" formControlName="serialNo" placeholder="Serial No."></ion-input>
-        <ion-input type="text" formControlName="assetType" placeholder="Asset Type"></ion-input>
-        <ion-input type="text" formControlName="yearOfManufacture" placeholder="Year of Manufacture"></ion-input>
+          <ion-input clearInput type="text" formControlName="owner" placeholder="Owner"></ion-input>
+        <ion-input clearInput type="text" formControlName="detailedVehicleType" placeholder="Detailed Vehicle Type"></ion-input>
+        <ion-input clearInput type="text" formControlName="serialNo" placeholder="Serial No."></ion-input>
+        <ion-input clearInput type="text" formControlName="assetType" placeholder="Asset Type"></ion-input>
+        <ion-input clearInput type="text" formControlName="yearOfManufacture" placeholder="Year of Manufacture"></ion-input>
+        <ion-button fill='clear'>Range</ion-button>
+<!--         <ion-item lines='none'>
+          <ion-input clearInput type="text" formControlName="yearOfManufacture" placeholder="Year of Manufacture"></ion-input>
+          <ion-button fill='clear'>Range</ion-button>
+        </ion-item> -->
         
-        <ion-input type="text" formControlName="datePutIntoUse" placeholder="Date put into Use"></ion-input>
-        <ion-input type="text" formControlName="vendorCode" placeholder="Vehicle Manufactire's Code/Vendor Code"></ion-input>
+        <ion-input clearInput type="text" formControlName="datePutIntoUse" placeholder="Date put into Use"></ion-input>
+        <ion-input clearInput type="text" formControlName="vendorCode" placeholder="Vehicle Manufactire's Code/Vendor Code"></ion-input>
         
     </form>
 
-    
-    <ngx-datatable *ngIf='showResults'
 
+    <ngx-datatable *ngIf='showResults'
+    class='material'
     [rows]="searchedItems"
     [columns]="columns"
     [scrollbarH]="true"
-    [scrollbarV]="true"
-    [rowHeight]="50"
+    [headerHeight]="50"
+    [footerHeight]="50"
     [rowHeight]="'auto'"
+    [limit]="10"
     >
+  
 
   </ngx-datatable>
+
 
   <!-- <ion-input clearInput expand='full' placeholder='Filter - Owner || Vehicle No.' [(ngModel)]='filterString' (ngModelChange)='startFilter()' ><ion-icon name="funnel"></ion-icon></ion-input> -->
   <!--     <ion-list>
@@ -160,16 +180,24 @@
    
            >
 
-         </ngx-datatable> -->
+        </ngx-datatable> -->
+        <span (click)='hideAtLeastOneMsg()'>
+          <ion-item lines='none' *ngIf='formGroup.touched && !formGroup.valid && !userHasCancelled '>
+            <ion-label color="danger">
+              Input for at least one field is required
+            </ion-label>
+            <ion-icon name='close'></ion-icon>
+          </ion-item>
+        </span>
 
 
- 
+        
 
 </ion-content>
 
 <ion-footer no-border text-center>
     <ion-toolbar>
         <ion-button  (click)='makeExcel()' [disabled]='searchedItems.length<1'><ion-icon name="arrow-round-down" ></ion-icon> </ion-button>
-        <ion-button  type="submit" (click)='onSubmit(formGroup)' ><ion-icon name="search"></ion-icon></ion-button>
+        <ion-button  type="submit" (click)='onSubmit(formGroup)' [disabled]='!formGroup.valid'><ion-icon name="search"></ion-icon></ion-button>
     </ion-toolbar>
   </ion-footer>
