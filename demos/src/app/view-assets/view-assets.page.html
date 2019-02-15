@@ -10,7 +10,7 @@
 <ion-content padding>
 
 
-  <form novalidate [formGroup]="formGroup"  *ngIf='!showResults'>
+  <form novalidate [formGroup]="formGroup" >
     <div id="custom-overlay" [style.display]="showSearchingOverlay ? 'flex': 'none'">
       <div class="flb">
         <div class="lds-ellipsis">
@@ -32,9 +32,35 @@
     </ion-input>
     <ion-input clearInput type="text" formControlName="rardSerialNo" placeholder="Serial No."></ion-input>
     <ion-input clearInput type="text" formControlName="rardAssetType" placeholder="Asset Type"></ion-input>
-    <ion-input clearInput type="text" formControlName="rardYearOfManufacture" placeholder="Year of Manufacture">
+    <ion-input clearInput type="text" formControlName="rardYearOfManufacture" placeholder="Year of Manufacture | YY ">
     </ion-input>
-    <ion-button fill='clear'>Range</ion-button>
+<!--     <ion-list>
+        <ion-item>
+          <ion-range color="danger" pin="true"></ion-range>
+        </ion-item> -->
+      
+        <ion-item lines="none">
+          <ion-range [disabled]='formGroup.controls["rardYearOfManufacture"].value.length>0' formControlName='rardYearOfManufacture' dualKnobs="true" pin='true' min="00" max="99" color="primary">
+            <ion-label slot="start">00</ion-label>
+            <ion-label slot="end">99</ion-label>
+          </ion-range>
+        </ion-item>
+      
+      <!--  <ion-item>
+         <ion-range min="20" max="80" step="2">
+           <ion-icon size="small" slot="start" name="sunny"></ion-icon>
+           <ion-icon slot="end" name="sunny"></ion-icon>
+         </ion-range>
+       </ion-item>
+      
+        <ion-item>
+          <ion-range min="1000" max="2000" step="100" snaps="true" color="secondary"></ion-range>
+        </ion-item>
+      
+        <ion-item>
+          <ion-range dualKnobs="true" min="21" max="72" step="3" snaps="true"></ion-range>
+        </ion-item>
+      </ion-list> -->
     <!--<ion-item lines='none'>
 <ion-input clearInput type="text" formControlName="yearOfManufacture" placeholder="Year of Manufacture"></ion-input>
 <ion-button fill='clear'>Range</ion-button>
@@ -43,15 +69,94 @@
     <ion-input clearInput type="text" formControlName="rardDateUse" placeholder="Date put into Use"></ion-input>
     <ion-input clearInput type="text" formControlName="rardVehicleManufacturerCode"
       placeholder="Vehicle Manufactire's Code/Vendor Code"></ion-input>
-
+      <span (click)='hideAtLeastOneMsg()'>
+          <ion-item lines='none' *ngIf='formGroup.touched && !formGroup.valid && !userHasCancelled '>
+            <ion-label color="danger">
+              Input for at least one field is required
+            </ion-label>
+            <ion-icon name='close'></ion-icon>
+          </ion-item>
+        </span>
   </form>
+  <ion-row style="height: 30px"></ion-row>
 
 
   <ngx-datatable *ngIf='showResults' class='material' [rows]="searchedItems" [columns]="columns" [scrollbarH]="true"
     [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="10">
-
-
   </ngx-datatable>
+
+  <ngx-datatable 
+  class="material striped" 
+  padding 
+  
+  [rows]="items" 
+  [scrollbarH]="true"
+  [headerHeight]="50" 
+  [footerHeight]="30" 
+  [rowHeight]="'auto'" 
+   [columnMode]="'force'"
+  [limit]="3">
+  <ngx-datatable-column name="assetType">
+    <!-- <ng-template let-value="value" ngx-datatable-cell-template> -->
+    <strong>{{value}}</strong>
+    <!-- </ng-template> -->
+  </ngx-datatable-column>
+  <ngx-datatable-column name="yearOfManufacture"><strong>{{value}}</strong></ngx-datatable-column>
+  <ngx-datatable-column name="owner"><strong>{{value}}</strong></ngx-datatable-column>
+  <ngx-datatable-column name="detailedVehicleType"><strong>{{value}}</strong></ngx-datatable-column>
+  <ngx-datatable-column name="serialNumber"><strong>{{value}}</strong></ngx-datatable-column>
+  <ngx-datatable-column name="datePutIntoUse"><strong>{{value}}</strong></ngx-datatable-column>
+  <ngx-datatable-column name="vendorCode"><strong>{{value}}</strong></ngx-datatable-column>
+  <!-- <ngx-datatable-footer> -->
+<!--       <ng-template 
+        ngx-datatable-footer-template 
+        let-rowCount="rowCount"
+        let-pageSize="pageSize"
+        let-selectedCount="selectedCount"
+        let-curPage="curPage"
+        let-offset="offset">
+        <div style="padding: 5px 10px">
+          <div>
+            <strong>Summary</strong>: Gender: Female
+          </div>
+          <hr style="width:100%" />
+          <div>
+            Rows: {{rowCount}} |
+            Size: {{pageSize}} |
+            Current: {{curPage}} |
+            Offset: {{offset}}
+          </div>
+        </div>
+      </ng-template> -->
+
+<!--       <ng-template 
+      ngx-datatable-footer-template
+      let-rowCount="rowCount"
+      let-pageSize="pageSize"
+      let-selectedCount="selectedCount"
+      let-curPage="curPage"
+      let-offset="offset"
+      let-isVisible="isVisible">
+        <div class="page-count">
+          <span *ngIf="selectedMessage">
+            {{selectedCount.toLocaleString()}} {{selectedMessage}} / 
+          </span>
+          {{rowCount.toLocaleString()}} {{totalMessage}}
+         Rows</div>
+        <datatable-pager
+            [pagerLeftArrowIcon]="'datatable-icon-left'"
+            [pagerRightArrowIcon]="'datatable-icon-right'"
+            [pagerPreviousIcon]="'datatable-icon-prev'"
+            [pagerNextIcon]="'datatable-icon-skip'"
+            [page]="curPage"
+            [size]="pageSize"
+            [count]="rowCount"
+            [hidden]="!((rowCount / pageSize) > 1)"
+            (change)="table.onFooterPage($event)">
+        </datatable-pager>
+    </ng-template> -->
+    <!-- </ngx-datatable-footer> -->
+</ngx-datatable>
 
 
   <!-- <ion-input clearInput expand='full' placeholder='Filter - Owner || Vehicle No.' [(ngModel)]='filterString' (ngModelChange)='startFilter()' ><ion-icon name="funnel"></ion-icon></ion-input> -->
@@ -175,14 +280,7 @@
 >
 
 </ngx-datatable> -->
-  <span (click)='hideAtLeastOneMsg()'>
-    <ion-item lines='none' *ngIf='formGroup.touched && !formGroup.valid && !userHasCancelled '>
-      <ion-label color="danger">
-        Input for at least one field is required
-      </ion-label>
-      <ion-icon name='close'></ion-icon>
-    </ion-item>
-  </span>
+
 
 
 

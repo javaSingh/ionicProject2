@@ -5,13 +5,19 @@ import { saveAs } from 'file-saver';
 // npm i file-saver
 import { HttpClient } from '@angular/common/http';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { ToastController } from '@ionic/angular';
 
+import { ViewEncapsulation } from '@angular/core';
+// import { index } from '@swimlane/ngx-datatable/release/'
 
 
 @Component({
   selector: 'app-view-assets',
   templateUrl: './view-assets.page.html',
   styleUrls: ['./view-assets.page.scss'],
+  encapsulation: ViewEncapsulation.None
+  //swmimlane ngx datatable css will not work well without this.
+  // https://stackoverflow.com/questions/44166811/css-issue-ngx-table-angular2-swimlane
 })
 
 
@@ -51,21 +57,34 @@ export class ViewAssetsPage implements OnInit {
   filteredItemsAPI
   data
   filterString
-  formGroup: FormGroup=null
+  formGroup: FormGroup = null
   uniqueOwner = ['PUN', 'DEL', 'NNL', 'DMV', 'SDAH']
   uniqueVehicleType = ['Coach', 'Locomotive', 'Carriage', 'Gurad Van']
   uniqueAssetType = ['Fan', 'Tyre', 'Lock', 'Overhead']
   uniqueVendorCode = ['TCS', 'TM', 'Wipro', 'CRIS', 'Dell']
   uniqueYearOfManufacure = ['2001', '2002', '2018', '2019', '2020']
-  controlStrings=['rardOwner','rardDetailedVehicleType','rardSerialNo','rardAssetType','rardYearOfManufacture','rardDateUse','rardVehicleManufacturerCode']
+  controlStrings = ['rardOwner', 'rardDetailedVehicleType', 'rardSerialNo', 'rardAssetType', 'rardYearOfManufacture', 'rardDateUse', 'rardVehicleManufacturerCode']
   queryURL: string = '?filter={"where":{'
-  
+
   showResults: boolean = false
   userHasCancelled: boolean = false
   showSearchingOverlay: boolean = false
+  enableRange:boolean=false
 
   hideAtLeastOneMsg() {
     this.userHasCancelled = true
+  }
+
+  async presentToast(msg:string){
+    const toast = await this.toastController.create({
+      message: msg,
+      translucent: false,
+      showCloseButton: true,
+      closeButtonText: 'CLOSE',
+      duration: 1500
+    });
+    toast.present();
+        
   }
 
 
@@ -75,14 +94,15 @@ export class ViewAssetsPage implements OnInit {
       this.searchedItems = []
 
     } else {
-      // this.showSearchingOverlay = true
+      this.showSearchingOverlay = true
       console.log(this.formGroup.value, this.formGroup.valid);
+      console.log(this.formGroup.controls['rardYearOfManufacture'].value.lower)
       console.log(this.formGroup.get('rardAssetType').value)
 
 
       Object.keys(this.formGroup.controls).forEach(key => {
         if (this.formGroup.controls[key].value) {
-          this.queryURL += '"'+key+'":"' + this.formGroup.controls[key].value + '"'
+          this.queryURL += '"' + key + '":"' + this.formGroup.controls[key].value + '"'
         }
       });
 
@@ -112,13 +132,35 @@ export class ViewAssetsPage implements OnInit {
         this.queryURL += '"rardVehicleManufacturerCode":"' + this.formGroup.controls['rardVehicleManufacturerCode'].value + '"'
       } */
 
-
-      
       this.queryURL += '}}'
       this.queryURL = this.queryURL.split('""').join('","')
       console.log(this.queryURL)
 
-/*       this.http.get('http://172.16.22.64:3000/api/RollingAssetRfidData' + this.queryURL,).subscribe(data => {
+      let timeoutPromise = new Promise((resolve, reject) => {
+        let wait = setTimeout(() => {
+          clearTimeout(wait);
+          resolve('Connection Timed Out');
+        }, 3000)
+      })
+
+
+      let responsePromise = this.http.get('http://172.16.22.64:3000/api/RollingAssetRfidData' + this.queryURL).toPromise()
+
+      let race=Promise.race([timeoutPromise,responsePromise])
+      race.then((res)=>{
+        if(res==='Connection Timed Out'){
+        console.log(res)
+        this.showSearchingOverlay=false
+        this.presentToast('Unable to Connect now.')
+        }
+        else{
+
+        }
+      })
+
+
+
+/*       this.http.get('http://172.16.22.64:3000/api/RollingAssetRfidData' + this.queryURL).subscribe(data => {
         this.data = data
         console.log(this.data)
         this.searchedItems = this.data
@@ -139,7 +181,7 @@ export class ViewAssetsPage implements OnInit {
     }
   }
 
-  constructor(public http: HttpClient, public fb: FormBuilder) {
+  constructor(public http: HttpClient, public fb: FormBuilder, public toastController: ToastController) {
 
 
   }
@@ -197,26 +239,32 @@ export class ViewAssetsPage implements OnInit {
 
   meraValidator(formGroup: FormGroup) {
 
-    Object.keys(formGroup.controls).forEach(key => {
-      if(formGroup.controls[key].value.length < 1)
-      {
-        return { valid: false }
+    /*     Object.keys(formGroup.controls).forEach(key => {
+          // console.log('length of control: '+key+' is ' +formGroup.controls[key].value.length+'.')
+          if (formGroup.controls[key].value.length < 1) {
+            console.log('returning false')
+            return { valid: false }
+          }
+        }); */
+
+    for (const key in formGroup.controls) {
+      if (!(formGroup.controls[key].value.length < 1)) {
+        // console.log('returning false')
+        return null
       }
-    });
-
-
+    }
     // this.formGroup.controls['owner'].value.length<1
-/*     if (formGroup.controls['rardOwner'].value.length < 1 &&
-      formGroup.controls['rardDetailedVehicleType'].value.length < 1 &&
-      formGroup.controls['rardSerialNo'].value.length < 1 &&
-      formGroup.controls['rardAssetType'].value.length < 1 &&
-      formGroup.controls['rardYearOfManufacture'].value.length < 1 &&
-      formGroup.controls['rardDateUse'].value.length < 1 &&
-      formGroup.controls['rardVehicleManufacturerCode'].value.length < 1) {
-      return { valid: false }
-    } */
-
-    return null
+    /*     if (formGroup.controls['rardOwner'].value.length < 1 &&
+          formGroup.controls['rardDetailedVehicleType'].value.length < 1 &&
+          formGroup.controls['rardSerialNo'].value.length < 1 &&
+          formGroup.controls['rardAssetType'].value.length < 1 &&
+          formGroup.controls['rardYearOfManufacture'].value.length < 1 &&
+          formGroup.controls['rardDateUse'].value.length < 1 &&
+          formGroup.controls['rardVehicleManufacturerCode'].value.length < 1) {
+          return { valid: false }
+        } */
+    console.log('returning null as well')
+    return { valid: false }
   }
 
   ngOnInit() {
@@ -231,7 +279,8 @@ export class ViewAssetsPage implements OnInit {
         'rardAssetType': [''],
         'rardYearOfManufacture': [''],
         'rardDateUse': [''],
-        'rardVehicleManufacturerCode': ['']
+        'rardVehicleManufacturerCode': [''],
+        'yearOfManufactureRange':['']
       }, { validator: this.meraValidator }
     )
     // this.formGroup.
@@ -245,15 +294,15 @@ export class ViewAssetsPage implements OnInit {
          console.log('HTTP ERROR' + err)
        }) */
 
-    /* new Promise(resolve => {
-              this.http.get('https://jsonplaceholder.typicode.com/users').subscribe(data => {
-                resolve(data);
-              }, err => {
-                console.log(err);
-              });
-            }).then(data=>{
-              this.users=data
-              console.log(this.users)
-            }) */
+    /*     new Promise(resolve => {
+                  this.http.get('https://jsonplaceholder.typicode.com/users').subscribe(data => {
+                    resolve(data);
+                  }, err => {
+                    console.log(err);
+                  });
+                }).then(data=>{
+                  this.users=data
+                  console.log(this.users)
+                }) */
   }
 } 
