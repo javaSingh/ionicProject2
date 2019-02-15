@@ -8,9 +8,10 @@
 </ion-header>
 
 <ion-content padding>
+  <!-- <ion-button (click)='presentAlert()'>Show Alert</ion-button> -->
 
 
-  <form novalidate [formGroup]="formGroup" >
+  <form novalidate [formGroup]="formGroup" *ngIf='!showResults'>
     <div id="custom-overlay" [style.display]="showSearchingOverlay ? 'flex': 'none'">
       <div class="flb">
         <div class="lds-ellipsis">
@@ -40,7 +41,7 @@
         </ion-item> -->
       
         <ion-item lines="none">
-          <ion-range [disabled]='formGroup.controls["rardYearOfManufacture"].value.length>0' formControlName='rardYearOfManufacture' dualKnobs="true" pin='true' min="00" max="99" color="primary">
+        <ion-range [disabled]='formGroup.controls["rardYearOfManufacture"].value.length>0' formControlName='rardYearOfManufactureRange' dualKnobs="true" pin='true' min="00" max="99" color="primary">
             <ion-label slot="start">00</ion-label>
             <ion-label slot="end">99</ion-label>
           </ion-range>
@@ -77,15 +78,24 @@
             <ion-icon name='close'></ion-icon>
           </ion-item>
         </span>
+        <ion-row style="height: 30px"></ion-row>
   </form>
-  <ion-row style="height: 30px"></ion-row>
 
 
-  <ngx-datatable *ngIf='showResults' class='material' [rows]="searchedItems" [columns]="columns" [scrollbarH]="true"
-    [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="10">
+
+  <ngx-datatable *ngIf='showResults' 
+  class='material striped' 
+  [rows]="searchedItems" 
+  [columns]="columns" 
+  [scrollbarH]="true"
+    [headerHeight]="50" 
+    [footerHeight]="50" 
+    [rowHeight]="'auto'" 
+    [columnMode]="'force'"
+    [limit]="10">
   </ngx-datatable>
 
-  <ngx-datatable 
+<!--   <ngx-datatable 
   class="material striped" 
   padding 
   
@@ -95,19 +105,19 @@
   [footerHeight]="30" 
   [rowHeight]="'auto'" 
    [columnMode]="'force'"
-  [limit]="3">
-  <ngx-datatable-column name="assetType">
+  [limit]="3"> -->
+  <!-- <ngx-datatable-column name="assetType"> -->
     <!-- <ng-template let-value="value" ngx-datatable-cell-template> -->
-    <strong>{{value}}</strong>
+    <!-- <strong>{{value}}</strong> -->
     <!-- </ng-template> -->
-  </ngx-datatable-column>
+  <!-- </ngx-datatable-column>
   <ngx-datatable-column name="yearOfManufacture"><strong>{{value}}</strong></ngx-datatable-column>
   <ngx-datatable-column name="owner"><strong>{{value}}</strong></ngx-datatable-column>
   <ngx-datatable-column name="detailedVehicleType"><strong>{{value}}</strong></ngx-datatable-column>
   <ngx-datatable-column name="serialNumber"><strong>{{value}}</strong></ngx-datatable-column>
   <ngx-datatable-column name="datePutIntoUse"><strong>{{value}}</strong></ngx-datatable-column>
   <ngx-datatable-column name="vendorCode"><strong>{{value}}</strong></ngx-datatable-column>
-  <!-- <ngx-datatable-footer> -->
+   --><!-- <ngx-datatable-footer> -->
 <!--       <ng-template 
         ngx-datatable-footer-template 
         let-rowCount="rowCount"
@@ -156,7 +166,7 @@
         </datatable-pager>
     </ng-template> -->
     <!-- </ngx-datatable-footer> -->
-</ngx-datatable>
+<!-- </ngx-datatable> -->
 
 
   <!-- <ion-input clearInput expand='full' placeholder='Filter - Owner || Vehicle No.' [(ngModel)]='filterString' (ngModelChange)='startFilter()' ><ion-icon name="funnel"></ion-icon></ion-input> -->
@@ -292,7 +302,7 @@
     <ion-button (click)='makeExcel()' [disabled]='searchedItems.length<1'>
       <ion-icon name="arrow-round-down"></ion-icon>
     </ion-button>
-    <ion-button type="submit" (click)='onSubmit(formGroup)' [disabled]='!formGroup.valid'>
+    <ion-button type="submit" (click)='onSubmit(formGroup)' >
       <ion-icon name="search"></ion-icon>
     </ion-button>
   </ion-toolbar>

@@ -9,6 +9,8 @@ import { ToastController } from '@ionic/angular';
 
 import { ViewEncapsulation } from '@angular/core';
 // import { index } from '@swimlane/ngx-datatable/release/'
+import { AlertController } from '@ionic/angular';
+import { error } from 'util';
 
 
 @Component({
@@ -69,13 +71,14 @@ export class ViewAssetsPage implements OnInit {
   showResults: boolean = false
   userHasCancelled: boolean = false
   showSearchingOverlay: boolean = false
-  enableRange:boolean=false
+  enableRange: boolean = false
+  showDownloadAlert: boolean = true
 
   hideAtLeastOneMsg() {
     this.userHasCancelled = true
   }
 
-  async presentToast(msg:string){
+  async presentToast(msg: string) {
     const toast = await this.toastController.create({
       message: msg,
       translucent: false,
@@ -84,7 +87,7 @@ export class ViewAssetsPage implements OnInit {
       duration: 1500
     });
     toast.present();
-        
+
   }
 
 
@@ -96,17 +99,60 @@ export class ViewAssetsPage implements OnInit {
     } else {
       this.showSearchingOverlay = true
       console.log(this.formGroup.value, this.formGroup.valid);
-      console.log(this.formGroup.controls['rardYearOfManufacture'].value.lower)
-      console.log(this.formGroup.get('rardAssetType').value)
+      console.log(this.formGroup.controls['rardYearOfManufacture'].value)
+      // console.log(this.formGroup.get('rardAssetType').value)
 
 
       Object.keys(this.formGroup.controls).forEach(key => {
         if (this.formGroup.controls[key].value) {
-          this.queryURL += '"' + key + '":"' + this.formGroup.controls[key].value + '"'
+//if range is not empty and field is empty
+       if(this.formGroup.controls[key].value.lower!=undefined && this.formGroup.controls['rardYearOfManufacture'].value<1){
+        // "rardYearOfManufacture":"{between:[30,66]}"
+        this.queryURL += '"rardYearOfManufacture":"{between:['+this.formGroup.controls[key].value.lower+','+this.formGroup.controls[key].value.upper+']}"'
+          }
+          else if(key!=='rardYearOfManufactureRange'){
+            this.queryURL += '"' + key + '":"' + this.formGroup.controls[key].value + '"'
+          }
         }
       });
 
+      this.formGroup = this.fb.group(
+        {
+          'rardOwner': [''],
+          'rardDetailedVehicleType': [''],
+          'rardSerialNo': [''],
+          'rardAssetType': [''],
+          'rardYearOfManufacture': [''],
+          'rardYearOfManufactureRange': [''],
+          'rardDateUse': [''],
+          'rardVehicleManufacturerCode': [''],
+        }, { validator: this.meraValidator }
+      )
 
+      // this.formGroup.reset()
+/*       this.formGroup = this.fb.group(
+        {
+          'rardOwner': [''],
+          'rardDetailedVehicleType': [''],
+          'rardSerialNo': [''],
+          'rardAssetType': [''],
+          'rardYearOfManufacture': [''],
+          'rardDateUse': [''],
+          'rardVehicleManufacturerCode': [''],
+          'yearOfManufactureRange': ['']
+        }, { validator: this.meraValidator }
+      ) */
+
+/*       this.formGroup.setValue({
+        'rardOwner': [''],
+        'rardDetailedVehicleType': [''],
+        'rardSerialNo': [''],
+        'rardAssetType': [''],
+        'rardYearOfManufacture': [''],
+        'rardDateUse': [''],
+        'rardVehicleManufacturerCode': [''],
+        'yearOfManufactureRange': ['']
+      }) */
       /* if (this.formGroup.controls['rardAssetType'].value) {
         this.queryURL += '"rardAssetType":"' + this.formGroup.controls['rardAssetType'].value + '"'
       }
@@ -144,47 +190,101 @@ export class ViewAssetsPage implements OnInit {
       })
 
 
-      let responsePromise = this.http.get('http://172.16.22.64:3000/api/RollingAssetRfidData' + this.queryURL).toPromise()
+      let responsePromise = this.http.get('http://172.16.22.64:3000/api/v1/RollingAssetRfidData' + this.queryURL).toPromise()
 
-      let race=Promise.race([timeoutPromise,responsePromise])
-      race.then((res)=>{
-        if(res==='Connection Timed Out'){
-        console.log(res)
-        this.showSearchingOverlay=false
-        this.presentToast('Unable to Connect now.')
+      let race = Promise.race([timeoutPromise, responsePromise])
+      race.then((data) => {
+        if (data === 'Connection Timed Out') {
+          console.log(data)
+
+          this.presentToast('Unable to Connect now.')
         }
-        else{
+        else {
+          console.log('response has win the race')
+          this.data = data
+          console.log(this.data)
+          this.searchedItems = this.data
+          this.showResults = true
+          Object.keys(this.formGroup.controls).forEach(key => {
+            // this.formGroup.controls[key].setValue(null)
+          });
 
+          // this.formGroup.reset()
+          // this.filteredItemsAPI = this.itemsAPI
         }
-      })
+      },error=>{
+        console.log("Error: "+error)
+      }).finally(()=>{
+        this.showSearchingOverlay = false
+
+      }
+        )
 
 
 
-/*       this.http.get('http://172.16.22.64:3000/api/RollingAssetRfidData' + this.queryURL).subscribe(data => {
-        this.data = data
-        console.log(this.data)
-        this.searchedItems = this.data
-        this.showResults = true
-        Object.keys(this.formGroup.controls).forEach(key => {
-          // this.formGroup.controls[key].setValue(null)
-        });
-        this.formGroup.markAsPristine
-        this.formGroup.markAsUntouched
-        // this.formGroup.reset()
-        // this.filteredItemsAPI = this.itemsAPI
-      }, err => {
-        console.log('HTTP ERROR' + err)
-        //Present toast here 
-      }).add(() => { this.showSearchingOverlay = false }) */
+      /*       this.http.get('http://172.16.22.64:3000/api/v1/RollingAssetRfidData' + this.queryURL).subscribe(data => {
+              this.data = data
+              console.log(this.data)
+              this.searchedItems = this.data
+              this.showResults = true
+              Object.keys(this.formGroup.controls).forEach(key => {
+                // this.formGroup.controls[key].setValue(null)
+              });
+              this.formGroup.markAsPristine
+              this.formGroup.markAsUntouched
+              // this.formGroup.reset()
+              // this.filteredItemsAPI = this.itemsAPI
+            }, err => {
+              console.log('HTTP ERROR' + err)
+              //Present toast here 
+            }).add(() => { this.showSearchingOverlay = false }) */
 
       this.queryURL = '?filter={"where":{'
     }
   }
 
-  constructor(public http: HttpClient, public fb: FormBuilder, public toastController: ToastController) {
+  constructor(public http: HttpClient, public fb: FormBuilder, public toastController: ToastController, public alertController: AlertController) {
+
+
+
+
+
 
 
   }
+
+
+
+  async presentAlert() {
+    const alert = await this.alertController.create({
+      header: 'Sure to Download ?',
+      // message: 'Message <strong>text</strong>!!!',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            console.log('Confirm Cancel: blah ');
+          }
+        }, {
+          text: 'Okay',
+          handler: () => {
+            console.log('Confirm Okay ');
+          }
+        }, {
+          text: 'OK and Never Show Again',
+          handler: () => {
+            console.log('User Selected Never Show Again')
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+
 
   startFilter() {
     console.log(this.filterString)
@@ -278,9 +378,9 @@ export class ViewAssetsPage implements OnInit {
         'rardSerialNo': [''],
         'rardAssetType': [''],
         'rardYearOfManufacture': [''],
+        'rardYearOfManufactureRange': [''],
         'rardDateUse': [''],
         'rardVehicleManufacturerCode': [''],
-        'yearOfManufactureRange':['']
       }, { validator: this.meraValidator }
     )
     // this.formGroup.
