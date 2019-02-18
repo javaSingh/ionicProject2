@@ -4,7 +4,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 // npm i file-saver
 import { HttpClient } from '@angular/common/http';
-import { FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { ToastController } from '@ionic/angular';
 
 import { ViewEncapsulation } from '@angular/core';
@@ -90,6 +90,17 @@ export class ViewAssetsPage implements OnInit {
 
   }
 
+/*   rangeMoving(){
+    console.log('Range Moving')
+console.log(this.formGroup.controls['rardYearOfManufactureRange'].value.upper)
+if(this.formGroup.controls['rardYearOfManufactureRange'].value.upper===this.formGroup.controls['rardYearOfManufactureRange'].value.lower)
+{
+  console.log('Lower === Upper')
+  this.formGroup.controls['rardYearOfManufacture'].setValue(this.formGroup.controls['rardYearOfManufactureRange'].value.lower)
+}
+
+  } */
+
 
   onSubmit() {
     if (this.showResults) {
@@ -101,8 +112,6 @@ export class ViewAssetsPage implements OnInit {
       console.log(this.formGroup.value, this.formGroup.valid);
       console.log(this.formGroup.controls['rardYearOfManufacture'].value)
       // console.log(this.formGroup.get('rardAssetType').value)
-
-
       Object.keys(this.formGroup.controls).forEach(key => {
         if (this.formGroup.controls[key].value) {
 //if range is not empty and field is empty
@@ -271,11 +280,14 @@ export class ViewAssetsPage implements OnInit {
           text: 'Okay',
           handler: () => {
             console.log('Confirm Okay ');
+            this.makeExcel()
           }
         }, {
-          text: 'OK and Never Show Again',
+          text: 'Okay & Never Show Again',
           handler: () => {
             console.log('User Selected Never Show Again')
+            this.makeExcel()
+            this.showDownloadAlert=false
           }
         }
       ]
@@ -347,9 +359,16 @@ export class ViewAssetsPage implements OnInit {
           }
         }); */
 
+        
     for (const key in formGroup.controls) {
-      if (!(formGroup.controls[key].value.length < 1)) {
-        // console.log('returning false')
+      if (
+        !(formGroup.controls[key].value.length < 1)
+        && 
+        !(key==='rardYearOfManufactureRange' && formGroup.controls[key].value.upper===0
+        )
+      ) 
+      {
+        console.log('returning null. valid form')
         return null
       }
     }
@@ -363,7 +382,7 @@ export class ViewAssetsPage implements OnInit {
           formGroup.controls['rardVehicleManufacturerCode'].value.length < 1) {
           return { valid: false }
         } */
-    console.log('returning null as well')
+    console.log('returning false. form is not valid')
     return { valid: false }
   }
 

@@ -28,7 +28,7 @@
 <ion-select-option *ngFor='let assetType of uniqueAssetType' value="{{assetType}}">{{assetType}}</ion-select-option>
 </ion-select>
 </ion-item> -->
-    <ion-input clearInput type="text" formControlName="rardOwner" placeholder="Owner"></ion-input>
+    <ion-input clear-input='true' type="text" formControlName="rardOwner" placeholder="Owner"></ion-input>
     <ion-input clearInput type="text" formControlName="rardDetailedVehicleType" placeholder="Detailed Vehicle Type">
     </ion-input>
     <ion-input clearInput type="text" formControlName="rardSerialNo" placeholder="Serial No."></ion-input>
@@ -302,7 +302,7 @@
     <ion-button (click)='makeExcel()' [disabled]='searchedItems.length<1'>
       <ion-icon name="arrow-round-down"></ion-icon>
     </ion-button>
-    <ion-button type="submit" (click)='onSubmit(formGroup)' >
+    <ion-button type="submit" (click)='onSubmit(formGroup)' [disabled]='!formGroup.valid'>
       <ion-icon name="search"></ion-icon>
     </ion-button>
   </ion-toolbar>
