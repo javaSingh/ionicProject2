@@ -80,16 +80,15 @@ export class FormsPage implements OnInit {
       email: 'Patching Work'
     })
   }
-  x:FormGroup
+  x: FormGroup
 
   meraEmailArrayValidator(formGroup: FormGroup) {
     // console.log(formGroup.controls['emailArray'].controls)
     // console.log(formGroup.controls['emailArray'].controls[0])
-    for(const key in formGroup.controls['emailArray'].controls){
+    for (const key in formGroup.controls['emailArray'].controls) {
       // console.log(formGroup.controls['emailArray'].controls[key].controls['email'].value)
-      if(!(formGroup.controls['emailArray'].controls[key].controls['email'].value.length<1))
-      {
-        console.log('Atleast one Empty Field is not Empty. Email is Valid')
+      if (!(formGroup.controls['emailArray'].controls[key].controls['email'].value.length < 1)) {
+        console.log('Atleast one Email Field is not Empty. Email is Valid')
         return null
       }
     }

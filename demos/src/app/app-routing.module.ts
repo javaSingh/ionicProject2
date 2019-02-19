@@ -12,6 +12,7 @@ const routes: Routes = [
 },
   { path: 'forms', loadChildren: './forms/forms.module#FormsPageModule' },
   { path: 'view-assets', loadChildren: './view-assets/view-assets.module#ViewAssetsPageModule' },
+  { path: 'hero-token-sample-login-page', loadChildren: './hero-token-sample-login-page/hero-token-sample-login-page.module#HeroTokenSampleLoginPagePageModule' },
 ];
 
 @NgModule({

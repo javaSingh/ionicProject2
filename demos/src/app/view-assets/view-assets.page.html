@@ -95,22 +95,21 @@
     [limit]="10">
   </ngx-datatable>
 
-<!--   <ngx-datatable 
-  class="material striped" 
-  padding 
-  
+  <ngx-datatable 
+  class="material fullscreen striped" 
+   
   [rows]="items" 
   [scrollbarH]="true"
   [headerHeight]="50" 
   [footerHeight]="30" 
   [rowHeight]="'auto'" 
-   [columnMode]="'force'"
-  [limit]="3"> -->
-  <!-- <ngx-datatable-column name="assetType"> -->
-    <!-- <ng-template let-value="value" ngx-datatable-cell-template> -->
-    <!-- <strong>{{value}}</strong> -->
-    <!-- </ng-template> -->
-  <!-- </ngx-datatable-column>
+
+  [limit]="3">
+  <ngx-datatable-column name="assetType" >
+    <ng-template let-value="value" ngx-datatable-cell-template>
+    <strong>{{value}}</strong>
+    </ng-template>
+  </ngx-datatable-column>
   <ngx-datatable-column name="yearOfManufacture"><strong>{{value}}</strong></ngx-datatable-column>
   <ngx-datatable-column name="owner"><strong>{{value}}</strong></ngx-datatable-column>
   <ngx-datatable-column name="detailedVehicleType"><strong>{{value}}</strong></ngx-datatable-column>
@@ -166,7 +165,7 @@
         </datatable-pager>
     </ng-template> -->
     <!-- </ngx-datatable-footer> -->
-<!-- </ngx-datatable> -->
+</ngx-datatable>
 
 
   <!-- <ion-input clearInput expand='full' placeholder='Filter - Owner || Vehicle No.' [(ngModel)]='filterString' (ngModelChange)='startFilter()' ><ion-icon name="funnel"></ion-icon></ion-input> -->
