@@ -1,3 +1,22 @@
+<div id="custom-overlay" *ngIf='showPinForm'>
+  <div class="flb">
+
+    <ion-item lines='none'>
+      <ion-input clearType type='text' placeholder="Enter Your Pin" [(ngModel)]='userPin'></ion-input>
+      <span (click)='submitPin()'>
+        <ion-label>
+          Submit
+        </ion-label>
+      </span>
+    </ion-item>
+    <!-- <ion-item>
+        <ion-label>I Don't have the PIN</ion-label>
+      </ion-item> -->
+  </div>
+</div>
+
+
+
 <ion-header *ngIf='showLogin'>
   <ion-toolbar>
     <ion-title>Login</ion-title>
@@ -7,19 +26,19 @@
 <ion-content padding *ngIf='showLogin'>
   <ion-item>
     <ion-label>UserId:</ion-label>
-    <ion-input type='text'  [(ngModel)]='userLoginId'></ion-input>
+    <ion-input type='text' [(ngModel)]='userLoginId'></ion-input>
   </ion-item>
 
   <ion-item>
-      <ion-label>Password:</ion-label>
-      <ion-input type='password'  [(ngModel)]='password'></ion-input>
-    </ion-item>
-    <ion-item lines='none'>
-      <ion-label color='danger' *ngIf='showNoSuchUser && userLoginId==="" && password===""'>No Such User</ion-label>
-        <ion-button slot='end' (click)='login()' [disabled]='userLoginId==="" || password===""'>Login</ion-button>
-    </ion-item>
+    <ion-label>Password:</ion-label>
+    <ion-input type='password' [(ngModel)]='password'></ion-input>
+  </ion-item>
+  <ion-item lines='none'>
+    <ion-label color='danger' *ngIf='showNoSuchUser && userLoginId==="" && password===""'>No Such User</ion-label>
+    <ion-button slot='end' (click)='login()' [disabled]='userLoginId==="" || password===""'>Login</ion-button>
+  </ion-item>
 
-    
-  
+
+
 
 </ion-content>

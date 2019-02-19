@@ -13,14 +13,19 @@ import { NavController } from '@ionic/angular';
 
 export class HeroTokenSampleLoginPagePage implements OnInit {
 
-  userPin
+  userPin: string = ''
   accessToken
   refreshToken
   showLogin: boolean = false
   showNoSuchUser: boolean = false
+  showPinForm: boolean = false
   userLoginId: string = ""
   password: string = ""
 
+  submitPin() {
+    console.log('Submitting Pin')
+    console.log(this.userPin)
+  }
 
   validateAccessToken() {
     console.log('@Validate Access Token: ' + localStorage.getItem('accessToken'))
@@ -42,35 +47,41 @@ export class HeroTokenSampleLoginPagePage implements OnInit {
         //send to home page
         this.navCtrl.navigateForward('/home');
       }
-      else if (data === 'expiry') {
-        console.log('Condition Detected: Expiry')
-        this.refreshToken = localStorage.getItem('refreshToken')
-        if (this.refreshToken === '' || this.refreshToken === null) {
-          console.log('Condition Detected: refreshToken=""')
-          // stay here
-        }
-        else {
-          var pinValidationResponse
-          for (var i in [1, 2, 3]) {
-            pinValidationResponse = this.validatePin(i)
-            if (pinValidationResponse === 'Valid') {
-              console.log('Condition Detected: pin Valid')
-              // go to home
-            }
-          }
-          //stay here
-        }
-      }
+
       else {
         console.log(data)
       }
     }, error => {
       console.log(error)
-      if (error.error.code === 'unauthorized') {
+      if (error.error.code === 'jwt malformed') {
+        this.showLogin = true
         console.log('Clear tokens and keep on login page')
         localStorage.setItem('accessToken', '')
         localStorage.setItem('refreshToken', '')
-        this.showLogin = true
+      }
+      else if (error.error.code === 'jwt expired') {
+        console.log('Condition Detected: Expiry')
+        this.refreshToken = localStorage.getItem('refreshToken')
+        if (this.refreshToken === '' || this.refreshToken === null) {
+          console.log('Condition Detected: refreshToken=""')
+          this.showLogin = true
+        }
+        else {
+          var pinValidationResponse
+          // for (var i in [1, 2, 3]) {
+          pinValidationResponse = this.validatePin(1)
+          pinValidationResponse.subscribe((data) => {
+            console.log(data.accessToken)
+            localStorage.setItem('accessToken', data.accessToken)
+            this.validateAccessToken()
+          }, error => {
+            console.log(error)
+          })
+
+          // }
+          //stay here
+        }
+
       }
     }
     )
@@ -78,8 +89,10 @@ export class HeroTokenSampleLoginPagePage implements OnInit {
 
   }
   validatePin(retryCount) {
-
-    return "Pin Validation Status"
+    let headers = new HttpHeaders();
+    headers = headers.set('x-ref-token', localStorage.getItem('refreshToken'))
+    let options = { headers: headers };
+    return this.httpClient.post('http://172.16.22.155:3000/api/newaccessToken', null, options)
   }
 
   /* {message: "Login successfully", user: "EAM47E", accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkVBT…PTiJ9.obl44D8Rf8xBWF_ns81wLpQq4r5D2Uwi5TuRpecPd28", refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkVBT…PTiJ9.6zBBRHJhA-Sdi-oY4XrAJhCRpNM3hV-dEj4mOBIbwcM"}
