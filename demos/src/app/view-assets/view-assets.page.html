@@ -12,6 +12,15 @@
 
 
   <form novalidate [formGroup]="formGroup" *ngIf='!showResults'>
+      <span (click)='hideAtLeastOneMsg()'>
+          <ion-item lines='none' *ngIf='formGroup.touched && !formGroup.valid && !userHasCancelled &&!(formGroup.controls["rardDateUseRangeEnd"].value!=="" && formGroup.controls["rardDateUseRangeStart"].value==="" )'>
+            <ion-label color="danger">
+              Input for at least one field is required
+            </ion-label>
+            <ion-icon name='close'></ion-icon>
+          </ion-item>
+        </span>
+
     <div id="custom-overlay" [style.display]="showSearchingOverlay ? 'flex': 'none'">
       <div class="flb">
         <div class="lds-ellipsis">
@@ -28,10 +37,11 @@
 <ion-select-option *ngFor='let assetType of uniqueAssetType' value="{{assetType}}">{{assetType}}</ion-select-option>
 </ion-select>
 </ion-item> -->
+<ion-input clearInput type="text" formControlName="rardSerialNo" placeholder="Serial No."></ion-input>
     <ion-input clear-input='true' type="text" formControlName="rardOwner" placeholder="Owner"></ion-input>
     <ion-input clearInput type="text" formControlName="rardDetailedVehicleType" placeholder="Detailed Vehicle Type">
     </ion-input>
-    <ion-input clearInput type="text" formControlName="rardSerialNo" placeholder="Serial No."></ion-input>
+
     <ion-input clearInput type="text" formControlName="rardAssetType" placeholder="Asset Type"></ion-input>
     <ion-input clearInput type="text" formControlName="rardYearOfManufacture" placeholder="Year of Manufacture | YY ">
     </ion-input>
@@ -40,7 +50,8 @@
           <ion-range color="danger" pin="true"></ion-range>
         </ion-item> -->
       
-        <ion-item lines="none">
+        <ion-item lines='none'>
+          <ion-label>Range</ion-label>
         <ion-range [disabled]='formGroup.controls["rardYearOfManufacture"].value.length>0' formControlName='rardYearOfManufactureRange' dualKnobs="true" pin='true' min="00" max="99" color="primary">
             <ion-label slot="start">00</ion-label>
             <ion-label slot="end">99</ion-label>
@@ -67,17 +78,28 @@
 <ion-button fill='clear'>Range</ion-button>
 </ion-item> -->
 
-    <ion-input clearInput type="text" formControlName="rardDateUse" placeholder="Date put into Use"></ion-input>
+    <!-- <ion-input clearInput type="text" formControlName="rardDateUse" placeholder="Date put into Use || YYYY-MM-DD"></ion-input> -->
+    <!-- <ion-item> -->
+      <!-- <ion-label>Date</ion-label> -->
+      <ion-datetime placeholder="Date put into Use" display-format="DD MMM YYYY" picker-format="DD MMM YYYY" formControlName="rardDateUse" [pickerOptions]="customOptions"></ion-datetime>
+    <!-- </ion-item> -->
+    <span>
+        <ion-item lines='none' *ngIf='formGroup.touched && (formGroup.controls["rardDateUseRangeEnd"].value!=="" && formGroup.controls["rardDateUseRangeStart"].value==="" )'>
+          <ion-label color="danger">
+            Start Date Required with End Date.
+          </ion-label>
+          <ion-icon name='close'></ion-icon>
+        </ion-item>
+      </span>
+    <ion-item lines='none' [disabled]='formGroup.controls["rardDateUse"].value!==""'>
+      
+      <ion-label>Range</ion-label>
+      <ion-datetime placeholder='Start Date' formControlName="rardDateUseRangeStart"></ion-datetime>
+      <ion-datetime placeholder='End Date' formControlName="rardDateUseRangeEnd"></ion-datetime>
+    </ion-item>
     <ion-input clearInput type="text" formControlName="rardVehicleManufacturerCode"
       placeholder="Vehicle Manufactire's Code/Vendor Code"></ion-input>
-      <span (click)='hideAtLeastOneMsg()'>
-          <ion-item lines='none' *ngIf='formGroup.touched && !formGroup.valid && !userHasCancelled '>
-            <ion-label color="danger">
-              Input for at least one field is required
-            </ion-label>
-            <ion-icon name='close'></ion-icon>
-          </ion-item>
-        </span>
+
         <ion-row style="height: 30px"></ion-row>
   </form>
 
@@ -95,7 +117,7 @@
     [limit]="10">
   </ngx-datatable>
 
-  <ngx-datatable 
+  <ngx-datatable *ngIf='false'
   class="material fullscreen striped" 
    
   [rows]="items" 

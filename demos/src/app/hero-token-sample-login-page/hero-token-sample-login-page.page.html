@@ -1,4 +1,4 @@
-<div id="custom-overlay" *ngIf='showPinForm'>
+<div id="custom-overlay" *ngIf='true'>
   <div class="flb">
 
     <ion-item lines='none'>
@@ -17,28 +17,30 @@
 
 
 
-<ion-header *ngIf='showLogin'>
+<ion-header *ngIf='showLogin '>
   <ion-toolbar>
     <ion-title>Login</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding *ngIf='showLogin'>
-  <ion-item>
-    <ion-label>UserId:</ion-label>
-    <ion-input type='text' [(ngModel)]='userLoginId'></ion-input>
+<ion-content padding>
+  <div *ngIf='showLogin && !loggingInProcess'>
+    <ion-item>
+      <ion-label>UserId:</ion-label>
+      <ion-input type='text' [(ngModel)]='userLoginId'></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Password:</ion-label>
+      <ion-input type='password' [(ngModel)]='password'></ion-input>
+    </ion-item>
+    <ion-item lines='none'>
+      <ion-label color='danger' *ngIf='showNoSuchUser && userLoginId==="" && password===""'>No Such User</ion-label>
+      <ion-button slot='end' (click)='login()' [disabled]='(userLoginId==="" || password==="")'>Login</ion-button>
+    </ion-item>
+  </div>
+
+  <ion-item *ngIf='loggingInProcess' lines='none'>
+    <ion-label>Loading.....</ion-label>
   </ion-item>
-
-  <ion-item>
-    <ion-label>Password:</ion-label>
-    <ion-input type='password' [(ngModel)]='password'></ion-input>
-  </ion-item>
-  <ion-item lines='none'>
-    <ion-label color='danger' *ngIf='showNoSuchUser && userLoginId==="" && password===""'>No Such User</ion-label>
-    <ion-button slot='end' (click)='login()' [disabled]='userLoginId==="" || password===""'>Login</ion-button>
-  </ion-item>
-
-
-
 
 </ion-content>
