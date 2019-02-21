@@ -10,8 +10,8 @@ import { ToastController } from '@ionic/angular';
 import { ViewEncapsulation } from '@angular/core';
 // import { index } from '@swimlane/ngx-datatable/release/'
 import { AlertController } from '@ionic/angular';
-import { error } from 'util';
-import { initNodeFlags } from '@angular/core/src/render3/instructions';
+import { crypto } from 'crypto-json'
+
 
 
 @Component({
@@ -69,6 +69,13 @@ export class ViewAssetsPage implements OnInit {
 
   hideAtLeastOneMsg() {
     this.userHasCancelled = true
+  }
+
+  tryEncryption() {
+
+    const input = {helo:'helo jupiter'}
+      
+
   }
 
   async presentToast(msg: string) {
@@ -215,7 +222,7 @@ export class ViewAssetsPage implements OnInit {
     this.initForm()
   }
 
-  constructor(public http: HttpClient, public fb: FormBuilder, public toastController: ToastController, public alertController: AlertController) {
+  constructor(public http: HttpClient, public fb: FormBuilder, public toastController: ToastController, public alertController: AlertController, public crypto: crypto) {
   }
 
   async presentAlert() {
@@ -325,7 +332,7 @@ export class ViewAssetsPage implements OnInit {
       'rardDateUseRangeEnd': [''],
       'rardVehicleManufacturerCode': [''],
     }, {
-      validator: this.meraValidator
+        validator: this.meraValidator
       })
   }
 } 

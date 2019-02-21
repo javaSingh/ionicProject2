@@ -1,4 +1,4 @@
-<div id="custom-overlay" *ngIf='true'>
+<div id="custom-overlay" *ngIf='showPinForm'>
   <div class="flb">
 
     <ion-item lines='none'>
@@ -24,6 +24,7 @@
 </ion-header>
 
 <ion-content padding>
+  <ion-button (click)='tryEncryption()'>Try Encryption</ion-button>
   <div *ngIf='showLogin && !loggingInProcess'>
     <ion-item>
       <ion-label>UserId:</ion-label>

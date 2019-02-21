@@ -27,30 +27,59 @@ export class HeroTokenSampleLoginPagePage implements OnInit {
   HOST: string = 'http://172.16.22.155'
   PORT: string = '3000'
 
+  invalidPinCounter: number = 0
+
   /*   HOST: string = 'http://10.64.29.89'
     PORT: string = '3002' */
 
   submitPin() {
-    console.log('Submitting Pin')
-    console.log(this.userPin)
-    // for (var i in [1, 2, 3]) {
-    if (this.userPin !== '') {
-      console.log('condition true inside if')
-      this.validatePin(1).subscribe((data) => {
-        console.log('inside subscription')
-        console.log(data)
-        console.log(data.accessToken)
-        localStorage.setItem('accessToken', data.accessToken)
-        this.validateAccessToken()
-      }, error => {
-        console.log('Error:')
-        console.log(error)
-        console.log(error.error.error.message)
-        if (error.error.error.message === 'jwt malformed')
-          console.log('Refresh Token is corrupted')
-      })
+
+    if (true) {
+      console.log('Submitting Pin')
+      console.log(this.userPin)
+      // for (var i in [1, 2, 3]) {
+      if (this.userPin !== '') {
+        // console.log('condition true inside if')
+        this.validatePin(1).subscribe((data) => {
+          // console.log('Inside Validate Pin Subscription')
+          console.log('Validate Pin Data: ')
+          console.log(data)
+          // console.log(data.accessToken)
+          // localStorage.setItem('accessToken', data.accessToken)
+          // this.validateAccessToken()
+
+          //Invalid pin
+        }, error => {
+          console.log('Validate Pin Error:')
+          console.log(error)
+          console.log(error.error.error.message)
+          if (error.error.error.message === 'jwt malformed') {
+            console.log('Refresh Token is corrupted. Clearing Both')
+            localStorage.setItem('accessToken', '')
+            localStorage.setItem('refreshToken', '')
+            this.showPinForm = false
+            this.showLogin = true
+          }
+          else if (error.error.error.message === 'Invalid pin') {
+            this.invalidPinCounter++
+            this.userPin=''
+            if (this.invalidPinCounter < 3) {
+              this.presentToast('Invalid Pin. Remaining Attempts: ' + (3 - this.invalidPinCounter))
+            }
+            else {
+              this.presentToast('Invalid Pin. No attempts left')
+              console.log('Attempts Over. Clearing')
+              localStorage.setItem('accessToken', '')
+              localStorage.setItem('refreshToken', '')
+              this.invalidPinCounter = 0
+              this.showPinForm = false
+              this.showLogin = true
+            }
+          }
+        })
+      }
     }
-    // }
+
   }
 
   validateAccessToken() {
@@ -76,7 +105,8 @@ export class HeroTokenSampleLoginPagePage implements OnInit {
         this.presentToast("Unable to connect now.")
       }
     }, error => {
-      console.log('Error: ' + error)
+      console.log('Error: ')
+      console.log(error)
     }).finally(() => {
       console.log('Finally')
     })
@@ -105,7 +135,7 @@ export class HeroTokenSampleLoginPagePage implements OnInit {
         localStorage.setItem('refreshToken', '')
       }
       else if (error.error.code === 'jwt expired') {
-        console.log('Condition Detected: Expiry')
+        console.log('Condition Detected: Expiry of Access Token')
         this.refreshToken = localStorage.getItem('refreshToken')
         if (this.refreshToken === '' || this.refreshToken === null) {
           console.log('Condition Detected: refreshToken=""')
@@ -120,9 +150,9 @@ export class HeroTokenSampleLoginPagePage implements OnInit {
   validatePin(retryCount) {
     console.log('Inside Validate Pin')
     let headers = new HttpHeaders();
-    headers = headers.set('x-ref-token', '12121')
+    headers = headers.set('x-ref-token', localStorage.getItem('refreshToken'))
     let options = { headers: headers };
-    console.log('before return. URL To Post: ' + this.HOST + ':' + this.PORT + '/api/newaccessToken')
+    // console.log('before return. URL To Post: ' + this.HOST + ':' + this.PORT + '/api/newaccessToken')
     return this.httpClient.post(this.HOST + ':' + this.PORT + '/api/newaccessToken',
       null, options)
   }
