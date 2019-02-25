@@ -12,6 +12,7 @@ import { AppRoutingModule } from './app-routing.module';
 import {ModalPagePage} from './modal-page/modal-page.page'
 
 import { HttpClientModule } from '@angular/common/http'
+import { HeroGuardServiceService } from './hero-guard-service.service';
 
 
 
@@ -20,10 +21,16 @@ import { HttpClientModule } from '@angular/common/http'
   entryComponents: [ModalPagePage],
   imports: [HttpClientModule, BrowserModule, IonicModule.forRoot(), AppRoutingModule],
   providers: [
+    HeroGuardServiceService,
     StatusBar,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]
 })
+
+
+
 export class AppModule {}
+
+

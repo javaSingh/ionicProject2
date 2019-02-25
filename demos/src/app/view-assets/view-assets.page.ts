@@ -10,7 +10,6 @@ import { ToastController } from '@ionic/angular';
 import { ViewEncapsulation } from '@angular/core';
 // import { index } from '@swimlane/ngx-datatable/release/'
 import { AlertController } from '@ionic/angular';
-import { crypto } from 'crypto-json'
 
 
 
@@ -34,8 +33,20 @@ export class ViewAssetsPage implements OnInit {
     { assetType: 'Fan', yearOfManufacture: '1990', owner: 'Dec', detailedVehicleType: 'Usha', serialNumber: '1212', datePutIntoUse: '22 Augh 2003', vendorCode: 'Vdn323' },
     { assetType: 'Seat', yearOfManufacture: '1990', owner: 'Dmv', detailedVehicleType: 'Bucket', serialNumber: '1012', datePutIntoUse: '11 Jan 1990', vendorCode: 'Vdn523' }
   ]
+  //
 
   columns = [
+    { prop: 'owner', name: 'Owner' },
+    // missing is latest API
+    // { prop: 'rardDetailedVehicleType', name: 'Vehicle Type' },
+    { prop: 'serialNo', name: 'Vehicle No.' },
+    { prop: 'assetType', name: 'Asset Type' },
+    { prop: 'yearOfManufacture', name: 'Year of Manufacture' },
+    { prop: 'dateUse', name: 'Date put into Use' },
+    { prop: 'gs1CompanyCode', name: 'Vendor Code' },
+  ]
+
+/*   bkp_columns = [
     { prop: 'rardOwner', name: 'Owner' },
     { prop: 'rardDetailedVehicleType', name: 'Vehicle Type' },
     { prop: 'rardSerialNo', name: 'Vehicle No.' },
@@ -43,9 +54,9 @@ export class ViewAssetsPage implements OnInit {
     { prop: 'rardYearOfManufacture', name: 'Year of Manufacture' },
     { prop: 'rardDateUse', name: 'Date put into Use' },
     { prop: 'rardVehicleManufacturerCode', name: 'Vendor Code' },
-  ]
+  ] */
 
-  //filtering Vars
+  //filtering Vars 
   itemsAPI
   searchedItems = []
   filteredItemsAPI
@@ -57,7 +68,9 @@ export class ViewAssetsPage implements OnInit {
   uniqueAssetType = ['Fan', 'Tyre', 'Lock', 'Overhead']
   uniqueVendorCode = ['TCS', 'TM', 'Wipro', 'CRIS', 'Dell']
   uniqueYearOfManufacure = ['2001', '2002', '2018', '2019', '2020']
-  controlStrings = ['rardOwner', 'rardDetailedVehicleType', 'rardSerialNo', 'rardAssetType', 'rardYearOfManufacture', 'rardDateUse', 'rardVehicleManufacturerCode']
+  controlStrings = ['owner', 
+  // 'rardDetailedVehicleType', 
+  'serialNo', 'assetType', 'yearOfManufacture', 'dateUse', 'gs1CompanyCode']
   queryURL: string = '?filter={"where":{'
   queryURL2: string = ''
 
@@ -74,7 +87,6 @@ export class ViewAssetsPage implements OnInit {
   tryEncryption() {
 
     const input = {helo:'helo jupiter'}
-      
 
   }
 
@@ -95,7 +107,7 @@ export class ViewAssetsPage implements OnInit {
       handler: ((data) => {
         console.log('Clicked Save! Data is: ')
         console.log(data)
-        this.formGroup.controls['rardDateUse'].setValue(data)
+        this.formGroup.controls['dateUse'].setValue(data)
       })
     }, {
       text: 'Cancel',
@@ -105,7 +117,7 @@ export class ViewAssetsPage implements OnInit {
       }
     }, {
       text: 'Clear',
-      handler: () => this.formGroup.controls['rardDateUse'].setValue('')
+      handler: () => this.formGroup.controls['dateUse'].setValue('')
     }]
   }
 
@@ -117,7 +129,7 @@ export class ViewAssetsPage implements OnInit {
     } else {
       this.showSearchingOverlay = true
       console.log(this.formGroup.value, this.formGroup.valid);
-      console.log(this.formGroup.controls['rardYearOfManufacture'].value)
+      console.log(this.formGroup.controls['yearOfManufacture'].value)
 
       //Use of Filters. Default API.
       //Between is not working here
@@ -147,26 +159,26 @@ export class ViewAssetsPage implements OnInit {
       Object.keys(this.formGroup.controls).forEach(key => {
         if (this.formGroup.controls[key].value) {
           if (this.formGroup.controls[key].value.lower != undefined) {
-            if (this.formGroup.controls['rardYearOfManufacture'].value < 1) {
-              this.queryURL2 += 'rardYearOfManufactureStartDate=' + this.formGroup.controls[key].value.lower + '&rardYearOfManufactureEndDate=' + this.formGroup.controls[key].value.upper + '&'
+            if (this.formGroup.controls['yearOfManufacture'].value < 1) {
+              this.queryURL2 += 'yearOfManufactureStartDate=' + this.formGroup.controls[key].value.lower + '&yearOfManufactureEndDate=' + this.formGroup.controls[key].value.upper + '&'
             }
           }
-          else if (key === 'rardYearOfManufacture') {
-            this.queryURL2 += 'rardYearOfManufactureStartDate=' + this.formGroup.controls[key].value + '&rardYearOfManufactureEndDate=' + this.formGroup.controls[key].value + '&'
+          else if (key === 'yearOfManufacture') {
+            this.queryURL2 += 'yearOfManufactureStartDate=' + this.formGroup.controls[key].value + '&yearOfManufactureEndDate=' + this.formGroup.controls[key].value + '&'
           }
-          else if (key === 'rardDateUse') {
+          else if (key === 'dateUse') {
             var day = this.formGroup.controls[key].value.day.value
             var month = this.formGroup.controls[key].value.month.value
             var year = this.formGroup.controls[key].value.year.value
-            this.queryURL2 += 'rardDateUseStartDate=' + year + '-' + month + '-' + day + '&rardDateUseEndDate=' + year + '-' + month + '-' + day + '&'
+            this.queryURL2 += 'dateUseStartDate=' + year + '-' + month + '-' + day + '&dateUseEndDate=' + year + '-' + month + '-' + day + '&'
           }
-          else if (key === 'rardDateUseRangeStart') {
-            if (this.formGroup.controls['rardDateUse'].value === '') {
+          else if (key === 'dateUseRangeStart') {
+            if (this.formGroup.controls['dateUse'].value === '') {
               startDate = this.formGroup.controls[key].value
             }
           }
-          else if (key === 'rardDateUseRangeEnd') {
-            if (this.formGroup.controls['rardDateUse'].value === '') {
+          else if (key === 'dateUseRangeEnd') {
+            if (this.formGroup.controls['dateUse'].value === '') {
               endDate = this.formGroup.controls[key].value
             }
           }
@@ -177,7 +189,7 @@ export class ViewAssetsPage implements OnInit {
       });
 
       if (startDate) {
-        this.queryURL2 += 'rardDateUseStartDate=' + startDate + '&rardDateUseEndDate=' + endDate + '&'
+        this.queryURL2 += 'dateUseStartDate=' + startDate + '&dateUseEndDate=' + endDate + '&'
       }
 
       this.queryURL += '}}'
@@ -191,7 +203,10 @@ export class ViewAssetsPage implements OnInit {
           resolve('Connection Timed Out');
         }, 3000)
       })
-      let responsePromise = this.http.get('http://http://172.16.22.64:3000/api/v1/RollingAssetRfidData/rfidData?' + this.queryURL2).toPromise()
+      
+      // let responsePromise = this.http.get('http://http://172.16.22.64:3000/api/v1/RollingAssetRfidData/rfidData?' + this.queryURL2).toPromise()
+      let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/EPC/search?'+ this.queryURL2).toPromise()
+
       let race = Promise.race([timeoutPromise, responsePromise])
       race.then((data) => {
         if (data === 'Connection Timed Out') {
@@ -222,7 +237,7 @@ export class ViewAssetsPage implements OnInit {
     this.initForm()
   }
 
-  constructor(public http: HttpClient, public fb: FormBuilder, public toastController: ToastController, public alertController: AlertController, public crypto: crypto) {
+  constructor(public http: HttpClient, public fb: FormBuilder, public toastController: ToastController, public alertController: AlertController) {
   }
 
   async presentAlert() {
@@ -260,10 +275,11 @@ export class ViewAssetsPage implements OnInit {
   startFilter() {
     console.log(this.filterString)
     const filteredItemsAPI = this.itemsAPI.filter((item) => {
-      return item.rardOwner.toLowerCase().indexOf(this.filterString.toLowerCase()) > -1 || item.rardSerialNo.toLowerCase().indexOf(this.filterString.toLowerCase()) > -1;
+      return item.owner.toLowerCase().indexOf(this.filterString.toLowerCase()) > -1 || item.serialNo.toLowerCase().indexOf(this.filterString.toLowerCase()) > -1;
     });
     this.filteredItemsAPI = filteredItemsAPI
   }
+  ////
 
   makeExcel() {
     console.log('Download Start' + new Date())
@@ -299,12 +315,12 @@ export class ViewAssetsPage implements OnInit {
         !(formGroup.controls[key].value.length < 1)
         &&
         //if range is undef or upper value is 0 then invalid
-        !(key === 'rardYearOfManufactureRange' && (formGroup.controls[key].value.upper === 0 || formGroup.controls[key].value.upper === undefined)
+        !(key === 'yearOfManufactureRange' && (formGroup.controls[key].value.upper === 0 || formGroup.controls[key].value.upper === undefined)
         )
 
         //if End Date Use is not empty the the Start Date Use should not be empty
         &&
-        !(key === 'rardDateUseRangeEnd' && formGroup.controls[key].value !== '' && formGroup.controls['rardDateUseRangeStart'].value === '')
+        !(key === 'dateUseRangeEnd' && formGroup.controls[key].value !== '' && formGroup.controls['dateUseRangeStart'].value === '')
       ) {
         console.log("returning null. valid form")
         return null
@@ -320,7 +336,7 @@ export class ViewAssetsPage implements OnInit {
   }
 
   initForm() {
-    this.formGroup = this.fb.group({
+/*     this.formGroup = this.fb.group({
       'rardOwner': [''],
       'rardDetailedVehicleType': [''],
       'rardSerialNo': [''],
@@ -333,6 +349,26 @@ export class ViewAssetsPage implements OnInit {
       'rardVehicleManufacturerCode': [''],
     }, {
         validator: this.meraValidator
-      })
+      }) */
+
+
+
+
+
+      this.formGroup = this.fb.group({
+        'owner': [''],
+        // 'rardDetailedVehicleType': [''],
+        'serialNo': [''],
+        'assetType': [''],
+        'yearOfManufacture': [''],
+        'yearOfManufactureRange': [''],
+        'dateUse': [''],
+        'dateUseRangeStart': [''],
+        'dateUseRangeEnd': [''],
+        'gs1CompanyCode': [''],
+      }, {
+          validator: this.meraValidator
+        })
+
   }
 } 

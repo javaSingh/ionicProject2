@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Guarded Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+    <ion-item>
+        <ion-label>UserId:</ion-label>
+        <ion-input type='text' [(ngModel)]='userLoginId'></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>Password:</ion-label>
+        <ion-input type='password' [(ngModel)]='password'></ion-input>
+      </ion-item>
+      <ion-item lines='none'>
+        <ion-label color='danger' *ngIf='showNoSuchUser && userLoginId==="" && password===""'>No Such User</ion-label>
+        <ion-button slot='end' (click)='login()' [disabled]='(userLoginId==="" || password==="")'>Login</ion-button>
+      </ion-item>
+
+</ion-content>
