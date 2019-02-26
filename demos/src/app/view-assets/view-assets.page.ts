@@ -5,13 +5,15 @@ import { saveAs } from 'file-saver';
 // npm i file-saver
 import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { ToastController } from '@ionic/angular';
+import { ToastController,Platform } from '@ionic/angular';
 
 import { ViewEncapsulation } from '@angular/core';
 // import { index } from '@swimlane/ngx-datatable/release/'
 import { AlertController } from '@ionic/angular';
 
 
+import { NGXLogger } from 'ngx-logger';
+// npm install --save ngx-logger
 
 @Component({
   selector: 'app-view-assets',
@@ -80,6 +82,7 @@ export class ViewAssetsPage implements OnInit {
   enableRange: boolean = false
   showDownloadAlert: boolean = true
 
+
   hideAtLeastOneMsg() {
     this.userHasCancelled = true
   }
@@ -119,6 +122,30 @@ export class ViewAssetsPage implements OnInit {
       text: 'Clear',
       handler: () => this.formGroup.controls['dateUse'].setValue('')
     }]
+  }
+
+  meraLogger(queryURL:string){
+    console.log('Logging starts here')
+    console.log('Timestamp:' +new Date())
+    console.log('Platform: '+this.platform.platforms())
+    console.log('QueryURL: '+queryURL)
+    console.log('IP: ')
+    // console.log('MAC: ')
+    // cannot extract MAC Address
+    console.log('Network Speed')
+    console.log('Network Type: (Wifi/Lan/Mobile:')
+    console.log('Location: (coordinates')
+    
+    // this.logger.info('ngx logger')
+
+/*     this.networkInterface.getWiFiIPAddress().then((address=>{
+      console.log(address)
+    }))
+ */
+    
+    
+
+
   }
 
   onSubmit() {
@@ -206,6 +233,7 @@ export class ViewAssetsPage implements OnInit {
       
       // let responsePromise = this.http.get('http://http://172.16.22.64:3000/api/v1/RollingAssetRfidData/rfidData?' + this.queryURL2).toPromise()
       let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/EPC/search?'+ this.queryURL2).toPromise()
+      this.meraLogger(this.queryURL2)
 
       let race = Promise.race([timeoutPromise, responsePromise])
       race.then((data) => {
@@ -237,7 +265,15 @@ export class ViewAssetsPage implements OnInit {
     this.initForm()
   }
 
-  constructor(public http: HttpClient, public fb: FormBuilder, public toastController: ToastController, public alertController: AlertController) {
+  constructor(
+    public http: HttpClient, 
+    public fb: FormBuilder, 
+    public toastController: ToastController, 
+    public alertController: AlertController,
+    public platform:Platform,
+    private logger: NGXLogger,
+    // private networkInterface: NetworkInterface,
+    ) {
   }
 
   async presentAlert() {
@@ -321,6 +357,9 @@ export class ViewAssetsPage implements OnInit {
         //if End Date Use is not empty the the Start Date Use should not be empty
         &&
         !(key === 'dateUseRangeEnd' && formGroup.controls[key].value !== '' && formGroup.controls['dateUseRangeStart'].value === '')
+        //if owner is not null and min length 2 maxlength 4 then valid
+        &&
+        !(key==='owner' && (formGroup.controls[key].value.length>4 || formGroup.controls[key].value.length<2))
       ) {
         console.log("returning null. valid form")
         return null

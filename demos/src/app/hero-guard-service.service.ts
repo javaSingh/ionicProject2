@@ -26,7 +26,7 @@ export class HeroGuardServiceService implements CanActivate, CanLoad{
     console.log(state)
     console.log('This is state url: ')
     console.log(state.url)
-
+    
 /*     let authInfo = {
         authenticated: false
     };

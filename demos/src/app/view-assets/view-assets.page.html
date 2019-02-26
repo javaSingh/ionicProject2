@@ -11,7 +11,7 @@
 
     <span (click)='hideAtLeastOneMsg()'>
         <ion-item lines='none'
-          *ngIf='formGroup.touched && !formGroup.valid && !userHasCancelled &&!(formGroup.controls["rardDateUseRangeEnd"].value!=="" && formGroup.controls["rardDateUseRangeStart"].value==="" )'>
+          *ngIf='formGroup.touched && !formGroup.valid && !userHasCancelled &&!(formGroup.controls["dateUseRangeEnd"].value!=="" && formGroup.controls["dateUseRangeStart"].value==="" )'>
           <!-- this should not show when date range error is there -->
           <ion-label color="danger">
             Input for at least one field is required.

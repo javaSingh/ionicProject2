@@ -9,6 +9,10 @@ import { ViewAssetsPage } from './view-assets.page';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { ReactiveFormsModule } from '@angular/forms';
 
+import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
+
+// import { NetworkInterface } from '@ionic-native/network-interface';
+
 const routes: Routes = [
   {
     path: '',
@@ -18,6 +22,12 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
+    // NetworkInterface,
+    LoggerModule.forRoot({
+      // serverLoggingUrl: '/api/logs', 
+      level: NgxLoggerLevel.DEBUG, 
+      // serverLogLevel: NgxLoggerLevel.ERROR
+    }),
     ReactiveFormsModule,
     NgxDatatableModule,
     CommonModule,

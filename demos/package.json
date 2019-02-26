@@ -38,6 +38,7 @@
     "file-saver": "^2.0.0",
     "lodash": "^4.17.11",
     "ngx-datatable": "^1.0.3",
+    "ngx-logger": "^3.3.11",
     "rxjs": "~6.3.3",
     "xlsx": "^0.14.1",
     "zone.js": "~0.8.29"
