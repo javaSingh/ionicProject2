@@ -14,12 +14,15 @@ import {ModalPagePage} from './modal-page/modal-page.page'
 import { HttpClientModule } from '@angular/common/http'
 import { HeroGuardServiceService } from './hero-guard-service.service';
 
+import { IonicStorageModule } from '@ionic/storage';
+// npm install @ionic/storage --save
+
 
 
 @NgModule({
   declarations: [AppComponent,ModalPagePage],
   entryComponents: [ModalPagePage],
-  imports: [HttpClientModule, BrowserModule, IonicModule.forRoot(), AppRoutingModule],
+  imports: [ IonicStorageModule.forRoot(), HttpClientModule, BrowserModule, IonicModule.forRoot(), AppRoutingModule],
   providers: [
     HeroGuardServiceService,
     StatusBar,

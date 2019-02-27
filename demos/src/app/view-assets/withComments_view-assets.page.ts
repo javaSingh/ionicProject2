@@ -152,7 +152,7 @@ export class ViewAssetsPage implements OnInit {
               }
             }); */
 
-      // http://172.16.22.64:3000/api/v1/RollingAssetRfidData/rfidData?rardOwner=ECR&rardDetailedVehicleType=BRN22.9&rardAssetType=F&rardSerialNo=001153&rardYearOfManufactureStartDate=16&rardYearOfManufactureEndDate=19&rardDateUseStartDate=2017-07-18&rardDateUseEndDate=2017-09-18
+      // http://172.16.22.64:3000/api/v1/RollingAssetRfidData/rfidData?rardOwner=ECR&rardDetailedVehicleType=BRN22.9&rardAssetType=F&rardSerialNo=001153&rardyearOfManufactureStart=16&rardyearOfManufactureEnd=19&rarddateUseStart=2017-07-18&rarddateUseEnd=2017-09-18
       var startDate
       //end date will be current date in case the user decides to ignore the end date
       var endDate=new Date().toISOString().slice(0,10);
@@ -160,18 +160,18 @@ export class ViewAssetsPage implements OnInit {
         /* if (this.formGroup.controls[key].value!=='') {
           //if range is not empty and field is empty
           if (this.formGroup.controls[key].value.lower != undefined && this.formGroup.controls['rardYearOfManufacture'].value < 1) {
-            this.queryURL2 += 'rardYearOfManufactureStartDate=' + this.formGroup.controls[key].value.lower + '&rardYearOfManufactureEndDate=' + this.formGroup.controls[key].value.upper + '&'
+            this.queryURL2 += 'rardyearOfManufactureStart=' + this.formGroup.controls[key].value.lower + '&rardyearOfManufactureEnd=' + this.formGroup.controls[key].value.upper + '&'
             // "rardYearOfManufacture":"{between:[30,66]}"
             // this.queryURL += '"rardYearOfManufacture":"{between:[' + this.formGroup.controls[key].value.lower + ',' + this.formGroup.controls[key].value.upper + ']}"'
           }
           else if (key === 'rardYearOfManufacture') {
-            this.queryURL2 += 'rardYearOfManufactureStartDate=' + this.formGroup.controls[key].value + '&rardYearOfManufactureEndDate=' + this.formGroup.controls[key].value + '&'
+            this.queryURL2 += 'rardyearOfManufactureStart=' + this.formGroup.controls[key].value + '&rardyearOfManufactureEnd=' + this.formGroup.controls[key].value + '&'
           }
           else if (key === 'rardDateUse') {
             var day = this.formGroup.controls[key].value.day.value
             var month = this.formGroup.controls[key].value.month.value
             var year = this.formGroup.controls[key].value.year.value
-            this.queryURL2 += 'rardDateUseStartDate=' + year + '-' + month + '-' + day + '&rardDateUseEndDate=' + year + '-' + month + '-' + day + '&'
+            this.queryURL2 += 'rarddateUseStart=' + year + '-' + month + '-' + day + '&rarddateUseEnd=' + year + '-' + month + '-' + day + '&'
           }
           else if (key !== 'rardYearOfManufactureRange' && key !== 'rardYearOfManufacture' && key !== 'rardDateUse') {
             this.queryURL2 += key + '=' + this.formGroup.controls[key].value + '&'
@@ -185,17 +185,17 @@ export class ViewAssetsPage implements OnInit {
 
           if (this.formGroup.controls[key].value.lower != undefined) {
             if (this.formGroup.controls['rardYearOfManufacture'].value < 1) {
-              this.queryURL2 += 'rardYearOfManufactureStartDate=' + this.formGroup.controls[key].value.lower + '&rardYearOfManufactureEndDate=' + this.formGroup.controls[key].value.upper + '&'
+              this.queryURL2 += 'rardyearOfManufactureStart=' + this.formGroup.controls[key].value.lower + '&rardyearOfManufactureEnd=' + this.formGroup.controls[key].value.upper + '&'
             }
           }
           else if (key === 'rardYearOfManufacture') {
-            this.queryURL2 += 'rardYearOfManufactureStartDate=' + this.formGroup.controls[key].value + '&rardYearOfManufactureEndDate=' + this.formGroup.controls[key].value + '&'
+            this.queryURL2 += 'rardyearOfManufactureStart=' + this.formGroup.controls[key].value + '&rardyearOfManufactureEnd=' + this.formGroup.controls[key].value + '&'
           }
           else if (key === 'rardDateUse') {
             var day = this.formGroup.controls[key].value.day.value
             var month = this.formGroup.controls[key].value.month.value
             var year = this.formGroup.controls[key].value.year.value
-            this.queryURL2 += 'rardDateUseStartDate=' + year + '-' + month + '-' + day + '&rardDateUseEndDate=' + year + '-' + month + '-' + day + '&'
+            this.queryURL2 += 'rarddateUseStart=' + year + '-' + month + '-' + day + '&rarddateUseEnd=' + year + '-' + month + '-' + day + '&'
           }
           else if (key === 'rardDateUseRangeStart') {
             if (this.formGroup.controls['rardDateUse'].value === '') {
@@ -219,8 +219,8 @@ export class ViewAssetsPage implements OnInit {
       });
       if (startDate) {
         // console.log('Adding the range')
-        // this.queryURL2 += 'rardDateUseStartDate=' + startDate[2] + '-' + startDate[1] + '-' + startDate[0] + '&rardDateUseEndDate=' + endDate[2] + '-' + endDate[1] + '-' + endDate[0] + '&'
-        this.queryURL2 += 'rardDateUseStartDate=' + startDate + '&rardDateUseEndDate=' + endDate + '&'
+        // this.queryURL2 += 'rarddateUseStart=' + startDate[2] + '-' + startDate[1] + '-' + startDate[0] + '&rarddateUseEnd=' + endDate[2] + '-' + endDate[1] + '-' + endDate[0] + '&'
+        this.queryURL2 += 'rarddateUseStart=' + startDate + '&rarddateUseEnd=' + endDate + '&'
       }
 
 
