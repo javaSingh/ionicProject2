@@ -3,25 +3,23 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"></ion-back-button>
     </ion-buttons>
-    <ion-title>Assets</ion-title>
+    <ion-title>Assets
+      <span (click)='hideAtLeastOneMsg()' *ngIf='formGroup.touched && !formGroup.valid && !userHasCancelled'>
+        <ion-icon name='close'></ion-icon>
+        <ion-label color="danger">
+          Invalid Form
+        </ion-label>
+
+      </span>
+
+    </ion-title>
+
+
   </ion-toolbar>
 </ion-header>
 
 <ion-content padding>
-
-  <span (click)='hideAtLeastOneMsg()'>
-    <ion-item lines='none'
-      *ngIf='formGroup.touched && !formGroup.valid && !userHasCancelled &&!(formGroup.controls["dateUseRangeEnd"].value!=="" && formGroup.controls["dateUseRangeStart"].value==="" )'>
-      <!-- this should not show when date range error is there -->
-      <ion-label color="danger">
-        Input for at least one field is required.
-      </ion-label>
-      <ion-icon name='close'></ion-icon>
-    </ion-item>
-
-
-  </span>
-
+  
   <div id="custom-overlay" [style.display]="showSearchingOverlay ? 'flex': 'none'">
     <div class="flb">
       <div class="lds-ellipsis">
@@ -40,48 +38,56 @@
     <ion-item lines='none'>
       <ion-label>Serial No.</ion-label>
 
-      <ion-input (keypress)="numberOnly($event)" clearInput type="text" formControlName="serialNo" placeholder="of 6 Digits only."></ion-input>
+      <ion-input (keypress)="numberOnly($event)" clearInput type="text" formControlName="serialNo"
+        placeholder="of 6 Digits only."></ion-input>
+      <span *ngIf='formGroup.controls["serialNo"].invalid'>
+        <ion-label color='danger'>6 Digits Only</ion-label>
+      </span>
     </ion-item>
-<!--     <ion-item lines='none'>
+    <!--     <ion-item lines='none'>
       <ion-label>Owner</ion-label>
       <ion-input clear-input='true' type="text" formControlName="owner" placeholder="should be 2, 3 or 4 letters. ">
       </ion-input>
     </ion-item> -->
     <ion-item lines='none'>
       <ion-label>Owner</ion-label>
-      <ion-select formControlName="owner" interface="popover"
-        placeholder="Select One">
+      <ion-select formControlName="owner" interface="popover" placeholder="Select One">
         <ion-select-option value="{{owner}}" *ngFor='let owner of uniqueOwnersList '>{{owner}}</ion-select-option>
       </ion-select>
     </ion-item>
-<!--     <ion-item lines='none'>
+    <!--     <ion-item lines='none'>
       <ion-label>Vehicle Code</ion-label>
       <ion-input clearInput type="text" formControlName="vehicleCode" placeholder=""></ion-input>
     </ion-item> -->
     <ion-item lines='none'>
       <ion-label>Vehicle Code</ion-label>
-      <ion-select formControlName="vehicleCode" interface="popover"
-        placeholder="Select One">
-        <ion-select-option value="{{vehicleCode}}" *ngFor='let vehicleCode of uniqueVehiclesCodeList '>{{vehicleCode}}</ion-select-option>
+      <ion-select formControlName="vehicleCode" interface="popover" placeholder="Select One">
+        <ion-select-option value="{{vehicleCode}}" *ngFor='let vehicleCode of uniqueVehiclesCodeList '>{{vehicleCode}}
+        </ion-select-option>
       </ion-select>
     </ion-item>
- <!--    <ion-item lines='none'>
+    <!--    <ion-item lines='none'>
       <ion-label>Asset Type</ion-label>
       <ion-input clearInput type="text" formControlName="assetType" placeholder=""></ion-input>
     </ion-item> -->
     <ion-item lines='none'>
       <ion-label>Asset Type</ion-label>
-      <ion-select formControlName="assetType" interface="popover"
-        placeholder="Select One">
-        <ion-select-option value="{{assetType}}" *ngFor='let assetType of uniqueAssetsTypeList '>{{assetType}}</ion-select-option>
+      <ion-select formControlName="assetType" interface="popover" placeholder="Select One">
+        <ion-select-option value="{{assetType}}" *ngFor='let assetType of uniqueAssetsTypeList '>{{assetType}}
+        </ion-select-option>
       </ion-select>
     </ion-item>
 
     <ion-item lines='none'>
       <ion-label>Manufacture Year</ion-label>
-      <ion-input clearInput type="text" formControlName="yearOfManufacture" placeholder="as YY">
+      <ion-input clearInput type="text" formControlName="yearOfManufacture" placeholder="as YY"
+        (keypress)="numberOnly($event)">
       </ion-input>
+      <span *ngIf='formGroup.controls["yearOfManufacture"].invalid'>
+        <ion-label color='danger'>0-99 Only</ion-label>
+      </span>
     </ion-item>
+
 
     <ion-item lines='none'>
       <ion-label>Range</ion-label>
@@ -90,32 +96,37 @@
         <ion-label slot="start">00</ion-label>
         <ion-label slot="end">99</ion-label>
       </ion-range>
+      <span *ngIf="formGroup.controls['yearOfManufactureRange'].invalid">
+        <ion-label color='danger'>Upper Can't be 0</ion-label>
+      </span>
     </ion-item>
     <ion-item lines='none'>
       <ion-label>Date put into Use</ion-label>
 
       <ion-datetime placeholder="" display-format="DD MMM YYYY" picker-format="DD MMM YYYY" formControlName="dateUse"
         [pickerOptions]="customOptions"></ion-datetime>
-
-      <span>
-        <ion-item lines='none'
-          *ngIf='formGroup.touched && (formGroup.controls["dateUseRangeEnd"].value!=="" && formGroup.controls["dateUseRangeStart"].value==="" )'>
-          <ion-label color="danger">
-            Start Date Required with End Date.
-          </ion-label>
-          <ion-icon name='close'></ion-icon>
-        </ion-item>
-      </span>
     </ion-item>
 
     <ion-item lines='none' [disabled]='formGroup.controls["dateUse"].value!==""'>
+      <span *ngIf="formGroup.controls['dateUseRangeStart'].invalid">
+        <ion-label color='danger'>Start Date Required Now.</ion-label>
+      </span>
       <ion-label>Range</ion-label>
       <ion-datetime placeholder='Start Date' formControlName="dateUseRangeStart"></ion-datetime>
+
       <ion-datetime placeholder='End Date' formControlName="dateUseRangeEnd"></ion-datetime>
     </ion-item>
-    <ion-item lines='none'>
+    <!--     <ion-item lines='none'>
       <ion-label>Vehicle Type</ion-label>
       <ion-input clearInput type="text" formControlName="vehicleType" placeholder=""></ion-input>
+    </ion-item> -->
+
+    <ion-item lines='none'>
+      <ion-label>Vehicle Type</ion-label>
+      <ion-select formControlName="vehicleType" interface="popover" placeholder="Select One">
+        <ion-select-option value="{{vehicleType}}" *ngFor='let vehicleType of uniqueVehiclesTypeList '>{{vehicleType}}
+        </ion-select-option>
+      </ion-select>
     </ion-item>
     <ion-row style="height: 30px"></ion-row>
   </form>

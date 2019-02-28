@@ -16,6 +16,8 @@ import { NGXLogger } from 'ngx-logger';
 // npm install --save ngx-logger
 
 import { Storage } from '@ionic/storage'
+import { browser } from 'protractor';
+// import { platform } from 'os';
 
 
 @Component({
@@ -43,7 +45,6 @@ export class ViewAssetsPage implements OnInit {
   columns = [
     { prop: 'serial_no', name: 'Serial No.' },
     { prop: 'owner', name: 'Owner' },
-    // missing is latest API
     { prop: 'vehicle_mfc_code', name: 'Vehicle MFC Code' },
     { prop: 'asset_type', name: 'Asset Type' },
     { prop: 'year_of_manufacture', name: 'Year of Manufacture' },
@@ -51,34 +52,60 @@ export class ViewAssetsPage implements OnInit {
     { prop: 'vehicle_type', name: 'Vehicle Type' },
   ]
 
-  /*   bkp_columns = [
-      { prop: 'rardOwner', name: 'Owner' },
-      { prop: 'rardDetailedVehicleType', name: 'Vehicle Type' },
-      { prop: 'rardSerialNo', name: 'Vehicle No.' },
-      { prop: 'rardAssetType', name: 'Asset Type' },
-      { prop: 'rardYearOfManufacture', name: 'Year of Manufacture' },
-      { prop: 'rardDateUse', name: 'Date put into Use' },
-      { prop: 'rardVehicleManufacturerCode', name: 'Vendor Code' },
-    ] */
-
-  //filtering Vars 
-  itemsAPI
-  searchedItems = []
-  filteredItemsAPI
-  data
+  //filtering vars
+  itemsAPI = []
+  filteredItemsAPI = []
   filterString
+
+
+  searchedItems = []
+
+  data
+
+
   formGroup: FormGroup = null
-  // uniqueOwnersList =['SCR', 'SR', 'ECOR', 'ECR']
+
   uniqueOwnersList = []
   uniqueVehiclesCodeList = []
   uniqueVehiclesTypeList = []
   uniqueAssetsTypeList = []
   uniqueVendorCode = []
   uniqueYearsOfManufactureist = []
-  controlStrings = ['owner',
-    // 'rardDetailedVehicleType', 
-    'serialNo', 'assetType', 'yearOfManufacture', 'dateUse', 'vehicleType']
-  queryURL: string = '?filter={"where":{'
+  locallyStoredQueryAndResultList = []
+  /*   locallyStoredQueryAndResultList = [
+      {
+        query: 'owner=ECOR&', result: [{
+          asset_type: "F",
+          date_use: "2029-07-17",
+          gs1_code: 8907709,
+          owner: "ECOR",
+          serial_no: "003927",
+          vehicle_mfc_code: "ARC",
+          vehicle_type: "BOXNHL",
+          year_of_manufacture: 17
+        }, {
+          asset_type: "F",
+          date_use: "2029-07-17",
+          gs1_code: 8907709,
+          owner: "ECOR",
+          serial_no: "003927",
+          vehicle_mfc_code: "ARC",
+          vehicle_type: "BOXNHL",
+          year_of_manufacture: 17
+        }, {
+          asset_type: "F",
+          date_use: "2029-07-17",
+          gs1_code: 8907709,
+          owner: "ECOR",
+          serial_no: "003927",
+          vehicle_mfc_code: "ARC",
+          vehicle_type: "BOXNHL",
+          year_of_manufacture: 17
+        }]
+      }
+    ] */
+
+  // queryURL: string = '?filter={"where":{'
   queryURL2: string = ''
 
   showResults: boolean = false
@@ -92,12 +119,6 @@ export class ViewAssetsPage implements OnInit {
     this.userHasCancelled = true
   }
 
-  tryEncryption() {
-
-    const input = { helo: 'helo jupiter'}
-
-  }
-
   async presentToast(msg: string) {
     const toast = await this.toastController.create({
       message: msg,
@@ -109,6 +130,7 @@ export class ViewAssetsPage implements OnInit {
     toast.present();
   }
 
+  //date picker options customization with clear button and more
   public customOptions: any = {
     buttons: [{
       text: 'Done',
@@ -140,12 +162,60 @@ export class ViewAssetsPage implements OnInit {
     console.log('Network Speed')
     console.log('Network Type: (Wifi/Lan/Mobile:')
     console.log('Location: (coordinates')
-    // this.logger.info('ngx logger')
 
-    /*     this.networkInterface.getWiFiIPAddress().then((address=>{
-          console.log(address)
-        }))
-     */
+  }
+
+  showOfflineResult() {
+    console.log(this.locallyStoredQueryAndResultList.filter(item => {
+      return item.query.indexOf(this.queryURL2) > -1
+    }))
+    this.searchedItems = this.locallyStoredQueryAndResultList.filter(item => {
+      return item.query.indexOf(this.queryURL2) > -1
+    })[0].result
+    this.showResults = true
+    this.showSearchingOverlay = false
+    this.queryURL2 = ''
+    this.initForm()
+  }
+
+  showOnlineResult() {
+
+    let timeoutPromise = new Promise((resolve, reject) => {
+      let wait = setTimeout(() => {
+        clearTimeout(wait);
+        resolve('Connection Timed Out');
+      }, 3000)
+    })
+
+    // let responsePromise = this.http.get('http://http://172.16.22.64:3000/api/v1/RollingAssetRfidData/rfidData?' + this.queryURL2).toPromise()
+    let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/EPC/search?' + this.queryURL2).toPromise()
+
+    let race = Promise.race([timeoutPromise, responsePromise])
+    race.then((data) => {
+      if (data === 'Connection Timed Out') {
+        console.log(data)
+        this.presentToast('Unable to Connect now.')
+      }
+      else {
+        console.log('response has win the race')
+        this.data = data
+        this.searchedItems = this.data
+        this.showResults = true
+        console.log(this.searchedItems)
+        this.initForm()
+        var queryAndResultItem = { query: this.queryURL2, result: this.searchedItems }
+        this.locallyStoredQueryAndResultList.push(queryAndResultItem)
+        this.storage.set('locallyStoredQueryAndResultList', JSON.stringify(this.locallyStoredQueryAndResultList))
+      }
+    }, error => {
+      console.log("Error: ")
+      console.log(error)
+      this.presentToast('Unable to Connect.')
+    }).finally(() => {
+      this.showSearchingOverlay = false
+      // this.queryURL = '?filter={"where":{'
+      this.queryURL2 = ''
+    })
   }
 
   onSubmit() {
@@ -156,13 +226,10 @@ export class ViewAssetsPage implements OnInit {
     } else {
       this.showSearchingOverlay = true
       console.log(this.formGroup.value, this.formGroup.valid);
-      console.log(this.formGroup.controls['yearOfManufacture'].value)
 
       //Use of Filters. Default API.
       //Between is not working here
-
       http://172.16.22.64:3000/api/v1/RollingAssetRfidData?filter={"where":{"rardOwner":"asdfdsfa","rardDetailedVehicleType":"sdfadsf","rardSerialNo":"sdfsdf","rardAssetType":"dfasdfa","rardYearOfManufacture":"adfasdfa","rardVehicleManufacturerCode":"fdfadsf"}}
-
       /*       Object.keys(this.formGroup.controls).forEach(key => {
               if (this.formGroup.controls[key].value) {
                 //if range is not empty and field is empty
@@ -175,7 +242,6 @@ export class ViewAssetsPage implements OnInit {
                 }
               }
             }); */
-
       //Custom API. WIP 20 Feb 19
       // http://172.16.22.64:3000/api/v1/RollingAssetRfidData/rfidData?rardOwner=ECR&rardDetailedVehicleType=BRN22.9&rardAssetType=F&rardSerialNo=001153&rardyearOfManufactureStart=16&rardyearOfManufactureEnd=19&rarddateUseStart=2017-07-18&rarddateUseEnd=2017-09-18
 
@@ -191,15 +257,12 @@ export class ViewAssetsPage implements OnInit {
             }
           }
           else if (key === 'yearOfManufacture') {
-            // this.queryURL2 += 'yearOfManufactureStart=' + this.formGroup.controls[key].value + '&yearOfManufactureEnd=' + this.formGroup.controls[key].value + '&'
-
             this.queryURL2 += 'yearOfManufacture=' + this.formGroup.controls[key].value + '&'
           }
           else if (key === 'dateUse') {
             var day = this.formGroup.controls[key].value.day.value
             var month = this.formGroup.controls[key].value.month.value
             var year = this.formGroup.controls[key].value.year.value
-            // this.queryURL2 += 'dateUseStart=' + year + '-' + month + '-' + day + '&dateUseEnd=' + year + '-' + month + '-' + day + '&'
             this.queryURL2 += 'dateUse=' + year + '-' + month + '-' + day + '&'
           }
           else if (key === 'dateUseRangeStart') {
@@ -222,49 +285,28 @@ export class ViewAssetsPage implements OnInit {
         this.queryURL2 += 'dateUseStart=' + startDate + '&dateUseEnd=' + endDate + '&'
       }
 
-      this.queryURL += '}}'
-      this.queryURL = this.queryURL.split('""').join('","')
-      console.log(this.queryURL)
+      // this.queryURL += '}}'
+      // this.queryURL = this.queryURL.split('""').join('","')
+      // console.log(this.queryURL)
       console.log(this.queryURL2)
 
-      let timeoutPromise = new Promise((resolve, reject) => {
-        let wait = setTimeout(() => {
-          clearTimeout(wait);
-          resolve('Connection Timed Out');
-        }, 3000)
+      var queryAndResultItem = this.locallyStoredQueryAndResultList.filter(item => {
+        return item.query.indexOf(this.queryURL2) > -1;
       })
-
-      // let responsePromise = this.http.get('http://http://172.16.22.64:3000/api/v1/RollingAssetRfidData/rfidData?' + this.queryURL2).toPromise()
-      let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/EPC/search?' + this.queryURL2).toPromise()
-      this.meraLogger(this.queryURL2)
-
-      let race = Promise.race([timeoutPromise, responsePromise])
-      race.then((data) => {
-        if (data === 'Connection Timed Out') {
-          console.log(data)
-          this.presentToast('Unable to Connect now.')
-        }
-        else {
-          console.log('response has win the race')
-          this.data = data
-          console.log(this.data)
-          this.searchedItems = this.data
-          this.showResults = true
-          this.storage.set('locallyStoredSearchedItems', JSON.stringify(this.searchedItems))
-        }
-      }, error => {
-        console.log("Error: ")
-        console.log(error)
-        this.presentToast('Unable to Connect.')
-      }).finally(() => {
+      if (queryAndResultItem.length > 0) {
+        console.log('Local Found. Showing Offline Result')
+        this.searchedItems = queryAndResultItem[0].result
+        this.showResults = true
         this.showSearchingOverlay = false
+        this.queryURL2 = ''
+        this.initForm()
       }
-      )
-      this.queryURL = '?filter={"where":{'
-      this.queryURL2 = ''
+      else {
+        console.log('Not found in local. Showing Online Result')
+        this.showOnlineResult()
+      }
     }
 
-    this.initForm()
   }
 
   constructor(
@@ -273,11 +315,30 @@ export class ViewAssetsPage implements OnInit {
     public toastController: ToastController,
     public alertController: AlertController,
     public platform: Platform,
-    private logger: NGXLogger,
     public storage: Storage,
-    // private networkInterface: NetworkInterface,
   ) {
+    console.log('Constructor')
 
+/*     // https://www.w3schools.com/jsref/dom_obj_event.asp
+    //browser window/tab close detection
+    window.addEventListener('unload', () => {
+      localStorage.setItem('unLoadData', 'unload detected')
+    });
+    //tab/window losing focus detection
+    window.addEventListener('blur', () => {
+      alert('Blur')
+      localStorage.setItem('blurData', 'blur detected')
+    })
+    // alert(!!window.cordova) */
+
+
+    this.platform.pause.subscribe((data) => {
+      localStorage.setItem('someData', 'platform pause detected')
+    })
+    this.storage.get('locallyStoredQueryAndResultList').then(data => {
+      if (data != null)
+        this.locallyStoredQueryAndResultList = JSON.parse(data)
+    })
   }
 
   async presentAlert() {
@@ -308,7 +369,6 @@ export class ViewAssetsPage implements OnInit {
         }
       ]
     });
-
     await alert.present();
   }
 
@@ -319,7 +379,6 @@ export class ViewAssetsPage implements OnInit {
     });
     this.filteredItemsAPI = filteredItemsAPI
   }
-  ////
 
   makeExcel() {
     console.log('Download Start' + new Date())
@@ -349,6 +408,43 @@ export class ViewAssetsPage implements OnInit {
   }
 
   meraValidator(formGroup: FormGroup) {
+    var atLeastOneIsFilled: boolean = false
+    var endDateIsWithStartDate: boolean = true
+    var rangeUpperValueIsValid: boolean = true
+    var ownerLenghtIsValid: boolean = true
+
+    if (formGroup.controls['yearOfManufactureRange'].value.upper === 0) {
+      console.log('InvalidForm. Range Is Active and Upper===Lower')
+      rangeUpperValueIsValid = false
+      formGroup.controls['yearOfManufactureRange'].setErrors({ incorrect: true })
+    }
+
+    for (var key in formGroup.controls) {
+      if (formGroup.controls[key].value && formGroup.controls[key].value.length > 0) {
+        console.log('ValidForm. AtLeastOneIsFilled. Breaking')
+        atLeastOneIsFilled = true
+        break
+      }
+    }
+
+    if (formGroup.controls['dateUseRangeEnd'].value !== '' && formGroup.controls['dateUseRangeStart'].value === '') {
+      console.log("InvalidForm. End Date is Wihout Start Date.")
+      endDateIsWithStartDate = false
+      formGroup.controls['dateUseRangeStart'].setErrors({ incorrect: true })
+    }
+
+    if (atLeastOneIsFilled) {
+
+
+      if (formGroup.controls['owner'].value.length != 0 && (formGroup.controls['owner'].value.length > 4 || formGroup.controls['owner'].value.length < 2)) {
+        ownerLenghtIsValid = false
+        console.log('InvalidForm. Owner Length out of range')
+        formGroup.controls['owner'].invalid
+      }
+
+
+    }
+
 
     for (const key in formGroup.controls) {
       if (
@@ -358,7 +454,6 @@ export class ViewAssetsPage implements OnInit {
         //if range is undef or upper value is 0 then invalid
         !(key === 'yearOfManufactureRange' && (formGroup.controls[key].value.upper === 0 || formGroup.controls[key].value.upper === undefined)
         )
-
         //if End Date Use is not empty the the Start Date Use should not be empty
         &&
         !(key === 'dateUseRangeEnd' && formGroup.controls[key].value !== '' && formGroup.controls['dateUseRangeStart'].value === '')
@@ -366,17 +461,17 @@ export class ViewAssetsPage implements OnInit {
         &&
         !(key === 'owner' && (formGroup.controls[key].value.length > 4 || formGroup.controls[key].value.length < 2))
       ) {
-        console.log("returning null. valid form")
+        console.log("ValidForm")
         return null
       }
     }
-
-    console.log('returning false. form is not valid')
+    console.log('InvalidForm')
     return { valid: false }
   }
 
-
   numberOnly(event): boolean {
+    console.log('Keypress Event: ')
+    console.log(event)
     const charCode = (event.which) ? event.which : event.keyCode;
     if (charCode > 31 && (charCode < 48 || charCode > 57)) {
       return false;
@@ -385,10 +480,11 @@ export class ViewAssetsPage implements OnInit {
   }
 
   ngOnInit() {
+
     console.log('Init')
     this.initForm()
     this.storage.get('uniqueOwnersList').then((data) => {
-      if (data) {
+      if (data != null) {
         this.uniqueOwnersList = JSON.parse(data)
         this.storage.get('uniqueAssetsTypeList').then((data) => {
           this.uniqueAssetsTypeList = JSON.parse(data)
@@ -406,47 +502,64 @@ export class ViewAssetsPage implements OnInit {
     })
   }
 
+
   getUniqueValues() {
-    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUnique').subscribe((data) => {
+    var ownerObservable = this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueOwner')
+    var ownerSubscription = ownerObservable.subscribe((data) => {
       console.log("Unique Values from Get: ")
       console.log(data)
       for (var i = 0; i < data.length; i++) {
         console.log('Inside For Loop')
         if (data[i].owner)
           this.uniqueOwnersList.push(data[i].owner)
-        else if (data[i].asset_type)
-          this.uniqueAssetsTypeList.push(data[i].asset_type)
-        else if (data[i].vehicle_type)
-          this.uniqueVehiclesTypeList.push(data[i].vehicle_type)
-        else if (data[i].vehicle_code)
-          this.uniqueVehiclesCodeList.push(data[i].vehicle_code)
-        else if (data[i].year_of_manufacture)
-          this.uniqueYearsOfManufactureist.push(data[i].year_of_manufacture)
       }
       this.storage.set('uniqueOwnersList', JSON.stringify(this.uniqueOwnersList))
+    })
+
+    setTimeout(() => {
+      ownerSubscription.unsubscribe()
+      console.log('Timeout for Get Unique Owners. 3 Sec Timer Expired. Unsubscribed')
+    }, 3000);
+
+    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueAssetType').subscribe((data) => {
+      for (var i = 0; i < data.length; i++) {
+        console.log('Inside For Loop')
+        if (data[i].asset_type)
+          this.uniqueAssetsTypeList.push(data[i].asset_type)
+      }
       this.storage.set('uniqueAssetsTypeList', JSON.stringify(this.uniqueAssetsTypeList))
+    })
+
+    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueVehicleType').subscribe((data) => {
+      for (var i = 0; i < data.length; i++) {
+        console.log('Inside For Loop')
+        if (data[i].vehicle_type)
+          this.uniqueVehiclesTypeList.push(data[i].vehicle_type)
+      }
+      this.storage.set('uniqueVehiclesTypeList', JSON.stringify(this.uniqueVehiclesTypeList))
+    })
+
+    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueVehicleCode').subscribe((data) => {
+      for (var i = 0; i < data.length; i++) {
+        console.log('Inside For Loop')
+        if (data[i].vehicle_mfc_code)
+          this.uniqueVehiclesCodeList.push(data[i].vehicle_mfc_code)
+      }
       this.storage.set('uniqueVehiclesCodeList', JSON.stringify(this.uniqueVehiclesCodeList))
+    })
+
+    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueYearOfManufacture').subscribe((data) => {
+      for (var i = 0; i < data.length; i++) {
+        console.log('Inside For Loop')
+        if (data[i].year_of_manufacture)
+          this.uniqueYearsOfManufactureist.push(data[i].year_of_manufacture)
+      }
       this.storage.set('uniqueYearsOfManufactureist', JSON.stringify(this.uniqueYearsOfManufactureist))
     })
 
   }
 
   initForm() {
-    /*     this.formGroup = this.fb.group({
-          'rardOwner': [''],
-          'rardDetailedVehicleType': [''],
-          'rardSerialNo': [''],
-          'rardAssetType': [''],
-          'rardYearOfManufacture': [''],
-          'rardYearOfManufactureRange': [''],
-          'rardDateUse': [''],
-          'rardDateUseRangeStart': [''],
-          'rardDateUseRangeEnd': [''],
-          'rardVehicleManufacturerCode': [''],
-        }, {
-            validator: this.meraValidator
-          }) */
-
     this.formGroup = this.fb.group({
       'owner': [''],
       'vehicleType': [''],
@@ -454,7 +567,9 @@ export class ViewAssetsPage implements OnInit {
         , Validators.pattern('[0-9]{6}')
       ],
       'assetType': [''],
-      'yearOfManufacture': [''],
+      'yearOfManufacture': [''
+        , Validators.pattern('[0-9]{1,2}')
+      ],
       'yearOfManufactureRange': [''],
       'dateUse': [''],
       'dateUseRangeStart': [''],
@@ -463,6 +578,5 @@ export class ViewAssetsPage implements OnInit {
     }, {
         validator: this.meraValidator
       })
-
   }
 } 
