@@ -22,8 +22,8 @@ import { error } from 'util';
   // https://stackoverflow.com/questions/44166811/css-issue-ngx-table-angular2-swimlane
 })
 
-
-export class ViewAssetsPage implements OnInit {
+// export 
+class ViewAssetsPage implements OnInit {
 
   items = [
     { assetType: 'Wheel', yearOfManufacture: '1990', owner: 'Pun', detailedVehicleType: 'Right Front Wheel', serialNumber: '12', datePutIntoUse: '15 May 1990', vendorCode: 'Vdn123' },

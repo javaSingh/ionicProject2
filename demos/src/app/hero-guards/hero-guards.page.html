@@ -14,7 +14,7 @@
         <ion-input type='password' [(ngModel)]='password'></ion-input>
       </ion-item>
       <ion-item lines='none'>
-        <ion-label color='danger' *ngIf='showNoSuchUser && userLoginId==="" && password===""'>No Such User</ion-label>
+        <ion-label color='danger' *ngIf='userLoginId==="" && password===""'>No Such User</ion-label>
         <ion-button slot='end' (click)='login()' [disabled]='(userLoginId==="" || password==="")'>Login</ion-button>
       </ion-item>
 

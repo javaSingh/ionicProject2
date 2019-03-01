@@ -169,7 +169,7 @@ user: "EAM47E" */
     if (this.userLoginId !== '' && this.password !== '') {
       console.log('User Creds: ' + this.userLoginId + " " + this.password)
       // {"userLoginId":"111111115167","password":"Y755RR8"}
-      this.httpClient.post(this.HOST + ':' + this.PORT + "/api/user/login", JSON.parse('{"userLoginId":"' + this.userLoginId + '","password":"' + this.password + '"}')).subscribe((data) => {
+      this.httpClient.post(this.HOST + ':' + this.PORT + "/api/user/login", JSON.parse('{"userLoginId":"' + this.userLoginId + '","password":"' + this.password + '"}')).subscribe((data:any) => {
         console.log("Post Response Data: ")
         console.log(data.message)
 

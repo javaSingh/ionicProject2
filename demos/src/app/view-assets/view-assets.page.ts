@@ -1,23 +1,26 @@
 import { Component, OnInit } from '@angular/core';
+
 import * as XLSX from 'xlsx';
 // npm i --save xlsx
+
 import { saveAs } from 'file-saver';
 // npm i file-saver
+
 import { HttpClient } from '@angular/common/http';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { ToastController, Platform } from '@ionic/angular';
 
 import { ViewEncapsulation } from '@angular/core';
-// import { index } from '@swimlane/ngx-datatable/release/'
 import { AlertController } from '@ionic/angular';
 
-
-import { NGXLogger } from 'ngx-logger';
+// import { NGXLogger } from 'ngx-logger';
 // npm install --save ngx-logger
 
 import { Storage } from '@ionic/storage'
-import { browser } from 'protractor';
-// import { platform } from 'os';
+
+import { IonInfiniteScroll } from '@ionic/angular';
+
+
 
 
 @Component({
@@ -66,11 +69,21 @@ export class ViewAssetsPage implements OnInit {
   formGroup: FormGroup = null
 
   uniqueOwnersList = []
+  uniqueOwnersMasterList = ["WR", "CR", "ECOR", "ECR", "ER", "KR", "NCR", "NER", "NFR", "NR", "NWR", "SCR", "SECR", "SER", "SR", "SWR", "WCR"]
+
   uniqueVehiclesCodeList = []
+
   uniqueVehiclesTypeList = []
+  uniqueVehiclesTypeMasterList = ["BOXNHL", "BCNHL", "BOXNS", "BOSTHSM2", "BOBYN", "BOBSN", "BTPGLN", "BFNS", "BVCM", "BVZI", "BOBRNHSM1"]
+
   uniqueAssetsTypeList = []
+  uniqueAssetsTypeMasterList = ["#", "A", "e", "C", "D", "E", "F", "L", "M", "P", "R", "S", "X", "Y", "Z"]
   uniqueVendorCode = []
+
   uniqueYearsOfManufactureist = []
+  uniqueYearsOfManufactureMasterList = ["ARC", "ASRW", "BESF", "BESWL", "BESWR", "BUR", "BWELK", "BWELZ", "BWT", "CIM", "CLW", "DLW", "DMW", "GOCW", "HEIB", "HEIS", "ICFW", "JMPW", "JRIL", "JWL", "MCFW", "MI", "OFPL", "RCFW", "SPJW", "SR", "TEXB", "TEXS", "TWL",]
+
+
   locallyStoredQueryAndResultList = []
   /*   locallyStoredQueryAndResultList = [
       {
@@ -178,6 +191,39 @@ export class ViewAssetsPage implements OnInit {
     this.initForm()
   }
 
+  loadData(event) {
+    console.log(event)
+    setTimeout(() => {
+      for (var i = 0; i < 5; i++) {
+        var start = new Date().getTime();
+        var end = start;
+        console.log('Waiting....')
+        while (end < start + 1000) {
+          end = new Date().getTime();
+        }
+        console.log(i)
+        this.items.push(this.items[i])
+      }
+      event.target.complete()
+    }, 100);
+    /*     for(var i=0;i<11;i++){
+          // this.items.push(this.items[i])
+          setTimeout(()=>{
+            this.items.push(this.items[i])
+          },1000)
+        }
+        event.target.complete(); */
+    /*     setTimeout(() => {
+          console.log('Done');
+          // event.target.complete();
+          // App logic to determine if all data is loaded
+          // and disable the infinite scroll
+          if (false) {
+            event.target.disabled = true;
+          }
+        }, 5000); */
+  }
+
   showOnlineResult() {
 
     let timeoutPromise = new Promise((resolve, reject) => {
@@ -188,7 +234,9 @@ export class ViewAssetsPage implements OnInit {
     })
 
     // let responsePromise = this.http.get('http://http://172.16.22.64:3000/api/v1/RollingAssetRfidData/rfidData?' + this.queryURL2).toPromise()
-    let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/EPC/search?' + this.queryURL2).toPromise()
+    // let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/EPC/search?' + this.queryURL2).toPromise()
+    let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/v1/EPC/qbe?' + this.queryURL2).toPromise()
+    this.http.get('http://abc')
 
     let race = Promise.race([timeoutPromise, responsePromise])
     race.then((data) => {
@@ -316,20 +364,21 @@ export class ViewAssetsPage implements OnInit {
     public alertController: AlertController,
     public platform: Platform,
     public storage: Storage,
+    // private secureStorage: SecureStorage
   ) {
     console.log('Constructor')
 
-/*     // https://www.w3schools.com/jsref/dom_obj_event.asp
-    //browser window/tab close detection
-    window.addEventListener('unload', () => {
-      localStorage.setItem('unLoadData', 'unload detected')
-    });
-    //tab/window losing focus detection
-    window.addEventListener('blur', () => {
-      alert('Blur')
-      localStorage.setItem('blurData', 'blur detected')
-    })
-    // alert(!!window.cordova) */
+    /*     // https://www.w3schools.com/jsref/dom_obj_event.asp
+        //browser window/tab close detection
+        window.addEventListener('unload', () => {
+          localStorage.setItem('unLoadData', 'unload detected')
+        });
+        //tab/window losing focus detection
+        window.addEventListener('blur', () => {
+          alert('Blur')
+          localStorage.setItem('blurData', 'blur detected')
+        })
+        // alert(!!window.cordova) */
 
 
     this.platform.pause.subscribe((data) => {
@@ -433,8 +482,14 @@ export class ViewAssetsPage implements OnInit {
       formGroup.controls['dateUseRangeStart'].setErrors({ incorrect: true })
     }
 
-    if (atLeastOneIsFilled) {
+    //if year of man range is invalid and yaer of man is filled then set the range as valid
+    if (formGroup.controls['yearOfManufactureRange'].invalid && formGroup.controls['yearOfManufacture'].value.length > 0) {
+      console.log('Setting Range as Valid:')
+      formGroup.controls['yearOfManufactureRange'].setErrors(null)
+      formGroup.controls['yearOfManufactureRange'].setValue('')
+    }
 
+    if (atLeastOneIsFilled) {
 
       if (formGroup.controls['owner'].value.length != 0 && (formGroup.controls['owner'].value.length > 4 || formGroup.controls['owner'].value.length < 2)) {
         ownerLenghtIsValid = false
@@ -495,8 +550,16 @@ export class ViewAssetsPage implements OnInit {
         this.storage.get('uniqueYearsOfManufactureist').then((data) => {
           this.uniqueYearsOfManufactureist = JSON.parse(data)
         })
+        this.storage.get('uniqueVehiclesTypeList').then((data) => {
+          this.uniqueVehiclesTypeList = JSON.parse(data)
+        })
       }
       else {
+        // use of master list in case network is down and localStorge is null
+        /*         this.uniqueOwnersList=this.uniqueOwnersMasterList
+                this.uniqueAssetsTypeList=this.uniqueAssetsTypeMasterList
+                this.uniqueVehiclesTypeList =this.uniqueVehiclesTypeMasterList */
+
         this.getUniqueValues()
       }
     })
@@ -505,7 +568,7 @@ export class ViewAssetsPage implements OnInit {
 
   getUniqueValues() {
     var ownerObservable = this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueOwner')
-    var ownerSubscription = ownerObservable.subscribe((data) => {
+    var ownerSubscription = ownerObservable.subscribe((data: any[]) => {
       console.log("Unique Values from Get: ")
       console.log(data)
       for (var i = 0; i < data.length; i++) {
@@ -521,7 +584,7 @@ export class ViewAssetsPage implements OnInit {
       console.log('Timeout for Get Unique Owners. 3 Sec Timer Expired. Unsubscribed')
     }, 3000);
 
-    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueAssetType').subscribe((data) => {
+    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueAssetType').subscribe((data: any[]) => {
       for (var i = 0; i < data.length; i++) {
         console.log('Inside For Loop')
         if (data[i].asset_type)
@@ -530,7 +593,7 @@ export class ViewAssetsPage implements OnInit {
       this.storage.set('uniqueAssetsTypeList', JSON.stringify(this.uniqueAssetsTypeList))
     })
 
-    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueVehicleType').subscribe((data) => {
+    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueVehicleType').subscribe((data: any[]) => {
       for (var i = 0; i < data.length; i++) {
         console.log('Inside For Loop')
         if (data[i].vehicle_type)
@@ -539,7 +602,7 @@ export class ViewAssetsPage implements OnInit {
       this.storage.set('uniqueVehiclesTypeList', JSON.stringify(this.uniqueVehiclesTypeList))
     })
 
-    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueVehicleCode').subscribe((data) => {
+    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueVehicleCode').subscribe((data: any[]) => {
       for (var i = 0; i < data.length; i++) {
         console.log('Inside For Loop')
         if (data[i].vehicle_mfc_code)
@@ -548,7 +611,7 @@ export class ViewAssetsPage implements OnInit {
       this.storage.set('uniqueVehiclesCodeList', JSON.stringify(this.uniqueVehiclesCodeList))
     })
 
-    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueYearOfManufacture').subscribe((data) => {
+    this.http.get('http://172.16.22.64:3000/Tags/EPC/searchUniqueYearOfManufacture').subscribe((data: any[]) => {
       for (var i = 0; i < data.length; i++) {
         console.log('Inside For Loop')
         if (data[i].year_of_manufacture)

@@ -10,16 +10,16 @@
 <ion-content padding>
 
   <p>Reactive Form (Nested)</p>
-  <form novalidate [formGroup]="formGroup" (ngSubmit)="onSubmit(formGroup)">
+  <form novalidate [formGroup]="formGroup" (ngSubmit)="onSubmit()">
     <span *ngIf="formGroup.get('name').hasError('required') && formGroup.get('name').touched">Name is Required</span>
     <ion-input type="text" placeholder="Your full name" formControlName="name" (keydown)="nameKeydown()"></ion-input>
     
     <div formArrayName='emailArray'>
-      <div [formGroupName]='i' *ngFor='let a of formGroup.controls.emailArray.controls;let i=index' >
+      <div [formGroupName]='i' *ngFor='let a of formGroup["controls"].emailArray["controls"];let i=index' >
         <ion-item no-padding>
           <ion-input type="text" formControlName="email" placeholder='Email'></ion-input>
           <ion-icon name="add" (click)='addEmail()'></ion-icon>
-          <ion-icon *ngIf='formGroup.controls.emailArray.length>1' name="trash" (click)='removeEmail(i)'></ion-icon>
+          <ion-icon *ngIf='formGroup["controls"].emailArray.length>1' name="trash" (click)='removeEmail(i)'></ion-icon>
         </ion-item>
       </div>
     </div>

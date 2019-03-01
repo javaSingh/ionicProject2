@@ -15,14 +15,19 @@ import { HttpClientModule } from '@angular/common/http'
 import { HeroGuardServiceService } from './hero-guard-service.service';
 
 import { IonicStorageModule } from '@ionic/storage';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 // npm install @ionic/storage --save
+
+// npm install @ionic-native/secure-storage
+
 
 
 
 @NgModule({
   declarations: [AppComponent,ModalPagePage],
   entryComponents: [ModalPagePage],
-  imports: [ IonicStorageModule.forRoot(), HttpClientModule, BrowserModule, IonicModule.forRoot(), AppRoutingModule],
+  imports: [ IonicStorageModule.forRoot(), HttpClientModule, BrowserModule, IonicModule.forRoot(), AppRoutingModule, ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })],
   providers: [
     HeroGuardServiceService,
     StatusBar,

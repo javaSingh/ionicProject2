@@ -9,6 +9,9 @@ import { Router,CanActivate,ActivatedRouteSnapshot  } from '@angular/router'
 
 @Injectable()
 export class HeroGuardsPage implements OnInit, CanActivate {
+  userLoginId
+  password
+
 
   constructor(public router:Router) { }
 
@@ -16,6 +19,10 @@ export class HeroGuardsPage implements OnInit, CanActivate {
     console.log('Inside canActivate(). Coming from: '+route )
     return true
 
+  }
+
+  login(){
+    console.log('Login Clicked')
   }
 
   ngOnInit() {
