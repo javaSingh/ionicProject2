@@ -83,3 +83,35 @@
     align-items: center;
     justify-content: center;
   }
+  ion-icon {
+    &.big {
+      width: 30px;
+      height: 30px;
+      color: skyblue;
+
+    }
+  
+    &.bigger {
+      width: 100px;
+      height: 100px;
+    }
+  
+    &.red {
+      color: red;
+    }
+  }
+  
+ion-item{
+  --background: #white;
+  --color: black;
+}
+ion-button{
+  --background:deepskyblue;
+}
+.bgs-class{
+  --background:  #00ffff ;
+  font-color:white
+}
+ion-label{
+  margin-left:5px;
+}

@@ -3,14 +3,15 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="home"></ion-back-button>
     </ion-buttons>
-    <ion-title>Assets {{items.length}}
+    <ion-title>Assets
+      <!-- {{items.length}}
       <span (click)='hideAtLeastOneMsg()' *ngIf='formGroup.touched && !formGroup.valid && !userHasCancelled'>
         <ion-icon name='close'></ion-icon>
         <ion-label color="danger">
           Invalid Form
         </ion-label>
 
-      </span>
+      </span> -->
 
     </ion-title>
 
@@ -18,123 +19,159 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content padding padding class="bg-class">
+
   
-  <div id="custom-overlay" [style.display]="showSearchingOverlay ? 'flex': 'none'">
-    <div class="flb">
-      <div class="lds-ellipsis">
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+  <ngx-datatable class='material striped' [rows]="searchedItems" [columns]="columns" [scrollbarH]="true"
+    [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [columnMode]="'force'" [limit]="5">
+  </ngx-datatable>
+  <ion-col>
+  </ion-col>
+  <ion-col>
+    <ion-card style=" border-radius: 10px;" class="bgs-class">
+      <ion-card-header style=" text-align: center;font-size: 30px;">
+      </ion-card-header>
+
+
+      <!--   <ngx-datatable *ngIf='showResults' class='material striped' [rows]="searchedItems" [columns]="columns"
+    [scrollbarH]="true" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [columnMode]="'force'"
+    [limit]="10">
+  </ngx-datatable> -->
+
+
+
+      <div id="custom-overlay" [style.display]="showSearchingOverlay ? 'flex': 'none'">
+        <div class="flb">
+          <div class="lds-ellipsis">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <form novalidate [formGroup]="formGroup" *ngIf='!showResults'>
-
+      <form novalidate [formGroup]="formGroup">
+        <!-- <form novalidate [formGroup]="formGroup" *ngIf='!showResults'> -->
 
 
-    <ion-item lines='none'>
-      <ion-label>Serial No.</ion-label>
 
-      <ion-input (keypress)="numberOnly($event)" clearInput type="text" formControlName="serialNo"
-        placeholder="of 6 Digits only."></ion-input>
-      <span *ngIf='formGroup.controls["serialNo"].invalid'>
-        <ion-label color='danger'>6 Digits Only</ion-label>
-      </span>
-    </ion-item>
-    <!--     <ion-item lines='none'>
+        <ion-item lines='none'>
+          <ion-icon class="big" src="../../assets/icon/binary-code.svg"></ion-icon>
+
+          <ion-label></ion-label>
+
+          <ion-input (keypress)="numberOnly($event)" clearInput type="text"   formControlName="serialNo"
+            placeholder="Serial No. 6 digits only."></ion-input>
+          <span *ngIf='formGroup.controls["serialNo"].invalid'>
+            <ion-label color='danger'>6 Digits Only</ion-label>
+          </span>
+        </ion-item>
+        <!--     <ion-item lines='none'>
       <ion-label>Owner</ion-label>
       <ion-input clear-input='true' type="text" formControlName="owner" placeholder="should be 2, 3 or 4 letters. ">
       </ion-input>
     </ion-item> -->
-    <ion-item lines='none'>
-      
-      <ion-label>Owner</ion-label>
-      <ion-select formControlName="owner" interface="popover" placeholder="Select One">
-        <ion-select-option value="{{owner}}" *ngFor='let owner of uniqueOwnersList '>{{owner}}</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <!--     <ion-item lines='none'>
+        <ion-item lines='none'>
+          <ion-icon class="big" src="../../assets/icon/entrepreneur.svg"></ion-icon>
+
+          <ion-select formControlName="owner" interface="popover" placeholder="Owner">
+            <ion-select-option value="{{owner}}" *ngFor='let owner of uniqueOwnersList '>{{owner}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <!--     <ion-item lines='none'>
       <ion-label>Vehicle Code</ion-label>
       <ion-input clearInput type="text" formControlName="vehicleCode" placeholder=""></ion-input>
     </ion-item> -->
-    <ion-item lines='none'>
-      <ion-label>Vehicle Code</ion-label>
-      <ion-select formControlName="vehicleCode" interface="popover" placeholder="Select One">
-        <ion-select-option value="{{vehicleCode}}" *ngFor='let vehicleCode of uniqueVehiclesCodeList '>{{vehicleCode}}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-    <!--    <ion-item lines='none'>
+        <ion-item lines='none'>
+          <ion-icon class="big" src="../../assets/icon/car.svg"></ion-icon>
+          
+          <ion-select formControlName="vehicleCode" interface="popover" placeholder="Vehicle Code">
+            <ion-select-option value="{{vehicleCode}}" *ngFor='let vehicleCode of uniqueVehiclesCodeList '>
+              {{vehicleCode}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <!--    <ion-item lines='none'>
       <ion-label>Asset Type</ion-label>
       <ion-input clearInput type="text" formControlName="assetType" placeholder=""></ion-input>
     </ion-item> -->
-    <ion-item lines='none'>
-      <ion-label>Asset Type</ion-label>
-      <ion-select formControlName="assetType" interface="popover" placeholder="Select One">
-        <ion-select-option value="{{assetType}}" *ngFor='let assetType of uniqueAssetsTypeList '>{{assetType}}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
+        <ion-item lines='none'>
+          <ion-icon class="big" src="../../assets/icon/train.svg"></ion-icon>
 
-    <ion-item lines='none'>
-      <ion-label>Manufacture Year</ion-label>
-      <ion-input clearInput type="text" formControlName="yearOfManufacture" placeholder="as YY"
-        (keypress)="numberOnly($event)">
-      </ion-input>
-      <span *ngIf='formGroup.controls["yearOfManufacture"].invalid'>
-        <ion-label color='danger'>0-99 Only</ion-label>
-      </span>
-    </ion-item>
+          
+
+          <ion-select formControlName="assetType" interface="popover" placeholder="Asset Type">
+            <ion-select-option value="{{assetType}}" *ngFor='let assetType of uniqueAssetsTypeList '>{{assetType}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item lines='none'>
+          <ion-icon class="big" src="../../assets/icon/mechanical-arm.svg"></ion-icon>
+
+          <ion-label></ion-label>
+          <ion-input clearInput type="text" formControlName="yearOfManufacture" placeholder="Manufacture Year as YY"
+            (keypress)="numberOnly($event)">
+          </ion-input>
+          <span *ngIf='formGroup.controls["yearOfManufacture"].invalid'>
+            <ion-label color='danger'>0-{{var99}} Only</ion-label>
+          </span>
+        </ion-item>
 
 
-    <ion-item lines='none'>
-      <ion-label>Range</ion-label>
-      <ion-range [disabled]='formGroup.controls["yearOfManufacture"].value.length>0'
-        formControlName='yearOfManufactureRange' dualKnobs="true" pin='true' min="00" max="99" color="primary">
-        <ion-label slot="start">00</ion-label>
-        <ion-label slot="end">99</ion-label>
-      </ion-range>
-    </ion-item>
-    <ion-item lines='none'>
-      <ion-label>Date put into Use</ion-label>
+        <ion-item lines='none'>
+          <ion-icon class="big" src="../../assets/icon/radar.svg"></ion-icon>
 
-      <ion-datetime placeholder="" display-format="DD MMM YYYY" picker-format="DD MMM YYYY" formControlName="dateUse"
-        [pickerOptions]="customOptions"></ion-datetime>
-    </ion-item>
+          <ion-label>Range</ion-label>
+          <ion-range [disabled]='formGroup.controls["yearOfManufacture"].value.length>0'
+            formControlName='yearOfManufactureRange' dualKnobs="true" pin='true' min="00" max="{{var99}}" color="primary">
+            <ion-label slot="start">00</ion-label>
+            <ion-label slot="end">{{var99}}</ion-label>
+          </ion-range>
+        </ion-item>
+        <ion-item lines='none'>
+          <ion-icon class="big" src="../../assets/icon/calendar.svg"></ion-icon>
 
-    <ion-item lines='none' [disabled]='formGroup.controls["dateUse"].value!==""'>
-      <span *ngIf="formGroup.controls['dateUseRangeStart'].invalid">
-        <ion-label color='danger'>Start Date Required Now.</ion-label>
-      </span>
-      <ion-label>Range</ion-label>
-      <ion-datetime placeholder='Start Date' formControlName="dateUseRangeStart"></ion-datetime>
+          <ion-label></ion-label>
 
-      <ion-datetime placeholder='End Date' formControlName="dateUseRangeEnd"></ion-datetime>
-    </ion-item>
-    <!--     <ion-item lines='none'>
+          <ion-datetime placeholder="Date put into Use" display-format="DD MMM YYYY" picker-format="DD MMM YYYY"
+            formControlName="dateUse" [pickerOptions]="customOptions"></ion-datetime>
+        </ion-item>
+
+        <ion-item lines='none' [disabled]='formGroup.controls["dateUse"].value!==""'>
+          <span *ngIf="formGroup.controls['dateUseRangeStart'].invalid">
+            <ion-label color='danger'>Start Date Required Now.</ion-label>
+          </span>
+          <ion-icon class="big" src="../../assets/icon/radars.svg"></ion-icon>
+
+
+          <ion-label>Range</ion-label>
+          <ion-datetime placeholder='Start Date' formControlName="dateUseRangeStart"></ion-datetime>
+
+          <ion-datetime placeholder='End Date' formControlName="dateUseRangeEnd"></ion-datetime>
+        </ion-item>
+        <!--     <ion-item lines='none'>
       <ion-label>Vehicle Type</ion-label>
       <ion-input clearInput type="text" formControlName="vehicleType" placeholder=""></ion-input>
     </ion-item> -->
 
-    <ion-item lines='none'>
-      <ion-label>Vehicle Type</ion-label>
-      <ion-select formControlName="vehicleType" interface="popover" placeholder="Select One">
-        <ion-select-option value="{{vehicleType}}" *ngFor='let vehicleType of uniqueVehiclesTypeList '>{{vehicleType}}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-    <ion-row style="height: 30px"></ion-row>
-  </form>
+        <ion-item lines='none'>
+          <ion-icon class="big" src="../../assets/icon/tire.svg"></ion-icon>
 
-  <ngx-datatable *ngIf='showResults' class='material striped' [rows]="searchedItems" [columns]="columns"
-    [scrollbarH]="true" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [columnMode]="'force'"
-    [limit]="10">
-  </ngx-datatable>
+          
+          <ion-select formControlName="vehicleType" interface="popover" placeholder="Vehicle Type">
+            <ion-select-option value="{{vehicleType}}" *ngFor='let vehicleType of uniqueVehiclesTypeList '>
+              {{vehicleType}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-row style="height: 30px"></ion-row>
+      </form>
 
-  <ngx-datatable *ngIf='false' class="material fullscreen striped" [rows]="items" [scrollbarH]="true"
+
+
+      <!--   <ngx-datatable *ngIf='true' class="material fullscreen striped" [rows]="items" [scrollbarH]="true"
     [headerHeight]="50" [footerHeight]="30" [rowHeight]="'auto'" [limit]='2'>
     <ngx-datatable-column name="assetType">
       <ng-template let-value="value" ngx-datatable-cell-template>
@@ -147,20 +184,30 @@
     <ngx-datatable-column name="serialNumber"><strong>{{value}}</strong></ngx-datatable-column>
     <ngx-datatable-column name="datePutIntoUse"><strong>{{value}}</strong></ngx-datatable-column>
     <ngx-datatable-column name="vendorCode"><strong>{{value}}</strong></ngx-datatable-column>
-  </ngx-datatable>
+  </ngx-datatable> -->
 
-  <ion-item *ngFor='let item of items '>
+
+      <!--   <br>
+  <br>
+  <br>
+  <br> -->
+
+      <!--  <ion-item *ngFor='let item of items '>
     {{item.assetType}}
-  </ion-item>
+  </ion-item> -->
 
 
-  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
+      <!--   <ion-infinite-scroll threshold="100px" (ionInfinite)="loadData($event)">
     <ion-infinite-scroll-content
       loadingSpinner="bubbles"
       loadingText="Loading more data...">
     </ion-infinite-scroll-content>
-  </ion-infinite-scroll>
+  </ion-infinite-scroll> -->
 
+    </ion-card>
+  </ion-col>
+  <ion-col>
+  </ion-col>
 </ion-content>
 
 <ion-footer no-border text-center>
@@ -168,7 +215,11 @@
     <ion-button (click)='makeExcel()' [disabled]='searchedItems.length<1'>
       <ion-icon name="arrow-round-down"></ion-icon>
     </ion-button>
-    <ion-button type="submit" (click)='onSubmit()' [disabled]='!formGroup.valid && !showResults'>
+    <!--     <ion-button type="submit" (click)='onSubmit()' [disabled]='!formGroup.valid && !showResults'>
+      <ion-icon name="search"></ion-icon>
+    </ion-button> -->
+
+    <ion-button type="submit" (click)='onSubmit()' [disabled]='!formGroup.valid'>
       <ion-icon name="search"></ion-icon>
     </ion-button>
   </ion-toolbar>

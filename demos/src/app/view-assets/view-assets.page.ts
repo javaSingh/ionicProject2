@@ -20,6 +20,8 @@ import { Storage } from '@ionic/storage'
 
 import { IonInfiniteScroll } from '@ionic/angular';
 
+import { HttpRequest, HttpEventType, HttpDownloadProgressEvent } from "@angular/common/http";
+
 
 
 
@@ -34,6 +36,8 @@ import { IonInfiniteScroll } from '@ionic/angular';
 
 
 export class ViewAssetsPage implements OnInit {
+
+  var99=new Date().getFullYear().toString().substr(-2);
 
   items = [
     { assetType: 'Wheel', yearOfManufacture: '1990', owner: 'Pun', detailedVehicleType: 'Right Front Wheel', serialNumber: '12', datePutIntoUse: '15 May 1990', vendorCode: 'Vdn123' },
@@ -65,18 +69,17 @@ export class ViewAssetsPage implements OnInit {
 
   data
 
-
   formGroup: FormGroup = null
 
-  uniqueOwnersList = []
+  uniqueOwnersList = ["ECOR", "SCR", "SR", "ECR"]
   uniqueOwnersMasterList = ["WR", "CR", "ECOR", "ECR", "ER", "KR", "NCR", "NER", "NFR", "NR", "NWR", "SCR", "SECR", "SER", "SR", "SWR", "WCR"]
 
-  uniqueVehiclesCodeList = []
+  uniqueVehiclesCodeList = ["ARC", "BURH"]
 
-  uniqueVehiclesTypeList = []
+  uniqueVehiclesTypeList = ["BRN22.9", "BOXNHL"]
   uniqueVehiclesTypeMasterList = ["BOXNHL", "BCNHL", "BOXNS", "BOSTHSM2", "BOBYN", "BOBSN", "BTPGLN", "BFNS", "BVCM", "BVZI", "BOBRNHSM1"]
 
-  uniqueAssetsTypeList = []
+  uniqueAssetsTypeList = ["F"]
   uniqueAssetsTypeMasterList = ["#", "A", "e", "C", "D", "E", "F", "L", "M", "P", "R", "S", "X", "Y", "Z"]
   uniqueVendorCode = []
 
@@ -122,14 +125,14 @@ export class ViewAssetsPage implements OnInit {
   queryURL2: string = ''
 
   showResults: boolean = false
-  userHasCancelled: boolean = false
+  // userHasCancelled: boolean = false
   showSearchingOverlay: boolean = false
   enableRange: boolean = false
-  showDownloadAlert: boolean = true
+  // showDownloadAlert: boolean = true
 
 
   hideAtLeastOneMsg() {
-    this.userHasCancelled = true
+    // this.userHasCancelled = true
   }
 
   async presentToast(msg: string) {
@@ -175,20 +178,6 @@ export class ViewAssetsPage implements OnInit {
     console.log('Network Speed')
     console.log('Network Type: (Wifi/Lan/Mobile:')
     console.log('Location: (coordinates')
-
-  }
-
-  showOfflineResult() {
-    console.log(this.locallyStoredQueryAndResultList.filter(item => {
-      return item.query.indexOf(this.queryURL2) > -1
-    }))
-    this.searchedItems = this.locallyStoredQueryAndResultList.filter(item => {
-      return item.query.indexOf(this.queryURL2) > -1
-    })[0].result
-    this.showResults = true
-    this.showSearchingOverlay = false
-    this.queryURL2 = ''
-    this.initForm()
   }
 
   loadData(event) {
@@ -203,6 +192,7 @@ export class ViewAssetsPage implements OnInit {
         }
         console.log(i)
         this.items.push(this.items[i])
+        this.items = [...this.items]
       }
       event.target.complete()
     }, 100);
@@ -224,7 +214,7 @@ export class ViewAssetsPage implements OnInit {
         }, 5000); */
   }
 
-  showOnlineResult() {
+  showOnlineResult(jsonQuery) {
 
     let timeoutPromise = new Promise((resolve, reject) => {
       let wait = setTimeout(() => {
@@ -235,11 +225,39 @@ export class ViewAssetsPage implements OnInit {
 
     // let responsePromise = this.http.get('http://http://172.16.22.64:3000/api/v1/RollingAssetRfidData/rfidData?' + this.queryURL2).toPromise()
     // let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/EPC/search?' + this.queryURL2).toPromise()
-    let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/v1/EPC/qbe?' + this.queryURL2).toPromise()
-    this.http.get('http://abc')
+
+    // let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/v1/EPC/qbe?' + this.queryURL2, { reportProgress: true }).toPromise()
+
+    let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/v1/EPC/qbe?filter=' + jsonQuery, { reportProgress: true }).toPromise()
+
+/*     const request = new HttpRequest(
+      "GET", 'http://172.16.22.64:3000/Tags/v1/EPC/qbe?' + this.queryURL2, {},
+      { reportProgress: true });
+
+    this.http.request(request)
+      .subscribe(
+        event => {
+
+          if (event.type === HttpEventType.DownloadProgress) {
+            console.log("Download progress event", event);
+            var partialText = (<HttpDownloadProgressEvent>event).partialText;
+            console.log('partial Text ', partialText)
+            // console.log('"Download progress partial data ',event)
+          }
+
+          if (event.type === HttpEventType.UploadProgress) {
+            console.log("Upload progress event", event);
+          }
+
+          if (event.type === HttpEventType.Response) {
+            console.log("response received...", event.body);
+          }
+
+        } 
+      );*/
 
     let race = Promise.race([timeoutPromise, responsePromise])
-    race.then((data) => {
+    race.then((data: any) => {
       if (data === 'Connection Timed Out') {
         console.log(data)
         this.presentToast('Unable to Connect now.')
@@ -267,93 +285,100 @@ export class ViewAssetsPage implements OnInit {
   }
 
   onSubmit() {
-    if (this.showResults) {
-      this.showResults = false
-      this.searchedItems = []
+    /*     if (this.showResults) {
+          this.showResults = false
+          this.searchedItems = []
+    
+        } else { */
+    this.showSearchingOverlay = true
+    console.log(this.formGroup.value, this.formGroup.valid);
 
-    } else {
-      this.showSearchingOverlay = true
-      console.log(this.formGroup.value, this.formGroup.valid);
-
-      //Use of Filters. Default API.
-      //Between is not working here
-      http://172.16.22.64:3000/api/v1/RollingAssetRfidData?filter={"where":{"rardOwner":"asdfdsfa","rardDetailedVehicleType":"sdfadsf","rardSerialNo":"sdfsdf","rardAssetType":"dfasdfa","rardYearOfManufacture":"adfasdfa","rardVehicleManufacturerCode":"fdfadsf"}}
-      /*       Object.keys(this.formGroup.controls).forEach(key => {
-              if (this.formGroup.controls[key].value) {
-                //if range is not empty and field is empty
-                if (this.formGroup.controls[key].value.lower != undefined && this.formGroup.controls['rardYearOfManufacture'].value < 1) {
-                  // "rardYearOfManufacture":"{between:[30,66]}"
-                  this.queryURL += '"rardYearOfManufacture":"{between:[' + this.formGroup.controls[key].value.lower + ',' + this.formGroup.controls[key].value.upper + ']}"'
-                }
-                else if (key !== 'rardYearOfManufactureRange') {
-                  this.queryURL += '"' + key + '":"' + this.formGroup.controls[key].value + '"'
-                }
+    //Use of Filters. Default API.
+    //Between is not working here
+    http://172.16.22.64:3000/api/v1/RollingAssetRfidData?filter={"where":{"rardOwner":"asdfdsfa","rardDetailedVehicleType":"sdfadsf","rardSerialNo":"sdfsdf","rardAssetType":"dfasdfa","rardYearOfManufacture":"adfasdfa","rardVehicleManufacturerCode":"fdfadsf"}}
+    /*       Object.keys(this.formGroup.controls).forEach(key => {
+            if (this.formGroup.controls[key].value) {
+              //if range is not empty and field is empty
+              if (this.formGroup.controls[key].value.lower != undefined && this.formGroup.controls['rardYearOfManufacture'].value < 1) {
+                // "rardYearOfManufacture":"{between:[30,66]}"
+                this.queryURL += '"rardYearOfManufacture":"{between:[' + this.formGroup.controls[key].value.lower + ',' + this.formGroup.controls[key].value.upper + ']}"'
               }
-            }); */
-      //Custom API. WIP 20 Feb 19
-      // http://172.16.22.64:3000/api/v1/RollingAssetRfidData/rfidData?rardOwner=ECR&rardDetailedVehicleType=BRN22.9&rardAssetType=F&rardSerialNo=001153&rardyearOfManufactureStart=16&rardyearOfManufactureEnd=19&rarddateUseStart=2017-07-18&rarddateUseEnd=2017-09-18
+              else if (key !== 'rardYearOfManufactureRange') {
+                this.queryURL += '"' + key + '":"' + this.formGroup.controls[key].value + '"'
+              }
+            }
+          }); */
+    //Custom API. WIP 20 Feb 19
+    // http://172.16.22.64:3000/api/v1/RollingAssetRfidData/rfidData?rardOwner=ECR&rardDetailedVehicleType=BRN22.9&rardAssetType=F&rardSerialNo=001153&rardyearOfManufactureStart=16&rardyearOfManufactureEnd=19&rarddateUseStart=2017-07-18&rarddateUseEnd=2017-09-18
 
-      var startDate
-      //end date will be current date in case the user decides to ignore the end date
-      var endDate = new Date().toISOString().slice(0, 10);
-
-      Object.keys(this.formGroup.controls).forEach(key => {
-        if (this.formGroup.controls[key].value) {
-          if (this.formGroup.controls[key].value.lower != undefined) {
-            if (this.formGroup.controls['yearOfManufacture'].value < 1) {
-              this.queryURL2 += 'yearOfManufactureStart=' + this.formGroup.controls[key].value.lower + '&yearOfManufactureEnd=' + this.formGroup.controls[key].value.upper + '&'
-            }
-          }
-          else if (key === 'yearOfManufacture') {
-            this.queryURL2 += 'yearOfManufacture=' + this.formGroup.controls[key].value + '&'
-          }
-          else if (key === 'dateUse') {
-            var day = this.formGroup.controls[key].value.day.value
-            var month = this.formGroup.controls[key].value.month.value
-            var year = this.formGroup.controls[key].value.year.value
-            this.queryURL2 += 'dateUse=' + year + '-' + month + '-' + day + '&'
-          }
-          else if (key === 'dateUseRangeStart') {
-            if (this.formGroup.controls['dateUse'].value === '') {
-              startDate = this.formGroup.controls[key].value
-            }
-          }
-          else if (key === 'dateUseRangeEnd') {
-            if (this.formGroup.controls['dateUse'].value === '') {
-              endDate = this.formGroup.controls[key].value
-            }
-          }
-          else {
-            this.queryURL2 += key + '=' + this.formGroup.controls[key].value + '&'
+    var startDate
+    //end date will be current date in case the user decides to ignore the end date
+    var endDate = new Date().toISOString().slice(0, 10);
+var jsonQuery='{'
+    Object.keys(this.formGroup.controls).forEach(key => {
+      if (this.formGroup.controls[key].value) {
+        if (this.formGroup.controls[key].value.lower != undefined) {
+          if (this.formGroup.controls['yearOfManufacture'].value < 1) {
+            this.queryURL2 += 'yearOfManufactureStart=' + this.formGroup.controls[key].value.lower + '&yearOfManufactureEnd=' + this.formGroup.controls[key].value.upper + '&'
+            jsonQuery+='"yearOfManufactureStart":"'+ this.formGroup.controls[key].value.lower + '","yearOfManufactureEnd":"' + this.formGroup.controls[key].value.upper + '",'
           }
         }
-      });
-
-      if (startDate) {
-        this.queryURL2 += 'dateUseStart=' + startDate + '&dateUseEnd=' + endDate + '&'
+        else if (key === 'yearOfManufacture') {
+          this.queryURL2 += 'yearOfManufacture=' + this.formGroup.controls[key].value + '&'
+          jsonQuery+='"yearOfManufacture":"' + this.formGroup.controls[key].value + '",'
+        }
+        else if (key === 'dateUse') {
+          var day = this.formGroup.controls[key].value.day.value
+          var month = this.formGroup.controls[key].value.month.value
+          var year = this.formGroup.controls[key].value.year.value
+          this.queryURL2 += 'dateUse=' + year + '-' + month + '-' + day + '&'
+          jsonQuery += '"dateUse":"' + year + '-' + month + '-' + day + '",'
+        }
+        else if (key === 'dateUseRangeStart') {
+          if (this.formGroup.controls['dateUse'].value === '') {
+            startDate = this.formGroup.controls[key].value
+          }
+        }
+        else if (key === 'dateUseRangeEnd') {
+          if (this.formGroup.controls['dateUse'].value === '') {
+            endDate = this.formGroup.controls[key].value
+          }
+        }
+        else {
+          this.queryURL2 += key + '=' + this.formGroup.controls[key].value + '&'
+          jsonQuery += '"'+key + '":"' + this.formGroup.controls[key].value + '",'
+        }
       }
+    });
 
-      // this.queryURL += '}}'
-      // this.queryURL = this.queryURL.split('""').join('","')
-      // console.log(this.queryURL)
-      console.log(this.queryURL2)
-
-      var queryAndResultItem = this.locallyStoredQueryAndResultList.filter(item => {
-        return item.query.indexOf(this.queryURL2) > -1;
-      })
-      if (queryAndResultItem.length > 0) {
-        console.log('Local Found. Showing Offline Result')
-        this.searchedItems = queryAndResultItem[0].result
-        this.showResults = true
-        this.showSearchingOverlay = false
-        this.queryURL2 = ''
-        this.initForm()
-      }
-      else {
-        console.log('Not found in local. Showing Online Result')
-        this.showOnlineResult()
-      }
+    if (startDate) {
+      this.queryURL2 += 'dateUseStart=' + startDate + '&dateUseEnd=' + endDate + '&'
+      jsonQuery += '"dateUseStart":"' + startDate + '","dateUseEnd":"' + endDate + '"'
     }
+    jsonQuery+='}'
+    jsonQuery=jsonQuery.split(',}').join('}')
+
+    console.log(this.queryURL2)
+    console.log(jsonQuery)
+    this.showOnlineResult(jsonQuery)
+
+    /*       var queryAndResultItem = this.locallyStoredQueryAndResultList.filter(item => {
+            return item.query.indexOf(this.queryURL2) > -1;
+          })
+          if (queryAndResultItem.length > 0) {
+            console.log('Local Found. Showing Offline Result')
+            this.searchedItems = queryAndResultItem[0].result
+            this.showResults = true
+            this.showSearchingOverlay = false
+            this.queryURL2 = ''
+            this.initForm()
+          }
+          else {
+            console.log('Not found in local. Showing Online Result')
+            this.showOnlineResult()
+          } */
+
+    // }
 
   }
 
@@ -368,6 +393,26 @@ export class ViewAssetsPage implements OnInit {
   ) {
     console.log('Constructor')
 
+
+    /* var xhr = new XMLHttpRequest();
+    console.log('UNSENT', xhr.readyState); // readyState will be 0
+
+    xhr.open('GET', 'http://172.16.22.64:3000/Tags/v1/EPC/qbe', true);
+    console.log('OPENED', xhr.readyState); // readyState will be 1
+
+    xhr.onprogress = function () {
+      console.log('LOADING', xhr.readyState); // readyState will be 3
+      console.log('Partial data: ', xhr.responseText)
+      console.log('Partial data length: ', xhr.responseText.length)
+    };
+
+    xhr.onload = function () {
+      console.log('DONE', xhr.readyState); // readyState will be 4
+    };
+
+    xhr.send(null); */
+
+
     /*     // https://www.w3schools.com/jsref/dom_obj_event.asp
         //browser window/tab close detection
         window.addEventListener('unload', () => {
@@ -380,7 +425,6 @@ export class ViewAssetsPage implements OnInit {
         })
         // alert(!!window.cordova) */
 
-
     this.platform.pause.subscribe((data) => {
       localStorage.setItem('someData', 'platform pause detected')
     })
@@ -388,37 +432,6 @@ export class ViewAssetsPage implements OnInit {
       if (data != null)
         this.locallyStoredQueryAndResultList = JSON.parse(data)
     })
-  }
-
-  async presentAlert() {
-    const alert = await this.alertController.create({
-      header: 'Sure to Download ?',
-      // message: 'Message <strong>text</strong>!!!',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: (blah) => {
-            console.log('Confirm Cancel: blah ');
-          }
-        }, {
-          text: 'Okay',
-          handler: () => {
-            console.log('Confirm Okay ');
-            this.makeExcel()
-          }
-        }, {
-          text: 'Okay & Never Show Again',
-          handler: () => {
-            console.log('User Selected Never Show Again')
-            this.makeExcel()
-            this.showDownloadAlert = false
-          }
-        }
-      ]
-    });
-    await alert.present();
   }
 
   startFilter() {
@@ -490,14 +503,11 @@ export class ViewAssetsPage implements OnInit {
     }
 
     if (atLeastOneIsFilled) {
-
       if (formGroup.controls['owner'].value.length != 0 && (formGroup.controls['owner'].value.length > 4 || formGroup.controls['owner'].value.length < 2)) {
         ownerLenghtIsValid = false
         console.log('InvalidForm. Owner Length out of range')
         formGroup.controls['owner'].invalid
       }
-
-
     }
 
 
@@ -529,8 +539,10 @@ export class ViewAssetsPage implements OnInit {
     console.log(event)
     const charCode = (event.which) ? event.which : event.keyCode;
     if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      console.log('Invalid Char')
       return false;
     }
+    console.log('Serial No. Length: ',this.formGroup.controls['serialNo'].value.length)
     return true;
   }
 
@@ -540,19 +552,19 @@ export class ViewAssetsPage implements OnInit {
     this.initForm()
     this.storage.get('uniqueOwnersList').then((data) => {
       if (data != null) {
-        this.uniqueOwnersList = JSON.parse(data)
-        this.storage.get('uniqueAssetsTypeList').then((data) => {
-          this.uniqueAssetsTypeList = JSON.parse(data)
-        })
-        this.storage.get('uniqueVehiclesCodeList').then((data) => {
-          this.uniqueVehiclesCodeList = JSON.parse(data)
-        })
-        this.storage.get('uniqueYearsOfManufactureist').then((data) => {
-          this.uniqueYearsOfManufactureist = JSON.parse(data)
-        })
-        this.storage.get('uniqueVehiclesTypeList').then((data) => {
-          this.uniqueVehiclesTypeList = JSON.parse(data)
-        })
+        /*        this.uniqueOwnersList = JSON.parse(data)
+               this.storage.get('uniqueAssetsTypeList').then((data) => {
+                 this.uniqueAssetsTypeList = JSON.parse(data)
+               })
+               this.storage.get('uniqueVehiclesCodeList').then((data) => {
+                 this.uniqueVehiclesCodeList = JSON.parse(data)
+               })
+               this.storage.get('uniqueYearsOfManufactureist').then((data) => {
+                 this.uniqueYearsOfManufactureist = JSON.parse(data)
+               })
+               this.storage.get('uniqueVehiclesTypeList').then((data) => {
+                 this.uniqueVehiclesTypeList = JSON.parse(data)
+               }) */
       }
       else {
         // use of master list in case network is down and localStorge is null
@@ -560,7 +572,7 @@ export class ViewAssetsPage implements OnInit {
                 this.uniqueAssetsTypeList=this.uniqueAssetsTypeMasterList
                 this.uniqueVehiclesTypeList =this.uniqueVehiclesTypeMasterList */
 
-        this.getUniqueValues()
+        // this.getUniqueValues()
       }
     })
   }
