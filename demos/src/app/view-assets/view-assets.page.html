@@ -61,8 +61,7 @@
 
           <ion-label></ion-label>
 
-          <ion-input (keypress)="numberOnly($event)" clearInput type="text"   formControlName="serialNo"
-            placeholder="Serial No. 6 digits only."></ion-input>
+          <ion-input (keypress)="numberOnly($event)" clearInput type="text"   formControlName="serialNo" placeholder="Serial No. 6 digits only."></ion-input>
           <span *ngIf='formGroup.controls["serialNo"].invalid'>
             <ion-label color='danger'>6 Digits Only</ion-label>
           </span>

@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Query Assets
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+
+  <!--   <ion-list> -->
+  <form style='max-width:400px' [formGroup]="formGroup">
+    <ion-item>
+      <ion-label position="floating">Asset Type</ion-label>
+      <ion-select formControlName="assetType" interface="alert">
+        <ion-select-option value="F">F</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+
+    <ion-item>
+      <ion-label position="floating">Manufacture Year</ion-label>
+      <ion-datetime formControlName="yearOfManufacture" displayFormat="YY" picker-format='YY'></ion-datetime>
+    </ion-item>
+
+    <!-- <ion-list> -->
+    <ion-item>
+      <ion-label position="floating">Owner</ion-label>
+      <ion-select formControlName="owner">
+        <ion-select-option value="ECOR">ECOR</ion-select-option>
+        <ion-select-option value="ECR">ECR</ion-select-option>
+        <ion-select-option value="SCR">SCR</ion-select-option>
+        <ion-select-option value="SR">SR</ion-select-option>
+
+      </ion-select>
+    </ion-item>
+    <!-- </ion-list> -->
+
+    <!-- <ion-list> -->
+    <ion-item>
+      <ion-label position="floating">Vehicle Type</ion-label>
+      <ion-select formControlName='vehicleType' interface="alert">
+        <ion-select-option value="BRN22.9">BRN22.9</ion-select-option>
+        <ion-select-option value="BOXNHL">BOXNHL</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <!-- </ion-list> -->
+
+    <ion-item style='--highlight-height:0'>
+      <ion-label position="floating">Serial Number <span style='color:red'
+          *ngIf='formGroup.controls["serialNo"].invalid'>
+          6 Digits Only
+        </span></ion-label>
+      <ion-input clearInput formControlName='serialNo'></ion-input>
+
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Date Of Use</ion-label>
+      <ion-datetime formControlName='dateUse' displayFormat="D MMM YYYY"></ion-datetime>
+    </ion-item>
+
+    <!-- <ion-list> -->
+    <ion-item>
+      <ion-label position="floating">Vehicle Code</ion-label>
+      <ion-select formControlName='vehicleCode' interface="alert">
+        <ion-select-option value="ARC">ARC</ion-select-option>
+        <ion-select-option value="BURH">BURH</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <!-- </ion-list> -->
+    <ion-item lines='none'>
+      <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid'>Search</ion-button>
+    </ion-item>
+  </form>
+
+</ion-content>

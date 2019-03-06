@@ -537,8 +537,11 @@ var jsonQuery='{'
   numberOnly(event): boolean {
     console.log('Keypress Event: ')
     console.log(event)
+    console.log(event.length)
     const charCode = (event.which) ? event.which : event.keyCode;
-    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+    console.log(event.length>5)
+    console.log
+    if (event.length>5 && charCode > 31 && (charCode < 48 || charCode > 57)) {
       console.log('Invalid Char')
       return false;
     }
