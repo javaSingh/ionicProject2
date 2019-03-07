@@ -7,20 +7,35 @@
 </ion-header>
 
 <ion-content padding>
-
+  <ion-item lines='none' *ngIf='results.length>1'>
+  <ion-button size='small' (click)='showPrevious()' [disabled]='index+1<=1'>
+    <ion-icon name="arrow-dropleft"></ion-icon>
+  </ion-button>
+<span>{{index+1}} of {{results.length}}</span>
+  <ion-button size='small' (click)='showNext()' [disabled]='index+1>=results.length'>
+    <ion-icon name="arrow-dropright"></ion-icon>
+  </ion-button>
+</ion-item>
   <!--   <ion-list> -->
   <form style='max-width:400px' [formGroup]="formGroup">
     <ion-item>
       <ion-label position="floating">Asset Type</ion-label>
-      <ion-select formControlName="assetType" interface="alert">
+      <ion-select [interfaceOptions]="customAlertOptions" formControlName="assetType" interface="alert" cancelText='Clear' (ionCancel)='clearSelection("assetType")'>
         <ion-select-option value="F">F</ion-select-option>
       </ion-select>
     </ion-item>
 
+<!--     <ion-select okText="Select" cancelText="Clear" formControlName="selectionValue" (ionCancel)="clearSelection()">
+        <ion-option>a</ion-option>
+</ion-select> -->
+    
 
-    <ion-item>
-      <ion-label position="floating">Manufacture Year</ion-label>
-      <ion-datetime formControlName="yearOfManufacture" displayFormat="YY" picker-format='YY'></ion-datetime>
+    <ion-item style='--highlight-height:0'>
+      <ion-label position="floating">Manufacture Year<span style='color:red'
+        *ngIf='formGroup.controls["yearOfManufacture"].invalid'>
+        YY Only
+      </span></ion-label>
+      <ion-input clearInput formControlName='yearOfManufacture'></ion-input>
     </ion-item>
 
     <!-- <ion-list> -->
@@ -72,6 +87,7 @@
     <ion-item lines='none'>
       <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid'>Search</ion-button>
     </ion-item>
+
   </form>
 
 </ion-content>
