@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { ToastController } from '@ionic/angular';
+import { ToastController, AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -13,11 +13,55 @@ export class HomePage implements OnInit {
   formGroup: FormGroup
   results: any[] = []
   index
+  // owners = ['ECOR', 'ECR', 'SCR', 'SR']
+  owners = ["WR", "CR", "ECOR", "ECR", "ER", "KR", "NCR", "NER", "NFR", "NR", "NWR", "SCR", "SECR", "SER", "SR", "SWR", "WCR"]
+
+  // vehiclesType=['BRN22.9','BOXNHL']
+  vehiclesType = ["BOXNHL", "BCNHL", "BOXNS", "BOSTHSM2", "BOBYN", "BOBSN", "BTPGLN", "BFNS", "BVCM", "BVZI", "BOBRNHSM1"]
+  // manufacturersCode = ['ARC', 'BURN']
+  manufacturersCode = ["ARC", "ASRW", "BESF", "BESWL", "BESWR", "BUR", "BWELK", "BWELZ", "BWT", "CIM", "CLW", "DLW", "DMW", "GOCW", "HEIB", "HEIS", "ICFW", "JMPW", "JRIL", "JWL", "MCFW", "MI", "OFPL", "RCFW", "SPJW", "SR", "TEXB", "TEXS", "TWL",]
+
+  assetsType=["#", "A", "e", "C", "D", "E", "F", "L", "M", "P", "R", "S", "X", "Y", "Z"]
+
+  public customOptions: any = {
+    buttons: [
+      {
+        text: 'Cancel',
+        handler: () => {
+          console.log('Dismiss.');
+          return true;
+        }
+      },
+      {
+        text: 'Clear',
+        handler: () => this.formGroup.controls['dateUse'].setValue('')
+      },{
+      text: 'Done',
+      handler: ((data) => {
+        console.log('Clicked Save! Data is: ')
+        console.log(data)
+        console.log(data.month.value.length)
+        if(data.month.value<10){
+          console.log('Single Digit Month Found')
+          data.month.value='0'+data.month.value
+          console.log('After padding',data.month.value)
+        }
+        if(data.day.value<10){
+          console.log('Single Digit Day Found')
+          data.day.value='0'+data.day.value
+          console.log('After padding',data.day.value)
+        }
+        console.log(''+data.year.value+'-'+data.month.value+'-'+data.day.value)
+        this.formGroup.controls['dateUse'].setValue(''+data.year.value+'-'+data.month.value+'-'+data.day.value)
+      })
+    },]
+  }
 
   constructor(
     public fb: FormBuilder,
     public http: HttpClient,
-    public toastController: ToastController
+    public toastController: ToastController,
+    public alertController: AlertController
   ) {
     console.log('Constructor')
   }
@@ -39,6 +83,8 @@ export class HomePage implements OnInit {
     }, {
         validator: this.customValidator
       });
+
+    // this.presentAlertRadio()
   }
 
   customValidator(formGroup: FormGroup) {
@@ -88,6 +134,7 @@ export class HomePage implements OnInit {
       }
     }, error => {
       console.log('HTTP GET ERROR: ', error)
+      // this.presentToast('')
     })
 
   }
@@ -137,17 +184,156 @@ year_of_manufacture: 17 */
     toast.present();
   }
 
-  clearSelection(key){
-    console.log('Inside clearSelection('+key+')')
-    if(this.formGroup.controls[key].value){
-      console.log('Select value Found for',key)
+  clearSelection(key) {
+    console.log('Inside clearSelection(' + key + ')')
+    if (this.formGroup.controls[key].value) {
+      console.log('Select value Found for', key)
     }
   }
 
-  customAlertOptions: any = {
-    header: 'Owner',
-    translucent: true,
-  };
+  /*   customAlertOptions: any = {
+      header: 'Owner',
+      translucent: true,
+    }; */
+
+
+  async presentAlertRadio(header, inputs: any[], key) {
+
+    const alert = await this.alertController.create({
+      header: header,
+      // message: '<div style="overflow-y:auto;max-height:240px;"></div>',
+      inputs: inputs
+      /*       [
+              {
+                name: 'radio1',
+                type: 'radio',
+                label: 'Radio 1',
+                value: 'value1',
+                checked: true
+              },
+              {
+                name: 'radio2',
+                type: 'radio',
+                label: 'Radio 2',
+                value: 'value2'
+              },
+              {
+                name: 'radio3',
+                type: 'radio',
+                label: 'Radio 3',
+                value: 'value3'
+              },
+              {
+                name: 'radio4',
+                type: 'radio',
+                label: 'Radio 4',
+                value: 'value4'
+              },
+              {
+                name: 'radio5',
+                type: 'radio',
+                label: 'Radio 5',
+                value: 'value5'
+              },
+              {
+                name: 'radio6',
+                type: 'radio',
+                label: 'Radio 6',
+                value: 'value6'
+              }
+            ], */
+      ,
+      buttons: [
+        /* {
+          text: 'Cancel',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (data) => {
+            console.log('Confirm Cancel',data);
+          }
+        }, */
+        {
+          text: 'Ok',
+          handler: (data) => {
+            console.log('Confirm Ok', data);
+            if (data != undefined)
+              this.formGroup.controls[key].setValue('' + data)
+          }
+        }, {
+          text: 'Clear',
+          handler: (data) => {
+            console.log('Confirm Clear', data);
+            this.formGroup.controls[key].setValue('')
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  openSelect(key) {
+    var header
+    var inputs=[]
+    if (key === 'owner') {
+      console.log('Owner Select')
+       inputs = this.makeRadioSelectList(key, this.owners)
+      header='Owner'
+    }
+    else if (key === 'vehicleType') {
+      console.log('Vehicle Type Select')
+       inputs = this.makeRadioSelectList(key, this.vehiclesType)
+      header='Vehicle Type'
+    }
+    else if(key==='vehicleCode'){
+      console.log('Vehicle Type Select')
+       inputs = this.makeRadioSelectList(key, this.manufacturersCode)
+      header='Manufacture Code'
+    }
+    else if(key==='assetType'){
+      console.log('Asset Type Select')
+       inputs = this.makeRadioSelectList(key, this.assetsType)
+      header='Asset Type'
+    }
+    this.presentAlertRadio(header, inputs, key)
+  }
+
+  makeRadioSelectList(key, array) {
+    var inputs = []
+    for (var i = 0; i < array.length; i++) {
+      var option = {
+        type: 'radio', label: array[i], value: array[i]
+      }
+      if (this.formGroup.controls[key].value && this.formGroup.controls[key].value !== '' && this.formGroup.controls[key].value === array[i]) {
+        option['checked'] = true
+      }
+      console.log(option)
+      inputs.push(option)
+    }
+    return inputs;
+
+  }
+
+  clearForm(){
+  this.results=[]
+    this.formGroup = this.fb.group({
+      'assetType': [''],
+      'yearOfManufacture': ['',
+        [Validators.pattern('[0-9]{1,2}'), Validators.min(0), Validators.max(99)]],
+      'owner': [''],
+      'vehicleType': [''],
+      'serialNo': [''
+        , [Validators.pattern('[0-9]{6}'), Validators.min(0), Validators.max(999999)]
+      ],
+      'dateUse': [''],
+      'vehicleCode': [''],
+    }, {
+        validator: this.customValidator
+      });
+
+  }
+
+  
 
 
 }

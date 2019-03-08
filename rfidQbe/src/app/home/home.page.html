@@ -4,90 +4,164 @@
       Query Assets
     </ion-title>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-item lines='none'>
+      <ion-button *ngIf='formGroup.valid' size='small' (click)='clearForm()'>Clear Form</ion-button>
+      <ion-button *ngIf='results.length>1' size='small' (click)='showPrevious()' [disabled]='index+1<=1'>
+        <ion-icon name="arrow-dropleft"></ion-icon>
+      </ion-button>
+      <span *ngIf='results.length>1'>{{index+1}} of {{results.length}} </span>
+      <ion-button *ngIf='results.length>1' size='small' (click)='showNext()' [disabled]='index+1>=results.length'>
+        <ion-icon name="arrow-dropright"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-toolbar>
+
+
 </ion-header>
 
 <ion-content padding>
-  <ion-item lines='none' *ngIf='results.length>1'>
-  <ion-button size='small' (click)='showPrevious()' [disabled]='index+1<=1'>
-    <ion-icon name="arrow-dropleft"></ion-icon>
-  </ion-button>
-<span>{{index+1}} of {{results.length}}</span>
-  <ion-button size='small' (click)='showNext()' [disabled]='index+1>=results.length'>
-    <ion-icon name="arrow-dropright"></ion-icon>
-  </ion-button>
-</ion-item>
-  <!--   <ion-list> -->
-  <form style='max-width:400px' [formGroup]="formGroup">
-    <ion-item>
-      <ion-label position="floating">Asset Type</ion-label>
-      <ion-select [interfaceOptions]="customAlertOptions" formControlName="assetType" interface="alert" cancelText='Clear' (ionCancel)='clearSelection("assetType")'>
-        <ion-select-option value="F">F</ion-select-option>
-      </ion-select>
-    </ion-item>
+    <div class="modal fade in" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: block;">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+              <h4 class="modal-title" id="myModalLabel">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+              <p>Some text in the modal.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+    </div>
 
-<!--     <ion-select okText="Select" cancelText="Clear" formControlName="selectionValue" (ionCancel)="clearSelection()">
-        <ion-option>a</ion-option>
-</ion-select> -->
-    
 
-    <ion-item style='--highlight-height:0'>
-      <ion-label position="floating">Manufacture Year<span style='color:red'
-        *ngIf='formGroup.controls["yearOfManufacture"].invalid'>
-        YY Only
-      </span></ion-label>
-      <ion-input clearInput formControlName='yearOfManufacture'></ion-input>
-    </ion-item>
 
-    <!-- <ion-list> -->
-    <ion-item>
-      <ion-label position="floating">Owner</ion-label>
-      <ion-select formControlName="owner">
-        <ion-select-option value="ECOR">ECOR</ion-select-option>
-        <ion-select-option value="ECR">ECR</ion-select-option>
-        <ion-select-option value="SCR">SCR</ion-select-option>
-        <ion-select-option value="SR">SR</ion-select-option>
+  <!-- <ion-alert class="sc-ion-alert-md-h sc-ion-alert-md-s hydrated" id="ion-overlay-1" role="dialog" aria-modal="true"
+    style="z-index: 20001;">
+    <ion-backdrop class="sc-ion-alert-md hydrated" tabindex="-1" style="opacity: 0.32;"></ion-backdrop>
+    <div class="alert-wrapper sc-ion-alert-md" style="opacity: 1; transform: scale(1);">
+      <div class="alert-head sc-ion-alert-md">
+        <h2 id="alert-1-hdr" class="alert-title sc-ion-alert-md">Owner</h2>
+      </div>
+      <div id="alert-1-msg" class="alert-message sc-ion-alert-md"></div>
+      <div class="alert-radio-group sc-ion-alert-md" role="radiogroup" aria-labelledby="alert-1-hdr"><button
+          type="button" aria-checked="false" id="alert-input-1-0" tabindex="0"
+          class="alert-radio-button alert-tappable alert-radio ion-focusable sc-ion-alert-md" role="radio">
+          <div class="alert-button-inner sc-ion-alert-md">
+            <div class="alert-radio-icon sc-ion-alert-md">
+              <div class="alert-radio-inner sc-ion-alert-md"></div>
+            </div>
+            <div class="alert-radio-label sc-ion-alert-md">ECOR</div>
+          </div>
+        </button><button type="button" aria-checked="false" id="alert-input-1-1" tabindex="0"
+          class="alert-radio-button alert-tappable alert-radio ion-focusable sc-ion-alert-md" role="radio">
+          <div class="alert-button-inner sc-ion-alert-md">
+            <div class="alert-radio-icon sc-ion-alert-md">
+              <div class="alert-radio-inner sc-ion-alert-md"></div>
+            </div>
+            <div class="alert-radio-label sc-ion-alert-md">ECR</div>
+          </div>
+        </button><button type="button" aria-checked="false" id="alert-input-1-2" tabindex="0"
+          class="alert-radio-button alert-tappable alert-radio ion-focusable sc-ion-alert-md" role="radio">
+          <div class="alert-button-inner sc-ion-alert-md">
+            <div class="alert-radio-icon sc-ion-alert-md">
+              <div class="alert-radio-inner sc-ion-alert-md"></div>
+            </div>
+            <div class="alert-radio-label sc-ion-alert-md">SCR</div>
+          </div>
+        </button><button type="button" aria-checked="false" id="alert-input-1-3" tabindex="0"
+          class="alert-radio-button alert-tappable alert-radio ion-focusable sc-ion-alert-md" role="radio">
+          <div class="alert-button-inner sc-ion-alert-md">
+            <div class="alert-radio-icon sc-ion-alert-md">
+              <div class="alert-radio-inner sc-ion-alert-md"></div>
+            </div>
+            <div class="alert-radio-label sc-ion-alert-md">SR</div>
+          </div>
+        </button></div>
+      <div class="alert-button-group sc-ion-alert-md"><button type="button"
+          class="alert-button ion-focusable ion-activatable sc-ion-alert-md" tabindex="0"><span
+            class="alert-button-inner sc-ion-alert-md">Ok</span>
+          <ion-ripple-effect class="sc-ion-alert-md hydrated" role="presentation"></ion-ripple-effect>
+        </button><button type="button" class="alert-button ion-focusable ion-activatable sc-ion-alert-md"
+          tabindex="0"><span class="alert-button-inner sc-ion-alert-md">Clear</span>
+          <ion-ripple-effect class="sc-ion-alert-md hydrated" role="presentation"></ion-ripple-effect>
+        </button></div>
+    </div>
+  </ion-alert> -->
 
-      </ion-select>
-    </ion-item>
-    <!-- </ion-list> -->
 
-    <!-- <ion-list> -->
-    <ion-item>
-      <ion-label position="floating">Vehicle Type</ion-label>
-      <ion-select formControlName='vehicleType' interface="alert">
-        <ion-select-option value="BRN22.9">BRN22.9</ion-select-option>
-        <ion-select-option value="BOXNHL">BOXNHL</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <!-- </ion-list> -->
 
-    <ion-item style='--highlight-height:0'>
-      <ion-label position="floating">Serial Number <span style='color:red'
-          *ngIf='formGroup.controls["serialNo"].invalid'>
-          6 Digits Only
-        </span></ion-label>
-      <ion-input clearInput formControlName='serialNo'></ion-input>
 
-    </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Date Of Use</ion-label>
-      <ion-datetime formControlName='dateUse' displayFormat="D MMM YYYY"></ion-datetime>
-    </ion-item>
+  <ion-grid>
+    <!-- <ion-row>
+      <ion-col> -->
+    <form style='max-width:400px' [formGroup]="formGroup">
+      <ion-row>
+        <ion-col>
+          <ion-item (click)='openSelect("assetType")' style='--highlight-height:0'>
+            <ion-label position="floating">Asset Type</ion-label>
+            <ion-input type='text' formControlName="assetType"></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item style='--highlight-height:0'>
+            <ion-label position="floating">Manufacture Year (YY)</ion-label>
+            <ion-input clearInput formControlName='yearOfManufacture'></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
 
-    <!-- <ion-list> -->
-    <ion-item>
-      <ion-label position="floating">Vehicle Code</ion-label>
-      <ion-select formControlName='vehicleCode' interface="alert">
-        <ion-select-option value="ARC">ARC</ion-select-option>
-        <ion-select-option value="BURH">BURH</ion-select-option>
-      </ion-select>
-    </ion-item>
-    <!-- </ion-list> -->
-    <ion-item lines='none'>
-      <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid'>Search</ion-button>
-    </ion-item>
+      <ion-row>
+        <ion-col>
+          <ion-item text-wrap (click)='openSelect("owner")' style='--highlight-height:0'>
+            <ion-label position="floating">Owner</ion-label>
+            <ion-input type='text' formControlName='owner'></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item text-wrap (click)='openSelect("vehicleType")' style='--highlight-height:0'>
+            <ion-label position="floating">Vehicle Type</ion-label>
+            <ion-input type='text' formControlName='vehicleType'></ion-input>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item text-wrap style='--highlight-height:0'>
+            <ion-label primary position="floating">Serial Number </ion-label>
+            <ion-input clearInput formControlName='serialNo'></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
 
-  </form>
+
+      <ion-item>
+        <ion-label position="floating">Date Of Use</ion-label>
+        <ion-datetime formControlName='dateUse' displayFormat="D MMM YYYY" [pickerOptions]="customOptions">
+        </ion-datetime>
+      </ion-item>
+
+      <ion-item (click)='openSelect("vehicleCode")' style='--highlight-height:0'>
+        <ion-label position="floating">Manufacturer Code</ion-label>
+        <ion-input type='text' formControlName='vehicleCode'></ion-input>
+      </ion-item>
+
+      <ion-item lines='none'>
+        <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid'>Search</ion-button>
+        <span style='color:red' *ngIf='formGroup.controls["serialNo"].invalid'>
+          Serial No. should be 6 Digits Only
+        </span>
+        <span style='color:red' *ngIf='formGroup.controls["yearOfManufacture"].invalid'>
+          Manufacture Year. Max 2 Digits.
+        </span>
+      </ion-item>
+
+    </form>
+    <!-- </ion-col>
+    </ion-row> -->
+  </ion-grid>
 
 </ion-content>
