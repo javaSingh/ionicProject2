@@ -2,6 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ToastController, AlertController } from '@ionic/angular';
+import { CalendarComponentOptions } from 'ion2-calendar';
+import { ModalController } from '@ionic/angular';
+import {
+    CalendarModal,
+    CalendarModalOptions,
+    DayConfig,
+    CalendarResult
+  } from 'ion2-calendar';
 
 @Component({
   selector: 'app-home',
@@ -77,7 +85,8 @@ export class HomePage implements OnInit {
     public fb: FormBuilder,
     public http: HttpClient,
     public toastController: ToastController,
-    public alertController: AlertController
+    public alertController: AlertController,
+    public modalCtrl: ModalController
   ) {
     console.log('Constructor')
   }
@@ -367,8 +376,45 @@ year_of_manufacture: 17 */
 
 
   showQuerySummary(){
-      
+
   }
+
+
+  type='string'
+  fromInfinite:CalendarComponentOptions={
+      from : new Date(1),
+      to : 0
+  }
+
+  onChange($event) {
+    console.log($event);
+    this.openCalendar()
+  }
+
+  async openCalendar() {
+    const options: CalendarModalOptions = {
+      title: 'Date Use',
+      canBackwardsSelected:true,
+      autoDone:true
+    };
+
+    const myCalendar = await this.modalCtrl.create({
+      component: CalendarModal,
+      componentProps: { options }
+    });
+
+    myCalendar.present();
+
+    const event: any = await myCalendar.onDidDismiss();
+    const date: CalendarResult = event.data;
+    console.log(date.string);
+  }
+
+  showDateUseCalendar(){
+      this.openCalendar()
+  }
+
+  //https://github.com/HsuanXyz/ion2-calendar
   
 
 

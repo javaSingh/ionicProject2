@@ -157,13 +157,18 @@
 
     </form>
 
-    <ion-calendar [(ngModel)]="date"
+    <ion-item (click)='showDateUseCalendar()'>
+      <ion-label position="floating">Date Of Use</ion-label>
+     <ion-input></ion-input>
+    </ion-item>
+
+<!--     <ion-calendar [(ngModel)]="date"
               (change)="onChange($event)"
               [type]="type"
               [format]="'YYYY-MM-DD'"
               [options]='fromInfinite'
               >
-</ion-calendar>
+</ion-calendar> -->
     <!-- </ion-col>
     </ion-row> -->
   </ion-grid>
