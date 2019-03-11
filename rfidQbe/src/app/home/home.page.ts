@@ -14,7 +14,23 @@ export class HomePage implements OnInit {
   results: any[] = []
   index
   // owners = ['ECOR', 'ECR', 'SCR', 'SR']
-  owners = ["WR", "CR", "ECOR", "ECR", "ER", "KR", "NCR", "NER", "NFR", "NR", "NWR", "SCR", "SECR", "SER", "SR", "SWR", "WCR"]
+  owners =     ["CR",
+  "ECOR",
+  "ECR",
+  "ER",
+  "KR",
+  "NCR",
+  "NER",
+  "NFR",
+  "NR",
+  "NWR",
+  "SCR",
+  "SECR",
+  "SER",
+  "SR",
+  "SWR",
+  "WCR",
+  "WR"]
 
   // vehiclesType=['BRN22.9','BOXNHL']
   vehiclesType = ["BOXNHL", "BCNHL", "BOXNS", "BOSTHSM2", "BOBYN", "BOBSN", "BTPGLN", "BFNS", "BVCM", "BVZI", "BOBRNHSM1"]
@@ -90,6 +106,12 @@ export class HomePage implements OnInit {
   customValidator(formGroup: FormGroup) {
 
     var atLeastOneIsFilled: boolean = false
+
+    if(formGroup.controls['yearOfManufacture']){
+        if(formGroup.controls['yearOfManufacture'].value.match('[0,9]{1,2}')!==null && formGroup.controls['yearOfManufacture'].value!==''){
+            formGroup.controls['yearOfManufacture'].setErrors({ incorrect: true })
+        }
+    }
 
     for (var key in formGroup.controls) {
       if (formGroup.controls[key].value && formGroup.controls[key].value.length > 0) {
@@ -323,7 +345,7 @@ year_of_manufacture: 17 */
       'owner': [''],
       'vehicleType': [''],
       'serialNo': [''
-        , [Validators.pattern('[0-9]{6}'), Validators.min(0), Validators.max(999999)]
+        , [Validators.pattern('[0-9]{1,6}'), Validators.min(0), Validators.max(999999)]
       ],
       'dateUse': [''],
       'vehicleCode': [''],
@@ -333,6 +355,20 @@ year_of_manufacture: 17 */
 
   }
 
+
+  numberOnly(event): boolean {
+    console.log('Keypress Event: ')
+    const charCode = (event.which) ? event.which : event.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+      return false;
+    }
+    return true;
+  }
+
+
+  showQuerySummary(){
+      
+  }
   
 
 

@@ -6,8 +6,12 @@ import { RouterModule } from '@angular/router';
 
 import { HomePage } from './home.page';
 
+import { CalendarModule } from 'ion2-calendar';
+
+
 @NgModule({
   imports: [
+    CalendarModule,
     ReactiveFormsModule,
     CommonModule,
     FormsModule,

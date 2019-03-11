@@ -1,19 +1,24 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>
-      Query Assets
+      RFID Tagged Assets
     </ion-title>
   </ion-toolbar>
   <ion-toolbar>
-    <ion-item lines='none'>
-      <ion-button *ngIf='formGroup.valid' size='small' (click)='clearForm()'>Clear Form</ion-button>
-      <ion-button *ngIf='results.length>1' size='small' (click)='showPrevious()' [disabled]='index+1<=1'>
+    <ion-item lines='none' *ngIf='results.length>1'>
+      <ion-button size='small' ion-button small (click)='makeExcel()' style="background:green;width:30px;">
+        <img src="../../assets/icon/excel.png" style="height:100%;max-width:30px;">
+      </ion-button>
+      <ion-icon src='../../assets/icon/excel.png'></ion-icon>
+      <!-- <ion-button *ngIf='formGroup.valid' size='small' (click)='clearForm()'>Clear Form</ion-button> -->
+      <ion-button size='small' (click)='showPrevious()' [disabled]='index+1<=1'>
         <ion-icon name="arrow-dropleft"></ion-icon>
       </ion-button>
-      <span *ngIf='results.length>1'>{{index+1}} of {{results.length}} </span>
-      <ion-button *ngIf='results.length>1' size='small' (click)='showNext()' [disabled]='index+1>=results.length'>
+      <span>{{index+1}} of {{results.length}} </span>
+      <ion-button size='small' (click)='showNext()' [disabled]='index+1>=results.length'>
         <ion-icon name="arrow-dropright"></ion-icon>
       </ion-button>
+      
     </ion-item>
   </ion-toolbar>
 
@@ -21,22 +26,7 @@
 </ion-header>
 
 <ion-content padding>
-    <div class="modal fade in" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: block;">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-              <h4 class="modal-title" id="myModalLabel">Modal Header</h4>
-            </div>
-            <div class="modal-body">
-              <p>Some text in the modal.</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-    </div>
+
 
 
 
@@ -100,18 +90,18 @@
   <ion-grid>
     <!-- <ion-row>
       <ion-col> -->
-    <form style='max-width:400px' [formGroup]="formGroup">
+    <form style='max-width:400px' [formGroup]="formGroup" (submit)='onSubmit()'>
       <ion-row>
         <ion-col>
           <ion-item (click)='openSelect("assetType")' style='--highlight-height:0'>
             <ion-label position="floating">Asset Type</ion-label>
-            <ion-input type='text' formControlName="assetType"></ion-input>
+            <ion-input style="--padding-start:0" type='text' formControlName="assetType"></ion-input>
           </ion-item>
         </ion-col>
         <ion-col>
           <ion-item style='--highlight-height:0'>
             <ion-label position="floating">Manufacture Year (YY)</ion-label>
-            <ion-input clearInput formControlName='yearOfManufacture'></ion-input>
+            <ion-input (keypress)="numberOnly($event)" clearInput formControlName='yearOfManufacture'></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -132,34 +122,48 @@
         <ion-col>
           <ion-item text-wrap style='--highlight-height:0'>
             <ion-label primary position="floating">Serial Number </ion-label>
-            <ion-input clearInput formControlName='serialNo'></ion-input>
+            <ion-input (keypress)="numberOnly($event)" clearInput formControlName='serialNo'></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
 
+      <ion-row>
+        <ion-col>
+          <ion-item>
+            <ion-label position="floating">Date Of Use</ion-label>
+            <ion-datetime style='--padding-top:0' formControlName='dateUse' displayFormat="D MMM YYYY" [pickerOptions]="customOptions">
+            </ion-datetime>
+          </ion-item>
+        </ion-col>
 
-      <ion-item>
-        <ion-label position="floating">Date Of Use</ion-label>
-        <ion-datetime formControlName='dateUse' displayFormat="D MMM YYYY" [pickerOptions]="customOptions">
-        </ion-datetime>
-      </ion-item>
-
-      <ion-item (click)='openSelect("vehicleCode")' style='--highlight-height:0'>
-        <ion-label position="floating">Manufacturer Code</ion-label>
-        <ion-input type='text' formControlName='vehicleCode'></ion-input>
-      </ion-item>
+        <ion-col>
+          <ion-item (click)='openSelect("vehicleCode")' style='--highlight-height:0'>
+            <ion-label position="floating">Manufacturer Code</ion-label>
+            <ion-input type='text' formControlName='vehicleCode'></ion-input>
+          </ion-item>
+        </ion-col>
+      </ion-row>
 
       <ion-item lines='none'>
         <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid'>Search</ion-button>
         <span style='color:red' *ngIf='formGroup.controls["serialNo"].invalid'>
-          Serial No. should be 6 Digits Only
+          Serial No. should be less than 6 Digits.
         </span>
         <span style='color:red' *ngIf='formGroup.controls["yearOfManufacture"].invalid'>
-          Manufacture Year. Max 2 Digits.
+          Manufacture Year Invalid.
         </span>
+        <ion-icon slot='end' name="information-circle-outline" (click)='showQuerySummary()' *ngIf='formGroup.valid'></ion-icon>
       </ion-item>
 
     </form>
+
+    <ion-calendar [(ngModel)]="date"
+              (change)="onChange($event)"
+              [type]="type"
+              [format]="'YYYY-MM-DD'"
+              [options]='fromInfinite'
+              >
+</ion-calendar>
     <!-- </ion-col>
     </ion-row> -->
   </ion-grid>

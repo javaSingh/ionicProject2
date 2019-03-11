@@ -11,11 +11,19 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { HttpClientModule } from '@angular/common/http'
 
+import { HttpProvider } from './providers/http/http'
+// import { Xml2Ts} from './providers/xml2js/xml2ts'
+
+// npm install ion2-calendar@next moment --save
+import { CalendarModule } from 'ion2-calendar';
+ 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,HttpClientModule],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule,HttpClientModule,CalendarModule],
   providers: [
+HttpProvider,
+// Xml2Ts,
     StatusBar,
     SplashScreen,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
