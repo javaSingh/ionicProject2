@@ -393,16 +393,6 @@ var jsonQuery='{'
   ) {
     console.log('Constructor')
 
-    if({a:'a'}==={a:'a'}){
-      console.log('match')
-    }
-    else{
-      console.log('match nof found json.')
-    }
-
-
-
-
 
     /* var xhr = new XMLHttpRequest();
     console.log('UNSENT', xhr.readyState); // readyState will be 0
@@ -445,8 +435,11 @@ var jsonQuery='{'
   }
 
   startFilter() {
-      console.log(this.filterString)
-
+    console.log(this.filterString)
+    const filteredItemsAPI = this.itemsAPI.filter((item) => {
+      return item.owner.toLowerCase().indexOf(this.filterString.toLowerCase()) > -1 || item.serialNo.toLowerCase().indexOf(this.filterString.toLowerCase()) > -1;
+    });
+    this.filteredItemsAPI = filteredItemsAPI
   }
 
   makeExcel() {

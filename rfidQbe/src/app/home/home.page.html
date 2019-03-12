@@ -5,7 +5,7 @@
     </ion-title>
   </ion-toolbar>
   <ion-toolbar>
-    <ion-item lines='none' *ngIf='results.length>1'>
+    <ion-item lines='none' *ngIf='results.length>0'>
       <ion-button size='small' ion-button small (click)='makeExcel()' style="background:green;width:30px;">
         <img src="../../assets/icon/excel.png" style="height:100%;max-width:30px;">
       </ion-button>
@@ -122,7 +122,7 @@
         <ion-col>
           <ion-item text-wrap style='--highlight-height:0'>
             <ion-label primary position="floating">Serial Number </ion-label>
-            <ion-input (click)='someClick()' (keypress)="numberOnly($event)" clearInput formControlName='serialNo'></ion-input>
+            <ion-input inputmod='numeric' type='text'  (click)='someClick()' (keypress)="numberOnly($event)" clearInput formControlName='serialNo'></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
@@ -151,7 +151,7 @@
       </ion-row>
 
       <ion-item lines='none'>
-        <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid && !isSearching'>Search</ion-button>
+        <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search</ion-button>
         <span style='color:red' *ngIf='formGroup.controls["serialNo"].invalid'>
           Serial Number: Max 6 digits allowed.
         </span>

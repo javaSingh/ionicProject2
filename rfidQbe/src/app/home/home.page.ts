@@ -101,15 +101,15 @@ export class HomePage implements OnInit {
     public modalCtrl: ModalController
   ) {
     console.log('Constructor')
-    console.log('Date:', new Date('adfadfasdfadfasdf'))
-    // Date: Invalid Date
-    console.log(new Date('2019-04-31').toISOString().slice(0, 10))
-    if (new Date('2019-04-31').toISOString().slice(0, 10) === '2019-04-31') {
-      console.log('match found')
-    }
-    else {
-      console.log('match not found')
-    }
+    /*     console.log('Date:', new Date('adfadfasdfadfasdf'))
+        // Date: Invalid Date
+        console.log(new Date('2019-04-31').toISOString().slice(0, 10))
+        if (new Date('2019-04-31').toISOString().slice(0, 10) === '2019-04-31') {
+          console.log('match found')
+        }
+        else {
+          console.log('match not found')
+        } */
   }
 
   ngOnInit() {
@@ -245,9 +245,9 @@ export class HomePage implements OnInit {
 
 
     var jsonData = this.formGroup.value
-    console.log(JSON.stringify(this.formGroup.value))
+    console.log('Form Value as String:',JSON.stringify(this.formGroup.value))
     Object.keys(jsonData).forEach(k => (!jsonData[k] && jsonData[k] !== undefined) && delete jsonData[k]);
-    console.log(JSON.stringify(this.formGroup.value))
+    console.log('Form value as string:',JSON.stringify(this.formGroup.value))
     /*     if (jsonData['yearOfManufacture']) {
           console.log(jsonData['yearOfManufacture'].substring(2, 4))
           jsonData['yearOfManufacture'] = jsonData['yearOfManufacture'].substring(2, 4)
@@ -517,18 +517,19 @@ year_of_manufacture: 17 */
     var message = 'Asset '
     var map = {
       assetType: ' of type ',
-      yearOfManufacture: ' manufactured on ',
-      owner: ' owned by ',
-      vehicleType: ' vehicle type ',
-      serialNo: ' having serial number ',
-      dateUse: ' put into use on ',
-      vehicleCode: ' manufactured  by ',
+      yearOfManufacture: ', manufactured on ',
+      owner: ', owned by ',
+      vehicleType: ', of vehicle type ',
+      serialNo: ', having serial number ',
+      dateUse: ', put into use on ',
+      vehicleCode: ', manufactured  by ',
     }
     Object.keys(this.formGroup.value).forEach(k => {
       if (this.formGroup.controls[k].value !== '') {
         message += map[k] + this.formGroup.controls[k].value
       }
     })
+    message=message.split(' , ').join(' ')
     this.presentQuerySummary(message + '.')
   }
 
@@ -631,13 +632,52 @@ year_of_manufacture: 17 */
 
   removeDuplicates() {
     console.log('Removing Duplicates')
-    var items=this.results
-    console.log('Local Items before filter:', items)
-     items = this.results.filter((item) => {
-       console.log('a')
-      return item.indexOf(item) > -1;
+    var uniqueResults = []
+    var found:boolean = false
+    Object.keys(this.results).forEach(k => {
+      // console.log('results item:', this.results[k])
+      Object.keys(uniqueResults).forEach(m => {
+        // console.log('uniqueResult item:', uniqueResults[m])
+        if (JSON.stringify(this.results[k]) === JSON.stringify(uniqueResults[m])) {
+          found = true
+        }
+        else {
+          found = false
+        }
+      });
+      if (!found) {
+        uniqueResults.push(this.results[k])
+      }
     });
-    console.log('Local Items after filter:', items)
+    console.log(uniqueResults)
+    this.results=uniqueResults
+
+
+    /*
+     assetType: ' of type ',
+    yearOfManufacture: ' manufactured on ',
+    owner: ' owned by ',
+    vehicleType: ' vehicle type ',
+    serialNo: ' having serial number ',
+    dateUse: ' put into use on ',
+    vehicleCode: ' manufactured  by ',
+
+
+
+
+
+
+
+
+    (4) [{…}, {…}, {…}, {…}]
+    0: asset_type: "F"date_use: "2029-07-17"gs1_code: 8907709owner: "ECOR"serial_no: "003927"vehicle_mfc_code: "ARC"vehicle_type: "BOXNHL"year_of_manufacture: 17__proto__: 
+    Object1: asset_type: "F"date_use: "2017-08-10"gs1_code: 8907709owner: "ECR"serial_no: "001141"vehicle_mfc_code: "BURH"vehicle_type: "BRN22.9"year_of_manufacture: 17__proto__: 
+    Object2: asset_type: "F"date_use: "2017-08-31"gs1_code: 8907709owner: "SR"serial_no: "001087"vehicle_mfc_code: "BURH"vehicle_type: "BRN22.9"year_of_manufacture: 17__proto__: 
+    Object3: asset_type: "F"date_use: "2017-10-25"gs1_code: 8907709owner: "SCR"serial_no: "001031"vehicle_mfc_code: "BURH"vehicle_type: "BRN22.9"year_of_manufacture: 17__proto__: 
+    Objectlength: 4__proto__: Array(0)
+
+     */
+
   }
 
 
