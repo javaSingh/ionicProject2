@@ -5,11 +5,20 @@ import { ToastController, AlertController } from '@ionic/angular';
 import { CalendarComponentOptions } from 'ion2-calendar';
 import { ModalController } from '@ionic/angular';
 import {
-    CalendarModal,
-    CalendarModalOptions,
-    DayConfig,
-    CalendarResult
-  } from 'ion2-calendar';
+  CalendarModal,
+  CalendarModalOptions,
+  DayConfig,
+  CalendarResult
+} from 'ion2-calendar';
+
+
+// npm i ionic4-date-picker --save
+
+import * as XLSX from 'xlsx';
+// npm i --save xlsx
+
+import { saveAs } from 'file-saver';
+// npm i file-saver
 
 @Component({
   selector: 'app-home',
@@ -18,34 +27,36 @@ import {
 })
 export class HomePage implements OnInit {
 
+  isSearching: boolean = false
+
   formGroup: FormGroup
   results: any[] = []
   index
   // owners = ['ECOR', 'ECR', 'SCR', 'SR']
-  owners =     ["CR",
-  "ECOR",
-  "ECR",
-  "ER",
-  "KR",
-  "NCR",
-  "NER",
-  "NFR",
-  "NR",
-  "NWR",
-  "SCR",
-  "SECR",
-  "SER",
-  "SR",
-  "SWR",
-  "WCR",
-  "WR"]
+  owners = ["CR",
+    "ECOR",
+    "ECR",
+    "ER",
+    "KR",
+    "NCR",
+    "NER",
+    "NFR",
+    "NR",
+    "NWR",
+    "SCR",
+    "SECR",
+    "SER",
+    "SR",
+    "SWR",
+    "WCR",
+    "WR"]
 
   // vehiclesType=['BRN22.9','BOXNHL']
   vehiclesType = ["BOXNHL", "BCNHL", "BOXNS", "BOSTHSM2", "BOBYN", "BOBSN", "BTPGLN", "BFNS", "BVCM", "BVZI", "BOBRNHSM1"]
   // manufacturersCode = ['ARC', 'BURN']
   manufacturersCode = ["ARC", "ASRW", "BESF", "BESWL", "BESWR", "BUR", "BWELK", "BWELZ", "BWT", "CIM", "CLW", "DLW", "DMW", "GOCW", "HEIB", "HEIS", "ICFW", "JMPW", "JRIL", "JWL", "MCFW", "MI", "OFPL", "RCFW", "SPJW", "SR", "TEXB", "TEXS", "TWL",]
 
-  assetsType=["#", "A", "e", "C", "D", "E", "F", "L", "M", "P", "R", "S", "X", "Y", "Z"]
+  assetsType = ["#", "A", "e", "C", "D", "E", "F", "L", "M", "P", "R", "S", "X", "Y", "Z"]
 
   public customOptions: any = {
     buttons: [
@@ -59,26 +70,26 @@ export class HomePage implements OnInit {
       {
         text: 'Clear',
         handler: () => this.formGroup.controls['dateUse'].setValue('')
-      },{
-      text: 'Done',
-      handler: ((data) => {
-        console.log('Clicked Save! Data is: ')
-        console.log(data)
-        console.log(data.month.value.length)
-        if(data.month.value<10){
-          console.log('Single Digit Month Found')
-          data.month.value='0'+data.month.value
-          console.log('After padding',data.month.value)
-        }
-        if(data.day.value<10){
-          console.log('Single Digit Day Found')
-          data.day.value='0'+data.day.value
-          console.log('After padding',data.day.value)
-        }
-        console.log(''+data.year.value+'-'+data.month.value+'-'+data.day.value)
-        this.formGroup.controls['dateUse'].setValue(''+data.year.value+'-'+data.month.value+'-'+data.day.value)
-      })
-    },]
+      }, {
+        text: 'Done',
+        handler: ((data) => {
+          console.log('Clicked Save! Data is: ')
+          console.log(data)
+          console.log(data.month.value.length)
+          if (data.month.value < 10) {
+            console.log('Single Digit Month Found')
+            data.month.value = '0' + data.month.value
+            console.log('After padding', data.month.value)
+          }
+          if (data.day.value < 10) {
+            console.log('Single Digit Day Found')
+            data.day.value = '0' + data.day.value
+            console.log('After padding', data.day.value)
+          }
+          console.log('' + data.year.value + '-' + data.month.value + '-' + data.day.value)
+          this.formGroup.controls['dateUse'].setValue('' + data.year.value + '-' + data.month.value + '-' + data.day.value)
+        })
+      },]
   }
 
   constructor(
@@ -101,7 +112,7 @@ export class HomePage implements OnInit {
       'owner': [''],
       'vehicleType': [''],
       'serialNo': [''
-        , [Validators.pattern('[0-9]{6}'), Validators.min(0), Validators.max(999999)]
+        , [Validators.pattern('[0-9]{1,6}'), Validators.min(0), Validators.max(999999)]
       ],
       'dateUse': [''],
       'vehicleCode': [''],
@@ -116,11 +127,11 @@ export class HomePage implements OnInit {
 
     var atLeastOneIsFilled: boolean = false
 
-    if(formGroup.controls['yearOfManufacture']){
-        if(formGroup.controls['yearOfManufacture'].value.match('[0,9]{1,2}')!==null && formGroup.controls['yearOfManufacture'].value!==''){
+    /*     if (formGroup.controls['yearOfManufacture']) {
+          if (formGroup.controls['yearOfManufacture'].value.match('[0,9]{1,2}') !== null && formGroup.controls['yearOfManufacture'].value !== '') {
             formGroup.controls['yearOfManufacture'].setErrors({ incorrect: true })
-        }
-    }
+          }
+        } */
 
     for (var key in formGroup.controls) {
       if (formGroup.controls[key].value && formGroup.controls[key].value.length > 0) {
@@ -142,6 +153,21 @@ export class HomePage implements OnInit {
 
   onSubmit() {
     console.log(this.formGroup.value, this.formGroup.valid)
+    this.isSearching = true
+
+    //0 padding for serial number
+    var map = ['00000', '0000', '000', '00', '0']
+    if (this.formGroup.controls['serialNo']) {
+      if (this.formGroup.controls['serialNo'].value.length < 6 && this.formGroup.controls['serialNo'].value !== '') {
+        console.log('Before padding:', this.formGroup.controls['serialNo'].value)
+        console.log('serial no length:', this.formGroup.controls['serialNo'].value.length)
+        this.formGroup.controls['serialNo'].setValue(map[this.formGroup.controls['serialNo'].value.length - 1] + this.formGroup.controls['serialNo'].value)
+      }
+      console.log('After padding:', this.formGroup.controls['serialNo'].value)
+    }
+
+
+
     var jsonData = this.formGroup.value
     console.log(JSON.stringify(this.formGroup.value))
     Object.keys(jsonData).forEach(k => (!jsonData[k] && jsonData[k] !== undefined) && delete jsonData[k]);
@@ -152,21 +178,55 @@ export class HomePage implements OnInit {
         } */
     console.log(jsonData)
 
-    this.http.get('http://172.16.22.64:3000/Tags/v1/EPC/qbe?filter=' + JSON.stringify(this.formGroup.value), { reportProgress: true }).subscribe((data: any[]) => {
-      console.log('HTTP GET Result: ', data)
-      this.results = data
-      /*           this.formGroup.patchValue({
-                  assetType:[this.results[0].asset_type.value]
-                }) */
-      if (this.results.length > 0)
-        this.showResults(0)
+
+
+    let timeoutPromise = new Promise((resolve, reject) => {
+      let wait = setTimeout(() => {
+        clearTimeout(wait);
+        resolve('Connection Timed Out');
+      }, 3000)
+    })
+
+    let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/v1/EPC/qbe?filter=' + JSON.stringify(this.formGroup.value), { reportProgress: true }).toPromise()
+
+    let race = Promise.race([timeoutPromise, responsePromise])
+    race.then((data: any) => {
+      console.log('Race Response: ', data)
+      if (data === 'Connection Timed Out') {
+        console.log(data)
+        this.presentToast('Unable to Connect now.')
+      }
       else {
-        this.presentToast('No Result Found')
+        console.log('response has win the race')
+        console.log('HTTP GET Result: ', data)
+        this.results = data
+        if (this.results.length > 0)
+          this.showResults(0)
+        else {
+          this.presentToast('No Result Found')
+        }
       }
     }, error => {
-      console.log('HTTP GET ERROR: ', error)
-      // this.presentToast('')
+      console.log("Error: ")
+      console.log(error)
+      this.presentToast('Unable to Connect.')
+    }).finally(() => {
+      this.isSearching = false
     })
+
+
+    /*     subscribe((data: any[]) => {
+          console.log('HTTP GET Result: ', data)
+          this.results = data
+          if (this.results.length > 0)
+            this.showResults(0)
+          else {
+            this.presentToast('No Result Found')
+          }
+        }, error => {
+          console.log('HTTP GET ERROR: ', error)
+          // this.presentToast('')
+        }) */
 
   }
 
@@ -305,26 +365,26 @@ year_of_manufacture: 17 */
 
   openSelect(key) {
     var header
-    var inputs=[]
+    var inputs = []
     if (key === 'owner') {
       console.log('Owner Select')
-       inputs = this.makeRadioSelectList(key, this.owners)
-      header='Owner'
+      inputs = this.makeRadioSelectList(key, this.owners)
+      header = 'Owner'
     }
     else if (key === 'vehicleType') {
       console.log('Vehicle Type Select')
-       inputs = this.makeRadioSelectList(key, this.vehiclesType)
-      header='Vehicle Type'
+      inputs = this.makeRadioSelectList(key, this.vehiclesType)
+      header = 'Vehicle Type'
     }
-    else if(key==='vehicleCode'){
+    else if (key === 'vehicleCode') {
       console.log('Vehicle Type Select')
-       inputs = this.makeRadioSelectList(key, this.manufacturersCode)
-      header='Manufacture Code'
+      inputs = this.makeRadioSelectList(key, this.manufacturersCode)
+      header = 'Manufacture Code'
     }
-    else if(key==='assetType'){
+    else if (key === 'assetType') {
       console.log('Asset Type Select')
-       inputs = this.makeRadioSelectList(key, this.assetsType)
-      header='Asset Type'
+      inputs = this.makeRadioSelectList(key, this.assetsType)
+      header = 'Asset Type'
     }
     this.presentAlertRadio(header, inputs, key)
   }
@@ -345,8 +405,8 @@ year_of_manufacture: 17 */
 
   }
 
-  clearForm(){
-  this.results=[]
+  clearForm() {
+    this.results = []
     this.formGroup = this.fb.group({
       'assetType': [''],
       'yearOfManufacture': ['',
@@ -375,27 +435,61 @@ year_of_manufacture: 17 */
   }
 
 
-  showQuerySummary(){
+  showQuerySummary() {
+    var message = 'Asset '
+    var map = {
+      assetType: ' of type ',
+      yearOfManufacture: ' manufactured on ',
+      owner: ' owned by ',
+      vehicleType: ' vehicle type ',
+      serialNo: ' having serial number ',
+      dateUse: ' put into use ',
+      vehicleCode: ' manufactured  by ',
+    }
+    Object.keys(this.formGroup.value).forEach(k => {
+      if (this.formGroup.controls[k].value !== '') {
+        message += map[k] + this.formGroup.controls[k].value
+      }
+    })
+    this.presentQuerySummary(message + '.')
+  }
 
+  async presentQuerySummary(message) {
+
+    const alert = await this.alertController.create({
+      header: 'Query Summary',
+      message: message,
+      buttons: [
+        {
+          text: 'Ok',
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
 
-  type='string'
-  fromInfinite:CalendarComponentOptions={
-      from : new Date(1),
-      to : 0
+  type = 'string'
+  fromInfinite: CalendarComponentOptions = {
+    from: new Date(1),
+    to: 0
   }
 
   onChange($event) {
-    console.log($event);
-    this.openCalendar()
+    console.log('On Change:',$event);
+    // this.openCalendar()
   }
+
+  defaultDate = new Date(new Date().toISOString().slice(0, 10))
 
   async openCalendar() {
     const options: CalendarModalOptions = {
       title: 'Date Use',
-      canBackwardsSelected:true,
-      autoDone:true
+      canBackwardsSelected: true,
+      autoDone: true,
+      // defaultDate: this.defaultDate,
+      // defaultScrollTo:this.defaultDate
     };
 
     const myCalendar = await this.modalCtrl.create({
@@ -407,15 +501,47 @@ year_of_manufacture: 17 */
 
     const event: any = await myCalendar.onDidDismiss();
     const date: CalendarResult = event.data;
-    console.log(date.string);
+    console.log('Date Value:', date.string);
+/*     if (date.string != undefined || date.string !== '')
+      this.defaultDate = new Date(date.string) */
   }
 
-  showDateUseCalendar(){
-      this.openCalendar()
+  showDateUseCalendar() {
+    this.openCalendar()
   }
 
   //https://github.com/HsuanXyz/ion2-calendar
-  
+
+
+  makeExcel() {
+    console.log('Download Start' + new Date())
+    let sheet = XLSX.utils.json_to_sheet(this.results);
+    // let sheet = XLSX.utils.json_to_sheet(this.testArr);
+    let wb = {
+      SheetNames: ["export"],
+      Sheets: {
+        "export": sheet
+      }
+    };
+    let wbout = XLSX.write(wb, {
+      bookType: 'xlsx',
+      bookSST: false,
+      type: 'binary'
+    });
+
+    function s2ab(s) {
+      let buf = new ArrayBuffer(s.length);
+      let view = new Uint8Array(buf);
+      for (let i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+      return buf;
+    }
+    let blob = new Blob([s2ab(wbout)], { type: 'application/octet-stream' });
+    saveAs(blob, "Output.xlsx");
+    console.log('Download End' + new Date())
+  }
+
+
+
 
 
 }

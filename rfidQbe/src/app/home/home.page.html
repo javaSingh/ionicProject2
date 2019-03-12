@@ -18,7 +18,7 @@
       <ion-button size='small' (click)='showNext()' [disabled]='index+1>=results.length'>
         <ion-icon name="arrow-dropright"></ion-icon>
       </ion-button>
-      
+
     </ion-item>
   </ion-toolbar>
 
@@ -131,7 +131,8 @@
         <ion-col>
           <ion-item>
             <ion-label position="floating">Date Of Use</ion-label>
-            <ion-datetime style='--padding-top:0' formControlName='dateUse' displayFormat="D MMM YYYY" [pickerOptions]="customOptions">
+            <ion-datetime style='--padding-top:0' formControlName='dateUse' displayFormat="D MMM YYYY"
+              [pickerOptions]="customOptions">
             </ion-datetime>
           </ion-item>
         </ion-col>
@@ -145,24 +146,31 @@
       </ion-row>
 
       <ion-item lines='none'>
-        <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid'>Search</ion-button>
+        <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid && !isSearching'>Search</ion-button>
         <span style='color:red' *ngIf='formGroup.controls["serialNo"].invalid'>
-          Serial No. should be less than 6 Digits.
+          Serial Number: Max 6 digits allowed.
         </span>
         <span style='color:red' *ngIf='formGroup.controls["yearOfManufacture"].invalid'>
           Manufacture Year Invalid.
         </span>
-        <ion-icon slot='end' name="information-circle-outline" (click)='showQuerySummary()' *ngIf='formGroup.valid'></ion-icon>
+        <ion-icon slot='end' name="information-circle-outline" (click)='showQuerySummary()' *ngIf='formGroup.valid'>
+        </ion-icon>
       </ion-item>
 
     </form>
 
     <ion-item (click)='showDateUseCalendar()'>
       <ion-label position="floating">Date Of Use</ion-label>
-     <ion-input></ion-input>
+      <ion-input></ion-input>
     </ion-item>
 
-<!--     <ion-calendar [(ngModel)]="date"
+    <ion-item>
+      <ion-label position="floating">Date Of Use</ion-label>
+      <ion-input></ion-input>
+      <ion-icon name='close'></ion-icon>
+    </ion-item>
+
+    <!--     <ion-calendar [(ngModel)]="date"
               (change)="onChange($event)"
               [type]="type"
               [format]="'YYYY-MM-DD'"
