@@ -122,19 +122,24 @@
         <ion-col>
           <ion-item text-wrap style='--highlight-height:0'>
             <ion-label primary position="floating">Serial Number </ion-label>
-            <ion-input (keypress)="numberOnly($event)" clearInput formControlName='serialNo'></ion-input>
+            <ion-input (click)='someClick()' (keypress)="numberOnly($event)" clearInput formControlName='serialNo'></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
 
       <ion-row>
         <ion-col>
-          <ion-item>
+          <!-- <ion-item>
             <ion-label position="floating">Date Of Use</ion-label>
             <ion-datetime style='--padding-top:0' formControlName='dateUse' displayFormat="D MMM YYYY"
               [pickerOptions]="customOptions">
-            </ion-datetime>
-          </ion-item>
+            </ion-datetime> 
+</ion-item>-->
+          <ion-item style='--highlight-height:0'>
+              <ion-label position="floating">Date Of Use</ion-label>
+              <ion-input (click)='showDateUseCalendar()' type='text' clearInput formControlName='dateUse'></ion-input>
+              <!-- <ion-icon name="create"></ion-icon> -->
+            </ion-item>
         </ion-col>
 
         <ion-col>
@@ -153,22 +158,24 @@
         <span style='color:red' *ngIf='formGroup.controls["yearOfManufacture"].invalid'>
           Manufacture Year Invalid.
         </span>
+        <span style='color:red' *ngIf='formGroup.controls["dateUse"].invalid'>
+            Invalid Date. 
+            <span *ngIf='!formGroup.controls["invalidDateRange"].invalid'>Valid format is YYYY-MM-DD.</span>
+          </span>
+          
         <ion-icon slot='end' name="information-circle-outline" (click)='showQuerySummary()' *ngIf='formGroup.valid'>
         </ion-icon>
       </ion-item>
 
+
+    
     </form>
 
-    <ion-item (click)='showDateUseCalendar()'>
-      <ion-label position="floating">Date Of Use</ion-label>
-      <ion-input></ion-input>
-    </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Date Of Use</ion-label>
-      <ion-input></ion-input>
-      <ion-icon name='close'></ion-icon>
-    </ion-item>
+
+
+
+
 
     <!--     <ion-calendar [(ngModel)]="date"
               (change)="onChange($event)"

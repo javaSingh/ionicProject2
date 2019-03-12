@@ -18,6 +18,7 @@ import * as XLSX from 'xlsx';
 // npm i --save xlsx
 
 import { saveAs } from 'file-saver';
+import { removeSummaryDuplicates } from '@angular/compiler';
 // npm i file-saver
 
 @Component({
@@ -100,12 +101,21 @@ export class HomePage implements OnInit {
     public modalCtrl: ModalController
   ) {
     console.log('Constructor')
+    console.log('Date:', new Date('adfadfasdfadfasdf'))
+    // Date: Invalid Date
+    console.log(new Date('2019-04-31').toISOString().slice(0, 10))
+    if (new Date('2019-04-31').toISOString().slice(0, 10) === '2019-04-31') {
+      console.log('match found')
+    }
+    else {
+      console.log('match not found')
+    }
   }
 
   ngOnInit() {
     console.log('ngOnInit')
     this.formGroup = this.fb.group({
-
+      "invalidDateRange": [''],
       'assetType': [''],
       'yearOfManufacture': ['',
         [Validators.pattern('[0-9]{1,2}'), Validators.min(0), Validators.max(99)]],
@@ -130,6 +140,72 @@ export class HomePage implements OnInit {
     /*     if (formGroup.controls['yearOfManufacture']) {
           if (formGroup.controls['yearOfManufacture'].value.match('[0,9]{1,2}') !== null && formGroup.controls['yearOfManufacture'].value !== '') {
             formGroup.controls['yearOfManufacture'].setErrors({ incorrect: true })
+          }
+        } */
+
+
+    if (formGroup.controls['dateUse'].value !== '') {
+      if (formGroup.controls['dateUse'].value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        //pattern is matching. 
+        //date maybe invalid like 50 Jan or 32 MMM
+        //date is jumping like 31 apr is treated as 1 may
+        if (new Date(formGroup.controls['dateUse'].value) + '' !== 'Invalid Date') {
+          //date is valid like 30 apr or 31 apr or 31 Feb
+          if (new Date(formGroup.controls['dateUse'].value).toISOString().slice(0, 10) !== formGroup.controls['dateUse'].value) {
+            // 31 Feb jumps to march
+            // for js, 30 Apr is valid. Also 31 Apr is valid but presented as 1 May. ie date jumps
+            formGroup.controls['dateUse'].setErrors({ incorrect: true })
+            console.log('Invalid Date: Date is Jumping.')
+            formGroup.controls['invalidDateRange'].setErrors({ incorrect: true })
+          }
+          // date is not jumping
+          else {
+            // valid pattern and valid date and no jumps
+            console.log('Pattern Matched. Valid Date. No Jumps.')
+          }
+        }
+        else {
+          //date is invalid eg 50 Feb
+          formGroup.controls['dateUse'].setErrors({ incorrect: true })
+          console.log('Invalid Date: Value like 32 Jan/50 Mar.')
+          formGroup.controls['invalidDateRange'].setErrors({ incorrect: true })
+        }
+      }
+      else {
+        //pattern not matching
+        formGroup.controls['dateUse'].setErrors({ incorrect: true })
+        console.log('Invalid Date: Format other than YYYY-MM-DD.')
+        formGroup.controls['invalidDateRange'].setErrors(null)
+      }
+    }
+
+
+
+
+
+
+    /*     if (formGroup.controls['dateUse'].value !== '') {
+          if (formGroup.controls['dateUse'].value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            console.log('Pattern match')
+            if (new Date(formGroup.controls['dateUse'].value) + '' !== 'Invalid Date') {
+              if (new Date(formGroup.controls['dateUse'].value).toISOString().slice(0, 10) === formGroup.controls['dateUse'].value) {
+                console.log('match found')
+              }
+              else {
+                console.log('match not found')
+                formGroup.controls['dateUse'].setErrors({ incorrect: true })
+              }
+            }
+            else {
+              console.log('Invalid Date')
+              formGroup.controls['dateUse'].setErrors({ incorrect: true })
+              formGroup.controls['invalidDateRange'].setErrors({ incorrect: true })
+            }
+          }
+          else {
+            console.log('Pattern not match')
+            formGroup.controls['dateUse'].setErrors({ incorrect: true })
+            formGroup.controls['invalidDateRange'].setErrors(null)
           }
         } */
 
@@ -200,8 +276,10 @@ export class HomePage implements OnInit {
         console.log('response has win the race')
         console.log('HTTP GET Result: ', data)
         this.results = data
-        if (this.results.length > 0)
+        if (this.results.length > 0) {
           this.showResults(0)
+          this.removeDuplicates()
+        }
         else {
           this.presentToast('No Result Found')
         }
@@ -443,7 +521,7 @@ year_of_manufacture: 17 */
       owner: ' owned by ',
       vehicleType: ' vehicle type ',
       serialNo: ' having serial number ',
-      dateUse: ' put into use ',
+      dateUse: ' put into use on ',
       vehicleCode: ' manufactured  by ',
     }
     Object.keys(this.formGroup.value).forEach(k => {
@@ -477,7 +555,7 @@ year_of_manufacture: 17 */
   }
 
   onChange($event) {
-    console.log('On Change:',$event);
+    console.log('On Change:', $event);
     // this.openCalendar()
   }
 
@@ -502,12 +580,14 @@ year_of_manufacture: 17 */
     const event: any = await myCalendar.onDidDismiss();
     const date: CalendarResult = event.data;
     console.log('Date Value:', date.string);
-/*     if (date.string != undefined || date.string !== '')
-      this.defaultDate = new Date(date.string) */
+    this.formGroup.controls['dateUse'].setValue('' + date.string)
+    /*     if (date.string != undefined || date.string !== '')
+          this.defaultDate = new Date(date.string) */
   }
 
   showDateUseCalendar() {
-    this.openCalendar()
+    if (this.formGroup.controls['dateUse'].value === '')
+      this.openCalendar()
   }
 
   //https://github.com/HsuanXyz/ion2-calendar
@@ -540,7 +620,25 @@ year_of_manufacture: 17 */
     console.log('Download End' + new Date())
   }
 
+  someClick() {
+    console.log('Some click.')
+  }
 
+  doukeypress(e) {
+    console.log(e)
+  }
+
+
+  removeDuplicates() {
+    console.log('Removing Duplicates')
+    var items=this.results
+    console.log('Local Items before filter:', items)
+     items = this.results.filter((item) => {
+       console.log('a')
+      return item.indexOf(item) > -1;
+    });
+    console.log('Local Items after filter:', items)
+  }
 
 
 
