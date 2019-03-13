@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 import { HomePage } from './home.page';
 
 import { CalendarModule } from 'ion2-calendar';
+import { IonicSelectableModule } from 'ionic-selectable';
 
 
 @NgModule({
@@ -14,6 +15,7 @@ import { CalendarModule } from 'ion2-calendar';
     CalendarModule,
     ReactiveFormsModule,
     CommonModule,
+    IonicSelectableModule,
     FormsModule,
     IonicModule,
     RouterModule.forChild([

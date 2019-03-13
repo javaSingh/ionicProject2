@@ -27,6 +27,7 @@
     "core-js": "^2.5.4",
     "file-saver": "^2.0.1",
     "ion2-calendar": "^3.0.0-rc.0",
+    "ionic-selectable": "^4.4.0",
     "moment": "^2.24.0",
     "rxjs": "~6.3.3",
     "xlsx": "^0.14.1",

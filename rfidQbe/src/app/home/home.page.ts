@@ -2,15 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ToastController, AlertController } from '@ionic/angular';
-import { CalendarComponentOptions } from 'ion2-calendar';
 import { ModalController } from '@ionic/angular';
 import {
   CalendarModal,
   CalendarModalOptions,
   DayConfig,
-  CalendarResult
+  CalendarResult,
+  CalendarComponentOptions
 } from 'ion2-calendar';
 
+import { HttpProvider } from '../providers/http/http'
 
 // npm i ionic4-date-picker --save
 
@@ -18,15 +19,29 @@ import * as XLSX from 'xlsx';
 // npm i --save xlsx
 
 import { saveAs } from 'file-saver';
-import { removeSummaryDuplicates } from '@angular/compiler';
 // npm i file-saver
+
+
+import { IonicSelectableComponent } from 'ionic-selectable'
+
+class Port {
+  public id: number;
+  public name: string;
+}
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
+
 export class HomePage implements OnInit {
+
+  ports: Port[];
+  years: string[] = []
+  port: Port;
+
+  // ?filter={"where":{"or":[{"owner":"ECOR"},{"owner":"ECR"}]}}
 
   isSearching: boolean = false
 
@@ -49,16 +64,45 @@ export class HomePage implements OnInit {
     "SER",
     "SR",
     "SWR",
-    "WCR",
-    "WR"]
+    "WCR", "WR"]
 
   // vehiclesType=['BRN22.9','BOXNHL']
-  vehiclesType = ["BOXNHL", "BCNHL", "BOXNS", "BOSTHSM2", "BOBYN", "BOBSN", "BTPGLN", "BFNS", "BVCM", "BVZI", "BOBRNHSM1"]
+  vehiclesType = ["BCNHL",
+    "BFNS",
+    "BOBRNHSM1",
+    "BOBSN",
+    "BOBYN",
+    "BOSTHSM2",
+    "BOXNHL",
+    "BOXNS",
+    'BRN22.9',
+    "BTPGLN",
+    "BVCM",
+    "BVZI",]
+
   // manufacturersCode = ['ARC', 'BURN']
   manufacturersCode = ["ARC", "ASRW", "BESF", "BESWL", "BESWR", "BUR", "BWELK", "BWELZ", "BWT", "CIM", "CLW", "DLW", "DMW", "GOCW", "HEIB", "HEIS", "ICFW", "JMPW", "JRIL", "JWL", "MCFW", "MI", "OFPL", "RCFW", "SPJW", "SR", "TEXB", "TEXS", "TWL",]
 
-  assetsType = ["#", "A", "e", "C", "D", "E", "F", "L", "M", "P", "R", "S", "X", "Y", "Z"]
+  assetsType = ["#", "A", "C", "D", "E", "F", "L", "M", "P", "R", "S", "X", "Y", "Z"]
+  assetsTypeExpanded = ["Condemned Vehicle",
+    "Ancillary vehicles, i.e., non-earning vehicles necessary for train operations",
+    "g., Guard Vans in freight, Generator Cars in coaching",
+    "Coaching (Passenger Carrying ONLY)",
+    "DEMU",
+    "EMU",
+    "Freight (Earning vehicles ONLY)",
+    "Electric Locos",
+    "Maintenance related vehicles, e.g., Tower cars",
+    "Not revealed, e.g., Defense",
+    "Part, i.e., an assembly/ subassembly, e.g., LHB bogie",
+    "Rescue and safety related Vehicles, e.g., SPART/ SPARME, Cranes etc",
+    "Diesel Locos",
+    "Experimental, Vehicles on trial, e.g., the Talgo rake",
+    "Departmental (Freight)",
+    "Departmental (Coaching) includes saloons"
+  ]
 
+  //ion date time/datetime/date-time custom option to implement clear which is not present in default
   public customOptions: any = {
     buttons: [
       {
@@ -70,6 +114,7 @@ export class HomePage implements OnInit {
       },
       {
         text: 'Clear',
+        //clearing dateUse
         handler: () => this.formGroup.controls['dateUse'].setValue('')
       }, {
         text: 'Done',
@@ -93,14 +138,127 @@ export class HomePage implements OnInit {
       },]
   }
 
+  portChange(event: {
+    component: IonicSelectableComponent,
+    value: any
+  }) {
+    console.log('port:', event.value);
+    console.log('Before Assign:', this.formGroup.value)
+    var meraVar = this.formGroup.value
+    console.log('After Assign:', meraVar)
+    meraVar = ''
+    console.log('After Deletion', this.formGroup.value)
+this.makeQueryFromFormValue()
+    // console.log(JSON.parse(query))
+
+    /*    console.log('FC:',this.formGroup.controls['yearOfManufacture'].value)
+       var arr=['17']
+       this.formGroup.controls['yearOfManufacture'].setValue(arr)
+       console.log('FC after set value:',this.formGroup.controls['yearOfManufacture'].value) */
+    /*     for(var i=0;i<event.value.length;i++){
+          event.value[i]=event.value[i].substring(2,4)
+        }
+        console.log('after:',event.value) */
+  }
+
+
+
+ makeQueryFromFormValue() {
+    var query = ''
+    // {"or":[{"owner":"[ECOR]"},{"owner":"ECR"}]}
+    Object.keys(this.formGroup.value).forEach(k => {
+      console.log('Inside forEach')
+      if (this.formGroup.controls[k].value !== '') {
+        // console.log('inside value !=="" if condition')
+        if (k !== 'serialNo') {
+          // console.log('inside k !=="serianNo" if condition')
+          if (this.formGroup.controls[k].value.length > 1) {
+            // console.log('multiple valued array found')
+            query += '{"or":['
+          }
+          for (var i = 0; i < this.formGroup.controls[k].value.length; i++) {
+            // console.log('inside query making for loop')
+            query += '{"' + k + '":"' + this.formGroup.controls[k].value[i] + '"},'
+          }
+          if (this.formGroup.controls[k].value.length > 1) {
+            // console.log('multiple valued array found')
+            query += ']}'
+          }
+        }
+      }
+
+    })
+
+    query += '.'
+    query = query.split('},.').join('}')
+    query = query.split(',]}.').join(']}')
+    // {"yearOfManufacture":"2018"},{"yearOfManufacture":"2016"},{"yearOfManufacture":"2014"}
+    // {"yearOfManufacture":"2018"}
+    console.log(query)
+  }
   constructor(
     public fb: FormBuilder,
     public http: HttpClient,
     public toastController: ToastController,
     public alertController: AlertController,
-    public modalCtrl: ModalController
+    public modalCtrl: ModalController,
+    public httpProvider: HttpProvider
   ) {
+
+    var yyToyyyy = []
+
+
+    console.log(yyToyyyy)
     console.log('Constructor')
+
+    for (var i = 2019; i > 1969; i--) {
+      var year = i + ''
+      this.years.push(year)
+    }
+
+
+    this.ports = [
+      { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' }, { id: 1, name: 'Tokai' },
+      { id: 2, name: 'Vladivostok' },
+      { id: 3, name: 'Navlakhi' }
+    ];
+
+
+
     /*     console.log('Date:', new Date('adfadfasdfadfasdf'))
         // Date: Invalid Date
         console.log(new Date('2019-04-31').toISOString().slice(0, 10))
@@ -117,8 +275,11 @@ export class HomePage implements OnInit {
     this.formGroup = this.fb.group({
       "invalidDateRange": [''],
       'assetType': [''],
-      'yearOfManufacture': ['',
-        [Validators.pattern('[0-9]{1,2}'), Validators.min(0), Validators.max(99)]],
+      'yearOfManufacture': [''
+        // ,[Validators.pattern('[0-9]{1,4}'), Validators.min(0), Validators.max(9999)]
+      ]
+      ,
+      'yearOfManufactureArray': [''],
       'owner': [''],
       'vehicleType': [''],
       'serialNo': [''
@@ -142,7 +303,6 @@ export class HomePage implements OnInit {
             formGroup.controls['yearOfManufacture'].setErrors({ incorrect: true })
           }
         } */
-
 
     if (formGroup.controls['dateUse'].value !== '') {
       if (formGroup.controls['dateUse'].value.match(/^\d{4}-\d{2}-\d{2}$/)) {
@@ -179,11 +339,6 @@ export class HomePage implements OnInit {
       }
     }
 
-
-
-
-
-
     /*     if (formGroup.controls['dateUse'].value !== '') {
           if (formGroup.controls['dateUse'].value.match(/^\d{4}-\d{2}-\d{2}$/)) {
             console.log('Pattern match')
@@ -216,7 +371,6 @@ export class HomePage implements OnInit {
         break
       }
     }
-
     if (atLeastOneIsFilled) {
       console.log("ValidForm")
       return null
@@ -242,19 +396,15 @@ export class HomePage implements OnInit {
       console.log('After padding:', this.formGroup.controls['serialNo'].value)
     }
 
-
-
     var jsonData = this.formGroup.value
-    console.log('Form Value as String:',JSON.stringify(this.formGroup.value))
+    console.log('Form Value as String:', JSON.stringify(this.formGroup.value))
     Object.keys(jsonData).forEach(k => (!jsonData[k] && jsonData[k] !== undefined) && delete jsonData[k]);
-    console.log('Form value as string:',JSON.stringify(this.formGroup.value))
+    console.log('Form value as string:', JSON.stringify(this.formGroup.value))
     /*     if (jsonData['yearOfManufacture']) {
           console.log(jsonData['yearOfManufacture'].substring(2, 4))
           jsonData['yearOfManufacture'] = jsonData['yearOfManufacture'].substring(2, 4)
         } */
     console.log(jsonData)
-
-
 
     let timeoutPromise = new Promise((resolve, reject) => {
       let wait = setTimeout(() => {
@@ -263,7 +413,9 @@ export class HomePage implements OnInit {
       }, 3000)
     })
 
-    let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/v1/EPC/qbe?filter=' + JSON.stringify(this.formGroup.value), { reportProgress: true }).toPromise()
+    let responsePromise = this.httpProvider.getMethod('/Tags/v1/EPC/qbe?filter=' + JSON.stringify(this.formGroup.value)).toPromise()
+
+    // let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/v1/EPC/qbe?filter=' + JSON.stringify(this.formGroup.value), { reportProgress: true }).toPromise()
 
     let race = Promise.race([timeoutPromise, responsePromise])
     race.then((data: any) => {
@@ -273,7 +425,7 @@ export class HomePage implements OnInit {
         this.presentToast('Unable to Connect now.')
       }
       else {
-        console.log('response has win the race')
+        // console.log('response has win the race')
         console.log('HTTP GET Result: ', data)
         this.results = data
         if (this.results.length > 0) {
@@ -291,7 +443,6 @@ export class HomePage implements OnInit {
     }).finally(() => {
       this.isSearching = false
     })
-
 
     /*     subscribe((data: any[]) => {
           console.log('HTTP GET Result: ', data)
@@ -313,7 +464,7 @@ export class HomePage implements OnInit {
     this.index = index
     console.log(this.results[0].year_of_manufacture)
     this.formGroup.controls['assetType'].setValue('' + this.results[index].asset_type)
-    this.formGroup.controls['yearOfManufacture'].setValue("" + this.results[0].year_of_manufacture)
+    // this.formGroup.controls['yearOfManufacture'].setValue("" + this.results[0].year_of_manufacture)
     this.formGroup.controls['owner'].setValue('' + this.results[index].owner)
     this.formGroup.controls['vehicleType'].setValue('' + this.results[index].vehicle_type)
     this.formGroup.controls['serialNo'].setValue('' + this.results[index].serial_no)
@@ -321,13 +472,13 @@ export class HomePage implements OnInit {
     this.formGroup.controls['vehicleCode'].setValue('' + this.results[index].vehicle_mfc_code)
 
     /* asset_type: "F"
-date_use: "2029-07-17"
-gs1_code: 8907709
-owner: "ECOR"
-serial_no: "003927"
-vehicle_mfc_code: "ARC"
-vehicle_type: "BOXNHL"
-year_of_manufacture: 17 */
+  date_use: "2029-07-17"
+  gs1_code: 8907709
+  owner: "ECOR"
+  serial_no: "003927"
+  vehicle_mfc_code: "ARC"
+  vehicle_type: "BOXNHL"
+  year_of_manufacture: 17 */
 
   }
 
@@ -360,11 +511,6 @@ year_of_manufacture: 17 */
     }
   }
 
-  /*   customAlertOptions: any = {
-      header: 'Owner',
-      translucent: true,
-    }; */
-
 
   async presentAlertRadio(header, inputs: any[], key) {
 
@@ -385,30 +531,6 @@ year_of_manufacture: 17 */
                 type: 'radio',
                 label: 'Radio 2',
                 value: 'value2'
-              },
-              {
-                name: 'radio3',
-                type: 'radio',
-                label: 'Radio 3',
-                value: 'value3'
-              },
-              {
-                name: 'radio4',
-                type: 'radio',
-                label: 'Radio 4',
-                value: 'value4'
-              },
-              {
-                name: 'radio5',
-                type: 'radio',
-                label: 'Radio 5',
-                value: 'value5'
-              },
-              {
-                name: 'radio6',
-                type: 'radio',
-                label: 'Radio 6',
-                value: 'value6'
               }
             ], */
       ,
@@ -446,32 +568,32 @@ year_of_manufacture: 17 */
     var inputs = []
     if (key === 'owner') {
       console.log('Owner Select')
-      inputs = this.makeRadioSelectList(key, this.owners)
+      inputs = this.makeRadioSelectList(key, this.owners, [])
       header = 'Owner'
     }
     else if (key === 'vehicleType') {
       console.log('Vehicle Type Select')
-      inputs = this.makeRadioSelectList(key, this.vehiclesType)
+      inputs = this.makeRadioSelectList(key, this.vehiclesType, [])
       header = 'Vehicle Type'
     }
     else if (key === 'vehicleCode') {
       console.log('Vehicle Type Select')
-      inputs = this.makeRadioSelectList(key, this.manufacturersCode)
+      inputs = this.makeRadioSelectList(key, this.manufacturersCode, [])
       header = 'Manufacture Code'
     }
     else if (key === 'assetType') {
       console.log('Asset Type Select')
-      inputs = this.makeRadioSelectList(key, this.assetsType)
+      inputs = this.makeRadioSelectList(key, this.assetsType, this.assetsTypeExpanded)
       header = 'Asset Type'
     }
     this.presentAlertRadio(header, inputs, key)
   }
 
-  makeRadioSelectList(key, array) {
+  makeRadioSelectList(key, array, expandedArray) {
     var inputs = []
     for (var i = 0; i < array.length; i++) {
       var option = {
-        type: 'radio', label: array[i], value: array[i]
+        type: 'checkbox', label: expandedArray[i], value: array[i]
       }
       if (this.formGroup.controls[key].value && this.formGroup.controls[key].value !== '' && this.formGroup.controls[key].value === array[i]) {
         option['checked'] = true
@@ -485,10 +607,13 @@ year_of_manufacture: 17 */
 
   clearForm() {
     this.results = []
+
     this.formGroup = this.fb.group({
       'assetType': [''],
-      'yearOfManufacture': ['',
-        [Validators.pattern('[0-9]{1,2}'), Validators.min(0), Validators.max(99)]],
+      'yearOfManufacture': [''
+        // ,[Validators.pattern('[0-9]{1,4}'), Validators.min(0), Validators.max(9999)]
+      ],
+      'yearOfManufactureArray': [''],
       'owner': [''],
       'vehicleType': [''],
       'serialNo': [''
@@ -529,7 +654,7 @@ year_of_manufacture: 17 */
         message += map[k] + this.formGroup.controls[k].value
       }
     })
-    message=message.split(' , ').join(' ')
+    message = message.split(' , ').join(' ')
     this.presentQuerySummary(message + '.')
   }
 
@@ -549,26 +674,22 @@ year_of_manufacture: 17 */
   }
 
 
-  type = 'string'
-  fromInfinite: CalendarComponentOptions = {
-    from: new Date(1),
-    to: 0
-  }
+  /*   type = 'string'
+    fromInfinite: CalendarComponentOptions = {
+      from: new Date(1),
+      to: 0
+    } */
 
-  onChange($event) {
-    console.log('On Change:', $event);
-    // this.openCalendar()
-  }
-
-  defaultDate = new Date(new Date().toISOString().slice(0, 10))
+  /*   onChange($event) {
+      console.log('On Change:', $event);
+      // this.openCalendar()
+    } */
 
   async openCalendar() {
     const options: CalendarModalOptions = {
       title: 'Date Use',
       canBackwardsSelected: true,
       autoDone: true,
-      // defaultDate: this.defaultDate,
-      // defaultScrollTo:this.defaultDate
     };
 
     const myCalendar = await this.modalCtrl.create({
@@ -582,8 +703,6 @@ year_of_manufacture: 17 */
     const date: CalendarResult = event.data;
     console.log('Date Value:', date.string);
     this.formGroup.controls['dateUse'].setValue('' + date.string)
-    /*     if (date.string != undefined || date.string !== '')
-          this.defaultDate = new Date(date.string) */
   }
 
   showDateUseCalendar() {
@@ -621,19 +740,10 @@ year_of_manufacture: 17 */
     console.log('Download End' + new Date())
   }
 
-  someClick() {
-    console.log('Some click.')
-  }
-
-  doukeypress(e) {
-    console.log(e)
-  }
-
-
   removeDuplicates() {
     console.log('Removing Duplicates')
     var uniqueResults = []
-    var found:boolean = false
+    var found: boolean = false
     Object.keys(this.results).forEach(k => {
       // console.log('results item:', this.results[k])
       Object.keys(uniqueResults).forEach(m => {
@@ -650,7 +760,7 @@ year_of_manufacture: 17 */
       }
     });
     console.log(uniqueResults)
-    this.results=uniqueResults
+    this.results = uniqueResults
 
 
     /*
@@ -661,21 +771,14 @@ year_of_manufacture: 17 */
     serialNo: ' having serial number ',
     dateUse: ' put into use on ',
     vehicleCode: ' manufactured  by ',
-
-
-
-
-
-
-
-
+  
     (4) [{…}, {…}, {…}, {…}]
     0: asset_type: "F"date_use: "2029-07-17"gs1_code: 8907709owner: "ECOR"serial_no: "003927"vehicle_mfc_code: "ARC"vehicle_type: "BOXNHL"year_of_manufacture: 17__proto__: 
     Object1: asset_type: "F"date_use: "2017-08-10"gs1_code: 8907709owner: "ECR"serial_no: "001141"vehicle_mfc_code: "BURH"vehicle_type: "BRN22.9"year_of_manufacture: 17__proto__: 
     Object2: asset_type: "F"date_use: "2017-08-31"gs1_code: 8907709owner: "SR"serial_no: "001087"vehicle_mfc_code: "BURH"vehicle_type: "BRN22.9"year_of_manufacture: 17__proto__: 
     Object3: asset_type: "F"date_use: "2017-10-25"gs1_code: 8907709owner: "SCR"serial_no: "001031"vehicle_mfc_code: "BURH"vehicle_type: "BRN22.9"year_of_manufacture: 17__proto__: 
     Objectlength: 4__proto__: Array(0)
-
+  
      */
 
   }

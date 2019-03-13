@@ -25,8 +25,22 @@
 
 </ion-header>
 
-<ion-content padding>
+<ion-content>
+  <ion-item>
+    <ion-label>Port</ion-label>
+    <ionic-selectable
+      item-content 
+      [(ngModel)]="port"
+      [items]="ports"
+      itemValueField="id"
+      itemTextField="name"
 
+      [canSearch]="true"
+      (onChange)="portChange($event)"
+      [canClear]="true"
+      [isMultiple]="true">
+    </ionic-selectable>
+  </ion-item>
 
 
 
@@ -88,9 +102,10 @@
 
 
   <ion-grid>
-    <!-- <ion-row>
+  <!--   <ion-row>
+        <ion-col></ion-col>
       <ion-col> -->
-    <form style='max-width:400px' [formGroup]="formGroup" (submit)='onSubmit()'>
+    <form style='max-width:500px;' [formGroup]="formGroup" (submit)='onSubmit()'>
       <ion-row>
         <ion-col>
           <ion-item (click)='openSelect("assetType")' style='--highlight-height:0'>
@@ -99,9 +114,28 @@
           </ion-item>
         </ion-col>
         <ion-col>
-          <ion-item style='--highlight-height:0'>
+          <!-- <ion-item style='--highlight-height:0'>
             <ion-label position="floating">Manufacture Year (YY)</ion-label>
             <ion-input (keypress)="numberOnly($event)" clearInput formControlName='yearOfManufacture'></ion-input>
+          </ion-item> -->
+          <ion-item>
+            <ion-label position='floating'>Manufacture</ion-label>
+            <ionic-selectable
+              item-content
+formControlName='yearOfManufacture'
+              [items]="years"
+              [canSearch]="true"
+              (onChange)="portChange($event)"
+              [canClear]="true"
+              [isMultiple]="true">
+            </ionic-selectable>
+          </ion-item>
+        </ion-col>
+        <ion-col>
+          <ion-item style='--highlight-height:0'>
+            <ion-label position="floating">Date Of Use</ion-label>
+            <ion-input (click)='showDateUseCalendar()' type='text' clearInput formControlName='dateUse'></ion-input>
+            <!-- <ion-icon name="create"></ion-icon> -->
           </ion-item>
         </ion-col>
       </ion-row>
@@ -122,25 +156,22 @@
         <ion-col>
           <ion-item text-wrap style='--highlight-height:0'>
             <ion-label primary position="floating">Serial Number </ion-label>
-            <ion-input inputmod='numeric' type='text'  (click)='someClick()' (keypress)="numberOnly($event)" clearInput formControlName='serialNo'></ion-input>
+            <ion-input inputmod='numeric' type='text' (keypress)="numberOnly($event)" clearInput
+              formControlName='serialNo'></ion-input>
           </ion-item>
         </ion-col>
       </ion-row>
 
       <ion-row>
-        <ion-col>
+        <!-- <ion-col> -->
           <!-- <ion-item>
             <ion-label position="floating">Date Of Use</ion-label>
             <ion-datetime style='--padding-top:0' formControlName='dateUse' displayFormat="D MMM YYYY"
               [pickerOptions]="customOptions">
             </ion-datetime> 
 </ion-item>-->
-          <ion-item style='--highlight-height:0'>
-              <ion-label position="floating">Date Of Use</ion-label>
-              <ion-input (click)='showDateUseCalendar()' type='text' clearInput formControlName='dateUse'></ion-input>
-              <!-- <ion-icon name="create"></ion-icon> -->
-            </ion-item>
-        </ion-col>
+
+        <!-- </ion-col> -->
 
         <ion-col>
           <ion-item (click)='openSelect("vehicleCode")' style='--highlight-height:0'>
@@ -152,6 +183,8 @@
 
       <ion-item lines='none'>
         <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search</ion-button>
+        <ion-button (click)='clearForm()' [disabled]='!formGroup.valid '>Reset</ion-button>
+        <!--         <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div> -->
         <span style='color:red' *ngIf='formGroup.controls["serialNo"].invalid'>
           Serial Number: Max 6 digits allowed.
         </span>
@@ -159,16 +192,16 @@
           Manufacture Year Invalid.
         </span>
         <span style='color:red' *ngIf='formGroup.controls["dateUse"].invalid'>
-            Invalid Date. 
-            <span *ngIf='!formGroup.controls["invalidDateRange"].invalid'>Valid format is YYYY-MM-DD.</span>
-          </span>
-          
+          Invalid Date.
+          <span *ngIf='!formGroup.controls["invalidDateRange"].invalid'>Valid format is YYYY-MM-DD.</span>
+        </span>
+
         <ion-icon slot='end' name="information-circle-outline" (click)='showQuerySummary()' *ngIf='formGroup.valid'>
         </ion-icon>
       </ion-item>
 
 
-    
+
     </form>
 
 
@@ -184,7 +217,8 @@
               [options]='fromInfinite'
               >
 </ion-calendar> -->
-    <!-- </ion-col>
+<!--     </ion-col>
+    <ion-col></ion-col>
     </ion-row> -->
   </ion-grid>
 
