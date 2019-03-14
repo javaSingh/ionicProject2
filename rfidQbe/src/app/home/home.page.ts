@@ -38,7 +38,7 @@ class Port {
 export class HomePage implements OnInit {
 
   ports: Port[];
-  years: string[] = []
+  yearsMapping = []
   port: Port;
 
   // ?filter={"where":{"or":[{"owner":"ECOR"},{"owner":"ECR"}]}}
@@ -80,26 +80,113 @@ export class HomePage implements OnInit {
     "BVCM",
     "BVZI",]
 
+  vehiclesTypeMapping = [
+    { id: "BCNHL", name: "BCNHL" },
+    { id: "BFNS", name: "BFNS" },
+    { id: "BOBRNHSM1", name: "BOBRNHSM1" },
+    { id: "BOBSN", name: "BOBSN" },
+    { id: "BOBYN", name: "BOBYN" },
+    { id: "BOSTHSM2", name: "BOSTHSM2" },
+    { id: "BOXNHL", name: "BOXNHL" },
+    { id: "BOXNS", name: "BOXNS" },
+    { id: "BRN22.9", name: "BRN22.9" },
+    { id: "BTPGLN", name: "BTPGLN" },
+    { id: "BVCM", name: "BVCM" },
+    { id: "BVZI", name: "BVZI" }
+  ]
+
   // manufacturersCode = ['ARC', 'BURN']
   manufacturersCode = ["ARC", "ASRW", "BESF", "BESWL", "BESWR", "BUR", "BWELK", "BWELZ", "BWT", "CIM", "CLW", "DLW", "DMW", "GOCW", "HEIB", "HEIS", "ICFW", "JMPW", "JRIL", "JWL", "MCFW", "MI", "OFPL", "RCFW", "SPJW", "SR", "TEXB", "TEXS", "TWL",]
 
+  manufacturersCodeMapping = [
+    { id: "ARC", name: "Amtek Railcar Industries Pvt. Ltd." },
+    { id: "ASRW", name: "Amritsar Workshop   " },
+    { id: "BESF", name: "BESCO Ltd (Foundry), Kolkata " },
+    { id: "BESWL", name: "BESCO Ltd. (Wagon), Kolkata " },
+    { id: "BESWR", name: "BESCO Ltd (Wagon), Kolkata " },
+    { id: "BUR", name: "Burn Standard Co. Ltd. " },
+    { id: "BWELK", name: "Bharat Wagon & Engineering Ltd." },
+    { id: "BWELZ", name: "Bharat Wagon & Engineering Ltd." },
+    { id: "BWT", name: "Braithwate & Co. Ltd., Kolkata" },
+    { id: "CIM", name: "CIMMCO Ltd, Bharatpur  " },
+    { id: "CLW", name: "Chittaranjan Locomotive Works  " },
+    { id: "DLW", name: "Diesel Locomotive Works  " },
+    { id: "DMW", name: "Diesel Loco Modernisation Works " },
+    { id: "GOCW", name: "Golden Rock Workshop, Trichurapalli " },
+    { id: "HEIB", name: "Hindustan Engineering Industries Ltd., Kolkata" },
+    { id: "HEIS", name: "Hindustan Engineering Industries Ltd., Kolkata" },
+    { id: "ICFW", name: "Integral Coach factory  " },
+    { id: "JMPW", name: "Jamalpur Workshop   " },
+    { id: "JRIL", name: "Jindal Rail Infrastructure Ltd, Vadodara Miyagam " },
+    { id: "JWL", name: "Jupiter Wagons Ltd, Chinsura, Hoogly" },
+    { id: "MCFW", name: "Modern Coach Factory  " },
+    { id: "MI", name: "Modern Industries (UP)  " },
+    { id: "OFPL", name: "Oriental Foundry Pvt Ltd " },
+    { id: "RCFW", name: "Rail Coach Factory  " },
+    { id: "SPJW", name: "Samastipur Workshop   " },
+    { id: "SR", name: "Sail RITES Bengal Wagon Industry Pvt. Ltd." },
+    { id: "TEXB", name: "Texmaco Rail and Engineering Ltd., Kolkata " },
+    { id: "TEXS", name: "Texmaco Rail and Engineering Ltd., Kolkata " },
+    { id: "TWL", name: "Titagarh, Howrah" },
+
+
+
+  ]
+
   assetsType = ["#", "A", "C", "D", "E", "F", "L", "M", "P", "R", "S", "X", "Y", "Z"]
-  assetsTypeExpanded = ["Condemned Vehicle",
-    "Ancillary vehicles, i.e., non-earning vehicles necessary for train operations",
-    "g., Guard Vans in freight, Generator Cars in coaching",
+  assetsTypeExpanded = [
+    "Condemned Vehicle",
+    "Ancillary vehicles, i.e., non-earning vehicles necessary for train operations e.g., Guard Vans in freight, Generator Cars in coaching",
     "Coaching (Passenger Carrying ONLY)",
     "DEMU",
     "EMU",
     "Freight (Earning vehicles ONLY)",
     "Electric Locos",
     "Maintenance related vehicles, e.g., Tower cars",
-    "Not revealed, e.g., Defense",
     "Part, i.e., an assembly/ subassembly, e.g., LHB bogie",
     "Rescue and safety related Vehicles, e.g., SPART/ SPARME, Cranes etc",
     "Diesel Locos",
     "Experimental, Vehicles on trial, e.g., the Talgo rake",
     "Departmental (Freight)",
     "Departmental (Coaching) includes saloons"
+  ]
+
+  assetsTypeMapping = [
+    { id: "#", name: "Condemned Vehicle" },
+    { id: "A", name: "Ancillary vehicles, i.e., non-earning vehicles nec…Guard Vans in freight, Generator Cars in coaching" },
+    { id: "C", name: "Coaching (Passenger Carrying ONLY)" },
+    { id: "D", name: "DEMU" },
+    { id: "E", name: "EMU" },
+    { id: "F", name: "Freight (Earning vehicles ONLY)" },
+    { id: "L", name: "Electric Locos" },
+    { id: "M", name: "Maintenance related vehicles, e.g., Tower cars" },
+    { id: "P", name: "Part, i.e., an assembly/ subassembly, e.g., LHB bogie" },
+    { id: "R", name: "Rescue and safety related Vehicles, e.g., SPART/ SPARME, Cranes etc" },
+    { id: "S", name: "Diesel Locos" },
+    { id: "X", name: "Experimental, Vehicles on trial, e.g., the Talgo rake" },
+    { id: "Y", name: "Departmental (Freight)" },
+    { id: "Z", name: "Departmental (Coaching) includes saloons" },
+  ]
+
+
+  ownersMapping = [
+    { id: "CR", name: "CR" },
+    { id: "ECOR", name: "ECOR" },
+    { id: "ECR", name: "ECR" },
+    { id: "ER", name: "ER" },
+    { id: "KR", name: "KR" },
+    { id: "NCR", name: "NCR" },
+    { id: "NER", name: "NER" },
+    { id: "NFR", name: "NFR" },
+    { id: "NR", name: "NR" },
+    { id: "NWR", name: "NWR" },
+    { id: "SCR", name: "SCR" },
+    { id: "SECR", name: "SECR" },
+    { id: "SER", name: "SER" },
+    { id: "SR", name: "SR" },
+    { id: "SWR", name: "SWR" },
+    { id: "WCR", name: "WCR" },
+    { id: "WR", name: "WR" }
   ]
 
   //ion date time/datetime/date-time custom option to implement clear which is not present in default
@@ -148,7 +235,7 @@ export class HomePage implements OnInit {
     console.log('After Assign:', meraVar)
     meraVar = ''
     console.log('After Deletion', this.formGroup.value)
-this.makeQueryFromFormValue()
+    this.makeQueryFromFormValue()
     // console.log(JSON.parse(query))
 
     /*    console.log('FC:',this.formGroup.controls['yearOfManufacture'].value)
@@ -163,11 +250,11 @@ this.makeQueryFromFormValue()
 
 
 
- makeQueryFromFormValue() {
+  makeQueryFromFormValue() {
     var query = ''
     // {"or":[{"owner":"[ECOR]"},{"owner":"ECR"}]}
     Object.keys(this.formGroup.value).forEach(k => {
-      console.log('Inside forEach')
+      // console.log('Inside forEach')
       if (this.formGroup.controls[k].value !== '') {
         // console.log('inside value !=="" if condition')
         if (k !== 'serialNo') {
@@ -178,7 +265,7 @@ this.makeQueryFromFormValue()
           }
           for (var i = 0; i < this.formGroup.controls[k].value.length; i++) {
             // console.log('inside query making for loop')
-            query += '{"' + k + '":"' + this.formGroup.controls[k].value[i] + '"},'
+            query += '{"' + k + '":"' + this.formGroup.controls[k].value[i].id + '"},'
           }
           if (this.formGroup.controls[k].value.length > 1) {
             // console.log('multiple valued array found')
@@ -195,7 +282,10 @@ this.makeQueryFromFormValue()
     // {"yearOfManufacture":"2018"},{"yearOfManufacture":"2016"},{"yearOfManufacture":"2014"}
     // {"yearOfManufacture":"2018"}
     console.log(query)
+    return query
   }
+
+
   constructor(
     public fb: FormBuilder,
     public http: HttpClient,
@@ -205,16 +295,25 @@ this.makeQueryFromFormValue()
     public httpProvider: HttpProvider
   ) {
 
+    /* var vehiclesMapping=[]
+        for(var i=0;i<this.owners.length;i++){
+          vehiclesMapping.push({'id':this.vehiclesType[i],'name':this.vehiclesType[i]})
+        }
+        console.log(vehiclesMapping) */
+
     var yyToyyyy = []
 
 
     console.log(yyToyyyy)
     console.log('Constructor')
 
+
+    //making of yearsMapping. Should not be commented.
     for (var i = 2019; i > 1969; i--) {
       var year = i + ''
-      this.years.push(year)
+      this.yearsMapping.push({ id: (i + '').substring(2, 4), name: '' + i })
     }
+    // console.log(this.yearsMapping)
 
 
     this.ports = [
@@ -272,24 +371,27 @@ this.makeQueryFromFormValue()
 
   ngOnInit() {
     console.log('ngOnInit')
+    var arr = []
+    var owner = ['ECOR']
     this.formGroup = this.fb.group({
       "invalidDateRange": [''],
-      'assetType': [''],
-      'yearOfManufacture': [''
+      'assetType': [arr],
+      'yearOfManufacture': [arr
         // ,[Validators.pattern('[0-9]{1,4}'), Validators.min(0), Validators.max(9999)]
       ]
       ,
-      'yearOfManufactureArray': [''],
-      'owner': [''],
-      'vehicleType': [''],
+      'owner': [arr],
+      'vehicleType': [arr],
       'serialNo': [''
         , [Validators.pattern('[0-9]{1,6}'), Validators.min(0), Validators.max(999999)]
       ],
-      'dateUse': [''],
-      'vehicleCode': [''],
-    }, {
-        validator: this.customValidator
-      });
+      'dateUse': [arr],
+      'vehicleCode': [arr],
+    },
+      /* {
+          validator: this.customValidator
+        } */
+    );
 
     // this.presentAlertRadio()
   }
@@ -384,6 +486,7 @@ this.makeQueryFromFormValue()
   onSubmit() {
     console.log(this.formGroup.value, this.formGroup.valid)
     this.isSearching = true
+    // this.makeQueryFromFormValue()
 
     //0 padding for serial number
     var map = ['00000', '0000', '000', '00', '0']
@@ -413,9 +516,14 @@ this.makeQueryFromFormValue()
       }, 3000)
     })
 
-    let responsePromise = this.httpProvider.getMethod('/Tags/v1/EPC/qbe?filter=' + JSON.stringify(this.formGroup.value)).toPromise()
+    // let responsePromise = this.httpProvider.getMethod('/Tags/v1/EPC/qbe?filter=' + JSON.stringify(this.formGroup.value)).toPromise()
 
     // let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/v1/EPC/qbe?filter=' + JSON.stringify(this.formGroup.value), { reportProgress: true }).toPromise()
+    var queryString = this.makeQueryFromFormValue()
+    console.log('This is query:', '{"where":' + queryString + '}')
+
+
+    let responsePromise = this.httpProvider.getMethod('/Tags/v2/EPC/qbe?filter=' + '{"where":' + queryString + '}').toPromise()
 
     let race = Promise.race([timeoutPromise, responsePromise])
     race.then((data: any) => {
@@ -427,13 +535,17 @@ this.makeQueryFromFormValue()
       else {
         // console.log('response has win the race')
         console.log('HTTP GET Result: ', data)
-        this.results = data
-        if (this.results.length > 0) {
-          this.showResults(0)
-          this.removeDuplicates()
-        }
-        else {
-          this.presentToast('No Result Found')
+        if (data.name === 'error') {
+
+        } else {
+          this.results = data
+          if (this.results.length > 0) {
+            this.showResults(0)
+            // this.removeDuplicates()
+          }
+          else {
+            this.presentToast('No Result Found')
+          }
         }
       }
     }, error => {
@@ -459,17 +571,62 @@ this.makeQueryFromFormValue()
 
   }
 
+
+  getSomething(mapping,value){
+    for (var i = 0; i < mapping.length; i++) {
+      if (mapping[i].id === value){
+        console.log('Match found', mapping[i])
+        return [this.ownersMapping[i]]
+      }
+      
+    }
+
+  }
   showResults(index: any) {
     console.log('Showing Reults. Index is: ', index)
     this.index = index
-    console.log(this.results[0].year_of_manufacture)
-    this.formGroup.controls['assetType'].setValue('' + this.results[index].asset_type)
-    // this.formGroup.controls['yearOfManufacture'].setValue("" + this.results[0].year_of_manufacture)
-    this.formGroup.controls['owner'].setValue('' + this.results[index].owner)
-    this.formGroup.controls['vehicleType'].setValue('' + this.results[index].vehicle_type)
-    this.formGroup.controls['serialNo'].setValue('' + this.results[index].serial_no)
-    this.formGroup.controls['dateUse'].setValue('' + this.results[index].date_use)
-    this.formGroup.controls['vehicleCode'].setValue('' + this.results[index].vehicle_mfc_code)
+    /* 
+        assetType: "F"
+    createdBy: "ABCXYZR"
+    createdOnClient: "2019-02-12T09:57:38.643Z"
+    createdOnServer: "2019-02-12T09:58:38.643Z"
+    dateUse: "2029-07-16T18:30:00.000Z"
+    dk: "54M0MAJ8"
+    gs1Code: "8907709"
+    modifiedBy: null
+    modifiedOnClient: "2019-02-12T09:57:38.643Z"
+    modifiedOnServer: "2019-02-12T09:57:38.643Z"
+    owner: "ECOR"
+    plNo: "00000000000"
+    productSerialNo: "00000000 "
+    serialNo: "003927"
+    side: "1"
+    stages: null
+    stationUse: "SDY"
+    structureVersion: null
+    tagTid: "E2C068922000A1021F0C5617"
+    usedFlag: true
+    validFlag: false
+    vehicleMfcCode: "ARC"
+    vehicleType: "BOXNHL"
+    version: "D"
+    yearOfManufacture: "17" */
+    console.log(this.results[0].yearOfManufacture)
+    /*     this.formGroup.controls['assetType'].setValue([].push(this.results[index].assetType))
+        this.formGroup.controls['yearOfManufacture'].setValue([].push(this.results[index].yearOfManufacture))
+        this.formGroup.controls['owner'].setValue([].push(this.results[index].owner))
+        this.formGroup.controls['vehicleType'].setValue([].push(this.results[index].vehicleType))
+        this.formGroup.controls['serialNo'].setValue([].push(this.results[index].serialNo))
+        this.formGroup.controls['dateUse'].setValue([].push(this.results[index].dateUse))
+        this.formGroup.controls['vehicleCode'].setValue([].push(this.results[index].vehicleMfcCode)) */
+    
+    this.formGroup.controls['serialNo'].setValue(this.results[index].serialNo)
+
+    this.formGroup.controls['owner'].setValue(this.getSomething(this.ownersMapping,this.results[index].owner))
+    
+
+
+    // this.formGroup.controls['owner'].setValue(owner)
 
     /* asset_type: "F"
   date_use: "2029-07-17"

@@ -26,7 +26,7 @@
 </ion-header>
 
 <ion-content>
-  <ion-item>
+<!--   <ion-item>
     <ion-label>Port</ion-label>
     <ionic-selectable
       item-content 
@@ -41,7 +41,7 @@
       [isMultiple]="true">
     </ionic-selectable>
   </ion-item>
-
+ -->
 
 
   <!-- <ion-alert class="sc-ion-alert-md-h sc-ion-alert-md-s hydrated" id="ion-overlay-1" role="dialog" aria-modal="true"
@@ -108,9 +108,25 @@
     <form style='max-width:500px;' [formGroup]="formGroup" (submit)='onSubmit()'>
       <ion-row>
         <ion-col>
-          <ion-item (click)='openSelect("assetType")' style='--highlight-height:0'>
+          <!-- <ion-item (click)='openSelect("assetType")' style='--highlight-height:0'>
             <ion-label position="floating">Asset Type</ion-label>
             <ion-input style="--padding-start:0" type='text' formControlName="assetType"></ion-input>
+          </ion-item> -->
+
+
+          <ion-item>
+            <ion-label position='floating'>Asset Type</ion-label>
+            <ionic-selectable
+              item-content
+formControlName='assetType'
+              [items]="assetsTypeMapping"
+              itemValueField="id"
+              itemTextField="name"
+              [canSearch]="true"
+              (onChange)="portChange($event)"
+              [canClear]="true"
+              [isMultiple]="true">
+            </ionic-selectable>
           </ion-item>
         </ion-col>
         <ion-col>
@@ -123,7 +139,9 @@
             <ionic-selectable
               item-content
 formControlName='yearOfManufacture'
-              [items]="years"
+[items]="yearsMapping"
+itemValueField="id"
+itemTextField="name"
               [canSearch]="true"
               (onChange)="portChange($event)"
               [canClear]="true"
@@ -142,15 +160,49 @@ formControlName='yearOfManufacture'
 
       <ion-row>
         <ion-col>
-          <ion-item text-wrap (click)='openSelect("owner")' style='--highlight-height:0'>
+<!--           <ion-item text-wrap (click)='openSelect("owner")' style='--highlight-height:0'>
             <ion-label position="floating">Owner</ion-label>
             <ion-input type='text' formControlName='owner'></ion-input>
           </ion-item>
+ -->
+
+          <ion-item>
+            <ion-label position='floating'>Owner</ion-label>
+            <ionic-selectable
+              item-content
+formControlName='owner'
+[items]="ownersMapping"
+itemValueField="id"
+itemTextField="name"
+
+              [canSearch]="true"
+              (onChange)="portChange($event)"
+              [canClear]="true"
+              [isMultiple]="true">
+            </ionic-selectable>
+          </ion-item>
+          
         </ion-col>
         <ion-col>
-          <ion-item text-wrap (click)='openSelect("vehicleType")' style='--highlight-height:0'>
+<!--           <ion-item text-wrap (click)='openSelect("vehicleType")' style='--highlight-height:0'>
             <ion-label position="floating">Vehicle Type</ion-label>
             <ion-input type='text' formControlName='vehicleType'></ion-input>
+          </ion-item> -->
+
+          <ion-item>
+            <ion-label position='floating'>Vehicle Type</ion-label>
+            <ionic-selectable
+              item-content
+formControlName='vehicleType'
+[items]="vehiclesTypeMapping"
+itemValueField="id"
+itemTextField="name"
+
+              [canSearch]="true"
+              (onChange)="portChange($event)"
+              [canClear]="true"
+              [isMultiple]="true">
+            </ionic-selectable>
           </ion-item>
         </ion-col>
         <ion-col>
@@ -174,9 +226,26 @@ formControlName='yearOfManufacture'
         <!-- </ion-col> -->
 
         <ion-col>
-          <ion-item (click)='openSelect("vehicleCode")' style='--highlight-height:0'>
+<!--           <ion-item (click)='openSelect("vehicleCode")' style='--highlight-height:0'>
             <ion-label position="floating">Manufacturer Code</ion-label>
             <ion-input type='text' formControlName='vehicleCode'></ion-input>
+          </ion-item> -->
+
+
+          <ion-item>
+            <ion-label position='floating'>Manufacturer Code</ion-label>
+            <ionic-selectable
+              item-content
+formControlName='vehicleCode'
+[items]="manufacturersCodeMapping"
+itemValueField="id"
+itemTextField="name"
+
+              [canSearch]="true"
+              (onChange)="portChange($event)"
+              [canClear]="true"
+              [isMultiple]="true">
+            </ionic-selectable>
           </ion-item>
         </ion-col>
       </ion-row>
