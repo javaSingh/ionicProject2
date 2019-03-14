@@ -26,7 +26,7 @@
 </ion-header>
 
 <ion-content>
-<!--   <ion-item>
+  <!--   <ion-item>
     <ion-label>Port</ion-label>
     <ionic-selectable
       item-content 
@@ -102,7 +102,7 @@
 
 
   <ion-grid>
-  <!--   <ion-row>
+    <!--   <ion-row>
         <ion-col></ion-col>
       <ion-col> -->
     <form style='max-width:500px;' [formGroup]="formGroup" (submit)='onSubmit()'>
@@ -116,15 +116,8 @@
 
           <ion-item>
             <ion-label position='floating'>Asset Type</ion-label>
-            <ionic-selectable
-              item-content
-formControlName='assetType'
-              [items]="assetsTypeMapping"
-              itemValueField="id"
-              itemTextField="name"
-              [canSearch]="true"
-              (onChange)="portChange($event)"
-              [canClear]="true"
+            <ionic-selectable item-content formControlName='assetType' [items]="assetsTypeMapping" itemValueField="id"
+              itemTextField="name" [canSearch]="true" (onChange)="portChange($event)" [canClear]="true"
               [isMultiple]="true">
             </ionic-selectable>
           </ion-item>
@@ -135,23 +128,20 @@ formControlName='assetType'
             <ion-input (keypress)="numberOnly($event)" clearInput formControlName='yearOfManufacture'></ion-input>
           </ion-item> -->
           <ion-item>
-            <ion-label position='floating'>Manufacture</ion-label>
-            <ionic-selectable
-              item-content
-formControlName='yearOfManufacture'
-[items]="yearsMapping"
-itemValueField="id"
-itemTextField="name"
-              [canSearch]="true"
-              (onChange)="portChange($event)"
-              [canClear]="true"
-              [isMultiple]="true">
+            <ion-icon slot='end' name="options" (click)='yearOfManufactureFilter()'></ion-icon>
+            <ion-label position='floating' *ngIf='lessThan==="" && moreThan===""'>Manufacture Year</ion-label>
+            <ion-label position='floating' *ngIf='lessThan!=="" && moreThan===""'>M/f Before  {{lessThan}}</ion-label>
+            <ion-label position='floating' *ngIf='lessThan==="" && moreThan!==""'>M/f After  {{moreThan}}</ion-label>
+            <ion-label position='floating' *ngIf='lessThan!=="" && moreThan!==""'>M/f B/w {{lessThan}}-{{moreThan}}</ion-label>
+            <ionic-selectable item-content formControlName='yearOfManufacture' [items]="yearsMapping"
+              itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="yomChange($event)"
+              [canClear]="true" [isMultiple]="true">
             </ionic-selectable>
           </ion-item>
         </ion-col>
         <ion-col>
           <ion-item style='--highlight-height:0'>
-            <ion-label position="floating">Date Of Use</ion-label>
+            <ion-label position="floating">Date Put Into Use</ion-label>
             <ion-input (click)='showDateUseCalendar()' type='text' clearInput formControlName='dateUse'></ion-input>
             <!-- <ion-icon name="create"></ion-icon> -->
           </ion-item>
@@ -160,7 +150,7 @@ itemTextField="name"
 
       <ion-row>
         <ion-col>
-<!--           <ion-item text-wrap (click)='openSelect("owner")' style='--highlight-height:0'>
+          <!--           <ion-item text-wrap (click)='openSelect("owner")' style='--highlight-height:0'>
             <ion-label position="floating">Owner</ion-label>
             <ion-input type='text' formControlName='owner'></ion-input>
           </ion-item>
@@ -168,40 +158,24 @@ itemTextField="name"
 
           <ion-item>
             <ion-label position='floating'>Owner</ion-label>
-            <ionic-selectable
-              item-content
-formControlName='owner'
-[items]="ownersMapping"
-itemValueField="id"
-itemTextField="name"
-
-              [canSearch]="true"
-              (onChange)="portChange($event)"
-              [canClear]="true"
+            <ionic-selectable item-content formControlName='owner' [items]="ownersMapping" itemValueField="id"
+              itemTextField="name" [canSearch]="true" (onChange)="portChange($event)" [canClear]="true"
               [isMultiple]="true">
             </ionic-selectable>
           </ion-item>
-          
+
         </ion-col>
         <ion-col>
-<!--           <ion-item text-wrap (click)='openSelect("vehicleType")' style='--highlight-height:0'>
+          <!--           <ion-item text-wrap (click)='openSelect("vehicleType")' style='--highlight-height:0'>
             <ion-label position="floating">Vehicle Type</ion-label>
             <ion-input type='text' formControlName='vehicleType'></ion-input>
           </ion-item> -->
 
           <ion-item>
             <ion-label position='floating'>Vehicle Type</ion-label>
-            <ionic-selectable
-              item-content
-formControlName='vehicleType'
-[items]="vehiclesTypeMapping"
-itemValueField="id"
-itemTextField="name"
-
-              [canSearch]="true"
-              (onChange)="portChange($event)"
-              [canClear]="true"
-              [isMultiple]="true">
+            <ionic-selectable item-content formControlName='vehicleType' [items]="vehiclesTypeMapping"
+              itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="portChange($event)"
+              [canClear]="true" [isMultiple]="true">
             </ionic-selectable>
           </ion-item>
         </ion-col>
@@ -216,7 +190,7 @@ itemTextField="name"
 
       <ion-row>
         <!-- <ion-col> -->
-          <!-- <ion-item>
+        <!-- <ion-item>
             <ion-label position="floating">Date Of Use</ion-label>
             <ion-datetime style='--padding-top:0' formControlName='dateUse' displayFormat="D MMM YYYY"
               [pickerOptions]="customOptions">
@@ -226,25 +200,17 @@ itemTextField="name"
         <!-- </ion-col> -->
 
         <ion-col>
-<!--           <ion-item (click)='openSelect("vehicleCode")' style='--highlight-height:0'>
+          <!--           <ion-item (click)='openSelect("vehicleMfcCode")' style='--highlight-height:0'>
             <ion-label position="floating">Manufacturer Code</ion-label>
-            <ion-input type='text' formControlName='vehicleCode'></ion-input>
+            <ion-input type='text' formControlName='vehicleMfcCode'></ion-input>
           </ion-item> -->
 
 
           <ion-item>
             <ion-label position='floating'>Manufacturer Code</ion-label>
-            <ionic-selectable
-              item-content
-formControlName='vehicleCode'
-[items]="manufacturersCodeMapping"
-itemValueField="id"
-itemTextField="name"
-
-              [canSearch]="true"
-              (onChange)="portChange($event)"
-              [canClear]="true"
-              [isMultiple]="true">
+            <ionic-selectable item-content formControlName='vehicleMfcCode' [items]="manufacturersCodeMapping"
+              itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="portChange($event)"
+              [canClear]="true" [isMultiple]="true">
             </ionic-selectable>
           </ion-item>
         </ion-col>
@@ -252,7 +218,7 @@ itemTextField="name"
 
       <ion-item lines='none'>
         <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search</ion-button>
-        <ion-button (click)='clearForm()' [disabled]='!formGroup.valid '>Reset</ion-button>
+        <ion-button (click)='clearForm()' [disabled]='!formGroup.valid || isSearching'>Reset</ion-button>
         <!--         <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div> -->
         <span style='color:red' *ngIf='formGroup.controls["serialNo"].invalid'>
           Serial Number: Max 6 digits allowed.
@@ -267,6 +233,7 @@ itemTextField="name"
 
         <ion-icon slot='end' name="information-circle-outline" (click)='showQuerySummary()' *ngIf='formGroup.valid'>
         </ion-icon>
+        <!-- <ion-icon slot='end' name="funnel"></ion-icon> -->
       </ion-item>
 
 
@@ -286,7 +253,7 @@ itemTextField="name"
               [options]='fromInfinite'
               >
 </ion-calendar> -->
-<!--     </ion-col>
+    <!--     </ion-col>
     <ion-col></ion-col>
     </ion-row> -->
   </ion-grid>

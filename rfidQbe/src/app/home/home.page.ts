@@ -249,39 +249,75 @@ export class HomePage implements OnInit {
   }
 
 
+  yomChange(event: {
+    component: IonicSelectableComponent,
+    value: any
+  }) {
+    console.log('port:', event.value);
+    this.lessThan = ''
+    this.moreThan = ''
+  }
+
+
 
   makeQueryFromFormValue() {
-    var query = ''
+
+    var query = '{'
     // {"or":[{"owner":"[ECOR]"},{"owner":"ECR"}]}
     Object.keys(this.formGroup.value).forEach(k => {
       // console.log('Inside forEach')
       if (this.formGroup.controls[k].value !== '') {
         // console.log('inside value !=="" if condition')
-        if (k !== 'serialNo') {
+        if (k !== 'serialNo' && k !== 'dateUse') {
           // console.log('inside k !=="serianNo" if condition')
           if (this.formGroup.controls[k].value.length > 1) {
             // console.log('multiple valued array found')
-            query += '{"or":['
+            query += '"or":['
+            for (var i = 0; i < this.formGroup.controls[k].value.length; i++) {
+              // console.log('inside query making for loop')
+              query += '{"' + k + '":"' + this.formGroup.controls[k].value[i].id + '"},'
+            }
+            query += ']'
           }
-          for (var i = 0; i < this.formGroup.controls[k].value.length; i++) {
-            // console.log('inside query making for loop')
-            query += '{"' + k + '":"' + this.formGroup.controls[k].value[i].id + '"},'
+          else if (this.formGroup.controls[k].value[0] != undefined) {
+            console.log(this.formGroup.controls[k].value[0].id)
+            query += '"' + k + '":"' + this.formGroup.controls[k].value[0].id + '",'
           }
-          if (this.formGroup.controls[k].value.length > 1) {
-            // console.log('multiple valued array found')
-            query += ']}'
+          else if (k === 'yearOfManufacture') {
+            if (this.lessThan !== '' && this.moreThan !== '') {
+
+              // "yearOfManufacture":{"gt": 18, "lt": 19},"
+              query += '"yearOfManufacture":{"gt":' + this.moreThan + ',"lt":' + this.lessThan + '},'
+            }
+            else if (this.lessThan === '' && this.moreThan !== '') {
+              query += '"yearOfManufacture":{"gt":' + this.moreThan + '},'
+            }
+            else if (this.moreThan === '' && this.lessThan !== '') {
+              query += '"yearOfManufacture":{"lt":' + this.lessThan + '},'
+            }
           }
+
+        }
+        else if (this.formGroup.controls[k].value != undefined) {
+          console.log(this.formGroup.controls[k].value[0].id)
+          query += '"' + k + '":"' + this.formGroup.controls[k].value + '",'
         }
       }
 
     })
 
+    query += '}'
     query += '.'
+    console.log('Before Split:', query)
+    query = query.split(',]"').join('],"')
     query = query.split('},.').join('}')
     query = query.split(',]}.').join(']}')
+    query = query.split(',]').join(']')
+    query = query.split(',}.').join('}')
+    query = query.split(']"').join('}')
     // {"yearOfManufacture":"2018"},{"yearOfManufacture":"2016"},{"yearOfManufacture":"2014"}
     // {"yearOfManufacture":"2018"}
-    console.log(query)
+    console.log('After Split:', query)
     return query
   }
 
@@ -385,12 +421,12 @@ export class HomePage implements OnInit {
       'serialNo': [''
         , [Validators.pattern('[0-9]{1,6}'), Validators.min(0), Validators.max(999999)]
       ],
-      'dateUse': [arr],
-      'vehicleCode': [arr],
+      'dateUse': [''],
+      'vehicleMfcCode': [arr],
     },
-      /* {
-          validator: this.customValidator
-        } */
+      {
+        validator: this.customValidator
+      }
     );
 
     // this.presentAlertRadio()
@@ -466,6 +502,7 @@ export class HomePage implements OnInit {
           }
         } */
 
+
     for (var key in formGroup.controls) {
       if (formGroup.controls[key].value && formGroup.controls[key].value.length > 0) {
         console.log('ValidForm. AtLeastOneIsFilled. Breaking')
@@ -520,10 +557,14 @@ export class HomePage implements OnInit {
 
     // let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/v1/EPC/qbe?filter=' + JSON.stringify(this.formGroup.value), { reportProgress: true }).toPromise()
     var queryString = this.makeQueryFromFormValue()
-    console.log('This is query:', '{"where":' + queryString + '}')
+    this.summaryQueryString = queryString
+    var fields = ',"fields":{"owner":"true","dateUse":"true","yearOfManufacture":"true","assetType":"true","serialNo":"true","vehicleType":"true","vehicleMfcCode":"true"}'
 
 
-    let responsePromise = this.httpProvider.getMethod('/Tags/v2/EPC/qbe?filter=' + '{"where":' + queryString + '}').toPromise()
+    console.log('This is query:', '{"where":' + queryString + fields + '}')
+
+
+    let responsePromise = this.httpProvider.getMethod('/Tags/v2/EPC/qbe?filter=' + '{"where":' + queryString + fields + '}').toPromise()
 
     let race = Promise.race([timeoutPromise, responsePromise])
     race.then((data: any) => {
@@ -541,7 +582,7 @@ export class HomePage implements OnInit {
           this.results = data
           if (this.results.length > 0) {
             this.showResults(0)
-            // this.removeDuplicates()
+            this.removeDuplicates()
           }
           else {
             this.presentToast('No Result Found')
@@ -572,13 +613,13 @@ export class HomePage implements OnInit {
   }
 
 
-  getSomething(mapping,value){
+  getItem(mapping, value) {
     for (var i = 0; i < mapping.length; i++) {
-      if (mapping[i].id === value){
+      if (mapping[i].id === value) {
         console.log('Match found', mapping[i])
-        return [this.ownersMapping[i]]
+        return [mapping[i]]
       }
-      
+
     }
 
   }
@@ -612,18 +653,18 @@ export class HomePage implements OnInit {
     version: "D"
     yearOfManufacture: "17" */
     console.log(this.results[0].yearOfManufacture)
-    /*     this.formGroup.controls['assetType'].setValue([].push(this.results[index].assetType))
-        this.formGroup.controls['yearOfManufacture'].setValue([].push(this.results[index].yearOfManufacture))
-        this.formGroup.controls['owner'].setValue([].push(this.results[index].owner))
-        this.formGroup.controls['vehicleType'].setValue([].push(this.results[index].vehicleType))
-        this.formGroup.controls['serialNo'].setValue([].push(this.results[index].serialNo))
-        this.formGroup.controls['dateUse'].setValue([].push(this.results[index].dateUse))
-        this.formGroup.controls['vehicleCode'].setValue([].push(this.results[index].vehicleMfcCode)) */
-    
-    this.formGroup.controls['serialNo'].setValue(this.results[index].serialNo)
+    this.formGroup.controls['assetType'].setValue(this.getItem(this.assetsTypeMapping, this.results[index].assetType))
+    this.formGroup.controls['yearOfManufacture'].setValue(this.getItem(this.yearsMapping, this.results[index].yearOfManufacture))
+    this.formGroup.controls['owner'].setValue(this.getItem(this.ownersMapping, this.results[index].owner))
+    this.formGroup.controls['vehicleType'].setValue(this.getItem(this.vehiclesTypeMapping, this.results[index].vehicleType))
+    // this.formGroup.controls['serialNo'].setValue()
+    this.formGroup.controls['dateUse'].setValue(this.results[index].dateUse.substring(0, 10))
 
-    this.formGroup.controls['owner'].setValue(this.getSomething(this.ownersMapping,this.results[index].owner))
-    
+    this.formGroup.controls['vehicleMfcCode'].setValue(this.getItem(this.manufacturersCodeMapping, this.results[index].vehicleMfcCode))
+
+    this.formGroup.controls['serialNo'].setValue(this.results[index].serialNo)
+    // this.formGroup.controls['owner'].setValue(this.getItem(this.ownersMapping, this.results[index].owner))
+
 
 
     // this.formGroup.controls['owner'].setValue(owner)
@@ -733,7 +774,7 @@ export class HomePage implements OnInit {
       inputs = this.makeRadioSelectList(key, this.vehiclesType, [])
       header = 'Vehicle Type'
     }
-    else if (key === 'vehicleCode') {
+    else if (key === 'vehicleMfcCode') {
       console.log('Vehicle Type Select')
       inputs = this.makeRadioSelectList(key, this.manufacturersCode, [])
       header = 'Manufacture Code'
@@ -764,20 +805,20 @@ export class HomePage implements OnInit {
 
   clearForm() {
     this.results = []
-
+    var arr = []
+this.moreThan=''
+this.lessThan=''
     this.formGroup = this.fb.group({
-      'assetType': [''],
-      'yearOfManufacture': [''
-        // ,[Validators.pattern('[0-9]{1,4}'), Validators.min(0), Validators.max(9999)]
+      'assetType': [arr],
+      'yearOfManufacture': [arr
       ],
       'yearOfManufactureArray': [''],
-      'owner': [''],
-      'vehicleType': [''],
+      'owner': [arr],
+      'vehicleType': [arr],
       'serialNo': [''
-        , [Validators.pattern('[0-9]{1,6}'), Validators.min(0), Validators.max(999999)]
       ],
       'dateUse': [''],
-      'vehicleCode': [''],
+      'vehicleMfcCode': [arr],
     }, {
         validator: this.customValidator
       });
@@ -794,22 +835,40 @@ export class HomePage implements OnInit {
     return true;
   }
 
-
+  summaryQueryString = ''
   showQuerySummary() {
+
+    // console.log('Query Summary String:',this.summaryQueryString)
+    console.log('Query Summary String:', this.formGroup.value)
+    if (this.summaryQueryString !== '') {
+      console.log('Query Summary String:', this.summaryQueryString)
+    }
     var message = 'Asset '
     var map = {
-      assetType: ' of type ',
-      yearOfManufacture: ', manufactured on ',
-      owner: ', owned by ',
-      vehicleType: ', of vehicle type ',
-      serialNo: ', having serial number ',
-      dateUse: ', put into use on ',
-      vehicleCode: ', manufactured  by ',
+      assetType: ' type is ',
+      yearOfManufacture: '<br>which was manufactured on ',
+      owner: '<br>which is owned by ',
+      vehicleType: '<br>which is of type ',
+      serialNo: "<br>having serial number ",
+      dateUse: '<br>which was put into use on ',
+      vehicleCode: '<br>manufactured by ',
     }
     Object.keys(this.formGroup.value).forEach(k => {
-      if (this.formGroup.controls[k].value !== '') {
-        message += map[k] + this.formGroup.controls[k].value
+      if (this.formGroup.controls[k].value.length > 0) {
+        if (k !== 'serialNo' && k !== 'dateUse') {
+          message += map[k]
+          for (var i = 0; i < this.formGroup.controls[k].value.length; i++) {
+            message += this.formGroup.controls[k].value[i].name
+            if (this.formGroup.controls[k].value.length > 1 && i < this.formGroup.controls[k].value.length - 1) {
+              message += ' OR '
+            }
+          }
+        }
+        else {
+          message += map[k] + this.formGroup.controls[k].value
+        }
       }
+
     })
     message = message.split(' , ').join(' ')
     this.presentQuerySummary(message + '.')
@@ -918,26 +977,70 @@ export class HomePage implements OnInit {
     });
     console.log(uniqueResults)
     this.results = uniqueResults
+  }
+
+  yearOfManufactureFilter() {
+    console.log('YOM Filtering')
+    this.presentYearOfManufactureFilter()
+
+  }
 
 
-    /*
-     assetType: ' of type ',
-    yearOfManufacture: ' manufactured on ',
-    owner: ' owned by ',
-    vehicleType: ' vehicle type ',
-    serialNo: ' having serial number ',
-    dateUse: ' put into use on ',
-    vehicleCode: ' manufactured  by ',
-  
-    (4) [{…}, {…}, {…}, {…}]
-    0: asset_type: "F"date_use: "2029-07-17"gs1_code: 8907709owner: "ECOR"serial_no: "003927"vehicle_mfc_code: "ARC"vehicle_type: "BOXNHL"year_of_manufacture: 17__proto__: 
-    Object1: asset_type: "F"date_use: "2017-08-10"gs1_code: 8907709owner: "ECR"serial_no: "001141"vehicle_mfc_code: "BURH"vehicle_type: "BRN22.9"year_of_manufacture: 17__proto__: 
-    Object2: asset_type: "F"date_use: "2017-08-31"gs1_code: 8907709owner: "SR"serial_no: "001087"vehicle_mfc_code: "BURH"vehicle_type: "BRN22.9"year_of_manufacture: 17__proto__: 
-    Object3: asset_type: "F"date_use: "2017-10-25"gs1_code: 8907709owner: "SCR"serial_no: "001031"vehicle_mfc_code: "BURH"vehicle_type: "BRN22.9"year_of_manufacture: 17__proto__: 
-    Objectlength: 4__proto__: Array(0)
-  
-     */
+  lessThan = ''
+  moreThan = ''
 
+  async presentYearOfManufactureFilter() {
+
+    const alert = await this.alertController.create({
+      header: 'Manufacture Year Filtering',
+      // message: 'Format: YYYY',
+      inputs: [
+        {
+          label: 'Before',
+          name: 'lessThan',
+          type: 'text',
+          id: 'name1-id',
+          value: this.lessThan,
+          placeholder: 'Before YYYY'
+        },
+        {
+          label: 'After',
+          name: 'moreThan',
+          type: 'text',
+          id: 'name2-id',
+          value: this.moreThan,
+          placeholder: 'After YYYY'
+        }],
+      buttons: [
+        {
+          text: 'X',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Cancel');
+
+          }
+        }, {
+          text: 'Clear',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Confirm Clear');
+            this.lessThan = ''
+            this.moreThan = ''
+          }
+        }, {
+          text: 'Ok',
+          handler: (data) => {
+            console.log('Confirm Ok');
+            console.log('Data:', data)
+            this.lessThan = data.lessThan
+            this.moreThan = data.moreThan
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
 
