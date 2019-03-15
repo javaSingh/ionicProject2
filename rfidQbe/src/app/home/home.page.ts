@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ToastController, AlertController } from '@ionic/angular';
 import { ModalController } from '@ionic/angular';
+import { ModalPage  } from '../modal/modal.page';
 import {
   CalendarModal,
   CalendarModalOptions,
@@ -46,6 +47,7 @@ export class HomePage implements OnInit {
   isSearching: boolean = false
 
   formGroup: FormGroup
+  validFormCustomStatus = false
   results: any[] = []
   index
   // owners = ['ECOR', 'ECR', 'SCR', 'SR']
@@ -105,6 +107,7 @@ export class HomePage implements OnInit {
     { id: "BESWL", name: "BESCO Ltd. (Wagon), Kolkata " },
     { id: "BESWR", name: "BESCO Ltd (Wagon), Kolkata " },
     { id: "BUR", name: "Burn Standard Co. Ltd. " },
+    { id: "BURH", name: "BUR Howrah" },
     { id: "BWELK", name: "Bharat Wagon & Engineering Ltd." },
     { id: "BWELZ", name: "Bharat Wagon & Engineering Ltd." },
     { id: "BWT", name: "Braithwate & Co. Ltd., Kolkata" },
@@ -287,13 +290,13 @@ export class HomePage implements OnInit {
             if (this.lessThan !== '' && this.moreThan !== '') {
 
               // "yearOfManufacture":{"gt": 18, "lt": 19},"
-              query += '"yearOfManufacture":{"gt":' + this.moreThan + ',"lt":' + this.lessThan + '},'
+              query += '"yearOfManufacture":{"gt":"' + this.moreThan.substring(2, 4) + '","lt":"' + this.lessThan.substring(2, 4) + '"},'
             }
             else if (this.lessThan === '' && this.moreThan !== '') {
-              query += '"yearOfManufacture":{"gt":' + this.moreThan + '},'
+              query += '"yearOfManufacture":{"gt":"' + this.moreThan.substring(2.4) + '"},'
             }
             else if (this.moreThan === '' && this.lessThan !== '') {
-              query += '"yearOfManufacture":{"lt":' + this.lessThan + '},'
+              query += '"yearOfManufacture":{"lt":"' + this.lessThan.substring(2.4) + '"},'
             }
           }
 
@@ -330,6 +333,8 @@ export class HomePage implements OnInit {
     public modalCtrl: ModalController,
     public httpProvider: HttpProvider
   ) {
+
+    // this.presentModal('Called from Constructor')
 
     /* var vehiclesMapping=[]
         for(var i=0;i<this.owners.length;i++){
@@ -410,6 +415,8 @@ export class HomePage implements OnInit {
     var arr = []
     var owner = ['ECOR']
     this.formGroup = this.fb.group({
+      'yearOfManufactureLessThan': [''],
+      'yearOfManufactureMoreThan': [''],
       "invalidDateRange": [''],
       'assetType': [arr],
       'yearOfManufacture': [arr
@@ -431,6 +438,13 @@ export class HomePage implements OnInit {
 
     // this.presentAlertRadio()
   }
+
+
+  two(a, b) {
+    return this.customValidator || (a !== '' && b !== "")
+  }
+
+
 
   customValidator(formGroup: FormGroup) {
 
@@ -477,6 +491,7 @@ export class HomePage implements OnInit {
       }
     }
 
+
     /*     if (formGroup.controls['dateUse'].value !== '') {
           if (formGroup.controls['dateUse'].value.match(/^\d{4}-\d{2}-\d{2}$/)) {
             console.log('Pattern match')
@@ -504,7 +519,7 @@ export class HomePage implements OnInit {
 
 
     for (var key in formGroup.controls) {
-      if (formGroup.controls[key].value && formGroup.controls[key].value.length > 0) {
+      if ((formGroup.controls[key].value && formGroup.controls[key].value.length > 0)) {
         console.log('ValidForm. AtLeastOneIsFilled. Breaking')
         atLeastOneIsFilled = true
         break
@@ -545,19 +560,20 @@ export class HomePage implements OnInit {
           jsonData['yearOfManufacture'] = jsonData['yearOfManufacture'].substring(2, 4)
         } */
     console.log(jsonData)
+    console.log('Form value after Shrink:', this.formGroup.value)
+    this.querySummaryString = jsonData
 
     let timeoutPromise = new Promise((resolve, reject) => {
       let wait = setTimeout(() => {
         clearTimeout(wait);
         resolve('Connection Timed Out');
-      }, 3000)
+      }, 10000)
     })
 
     // let responsePromise = this.httpProvider.getMethod('/Tags/v1/EPC/qbe?filter=' + JSON.stringify(this.formGroup.value)).toPromise()
 
     // let responsePromise = this.http.get('http://172.16.22.64:3000/Tags/v1/EPC/qbe?filter=' + JSON.stringify(this.formGroup.value), { reportProgress: true }).toPromise()
     var queryString = this.makeQueryFromFormValue()
-    this.summaryQueryString = queryString
     var fields = ',"fields":{"owner":"true","dateUse":"true","yearOfManufacture":"true","assetType":"true","serialNo":"true","vehicleType":"true","vehicleMfcCode":"true"}'
 
 
@@ -582,7 +598,7 @@ export class HomePage implements OnInit {
           this.results = data
           if (this.results.length > 0) {
             this.showResults(0)
-            this.removeDuplicates()
+            // this.removeDuplicates()
           }
           else {
             this.presentToast('No Result Found')
@@ -682,6 +698,16 @@ export class HomePage implements OnInit {
 
   showPrevious() {
     console.log('Showing Previous')
+    console.log('Current:', this.results[this.index])
+    console.log("Previous:", this.results[this.index - 1])
+    if (JSON.stringify(this.results[this.index]) === JSON.stringify(this.results[this.index - 1])) {
+      console.log("Current and Previous is same.")
+      // this.index--
+    }
+    else {
+      console.log("Current and Previous is not the same.")
+    }
+
     this.showResults(this.index - 1)
   }
 
@@ -806,9 +832,12 @@ export class HomePage implements OnInit {
   clearForm() {
     this.results = []
     var arr = []
-this.moreThan=''
-this.lessThan=''
+    this.moreThan = ''
+    this.lessThan = ''
     this.formGroup = this.fb.group({
+      'yearOfManufactureLessThan': [''],
+      'yearOfManufactureMoreThan': [''],
+      'invalidDateRange': [''],
       'assetType': [arr],
       'yearOfManufacture': [arr
       ],
@@ -835,43 +864,91 @@ this.lessThan=''
     return true;
   }
 
-  summaryQueryString = ''
+  querySummaryString = ''
   showQuerySummary() {
+    var queryString = this.querySummaryString
+    if (this.querySummaryString !== '') {
+      //User has made a search and viewing the query summary
+      //here the form value before search is show.
+      var formValue = this.formGroup.value
+      var result = this.results[this.index]
+      var arrayUndefined = false
 
-    // console.log('Query Summary String:',this.summaryQueryString)
-    console.log('Query Summary String:', this.formGroup.value)
-    if (this.summaryQueryString !== '') {
-      console.log('Query Summary String:', this.summaryQueryString)
+      //Clearing Form Value of keys where value ===""
+      Object.keys(formValue).forEach(k => (!formValue[k] && formValue[k] !== undefined) && delete formValue[k]);
+
+      console.log('Query String:', queryString)
+      console.log('From String:', formValue)
+      console.log('Result String:', result)
+
+      //flag if any of the formcontrol array is undefined/len<=0
+      //this cound happen if user clears form control array after search results is loaded and before hitting the eye
+      Object.keys(formValue).forEach(k => {
+        if (formValue[k].length <= 0) {
+          arrayUndefined = true
+        }
+      })
+
+      //run check if the user has modified the form after hitting the search button and before hitting eye
+      if (!arrayUndefined
+        && result.assetType === formValue.assetType[0].id
+        && result.yearOfManufacture === formValue.yearOfManufacture[0].id
+        && result.owner === formValue.owner[0].id
+        && result.vehicleType === formValue.vehicleType[0].id
+        && result.dateUse.substring(0, 10) === formValue.dateUse
+        && result.vehicleMfcCode.substring(0, 10) === formValue.vehicleMfcCode[0].id
+        && parseInt(result.serialNo) === parseInt(formValue.serialNo)
+      ) {
+
+        //user has not modified the fields after loading results and before hitting the eye
+        //no change in queryString here
+        console.log(' ##Match##')
+      }
+      else {
+
+        //user has  modified the fields after loading results and before hitting the eye
+        //point query String to the form value
+        console.log(' ##No Match##')
+        queryString = formValue
+      }
     }
+    else {
+      queryString = this.formGroup.value
+    }
+
+
     var message = 'Asset '
     var map = {
       assetType: ' type is ',
-      yearOfManufacture: '<br>which was manufactured on ',
-      owner: '<br>which is owned by ',
-      vehicleType: '<br>which is of type ',
-      serialNo: "<br>having serial number ",
-      dateUse: '<br>which was put into use on ',
-      vehicleCode: '<br>manufactured by ',
+      yearOfManufacture: ' which was manufactured on ',
+      owner: ' which is owned by ',
+      vehicleType: ' which is of type ',
+      serialNo: " having serial number ",
+      dateUse: ' which was put into use on ',
+      vehicleMfcCode: ' manufactured by ',
     }
-    Object.keys(this.formGroup.value).forEach(k => {
-      if (this.formGroup.controls[k].value.length > 0) {
+    Object.keys(queryString).forEach(k => {
+      if (queryString[k].length > 0) {
         if (k !== 'serialNo' && k !== 'dateUse') {
           message += map[k]
-          for (var i = 0; i < this.formGroup.controls[k].value.length; i++) {
-            message += this.formGroup.controls[k].value[i].name
-            if (this.formGroup.controls[k].value.length > 1 && i < this.formGroup.controls[k].value.length - 1) {
+          console.log(message)
+          for (var i = 0; i < queryString[k].length; i++) {
+            message += queryString[k][i].name
+            console.log(message)
+            if (queryString[k].length > 1 && i < queryString[k].length - 1) {
               message += ' OR '
             }
           }
         }
         else {
-          message += map[k] + this.formGroup.controls[k].value
+          message += map[k] + queryString[k]
+          console.log(message)
         }
       }
-
     })
     message = message.split(' , ').join(' ')
-    this.presentQuerySummary(message + '.')
+    // this.presentQuerySummary(message + '.')
+    this.presentModal(message,queryString)
   }
 
   async presentQuerySummary(message) {
@@ -957,7 +1034,9 @@ this.lessThan=''
   }
 
   removeDuplicates() {
+
     console.log('Removing Duplicates')
+    console.log('Start Time:', new Date())
     var uniqueResults = []
     var found: boolean = false
     Object.keys(this.results).forEach(k => {
@@ -977,6 +1056,7 @@ this.lessThan=''
     });
     console.log(uniqueResults)
     this.results = uniqueResults
+    console.log('End Time:', new Date())
   }
 
   yearOfManufactureFilter() {
@@ -1033,14 +1113,40 @@ this.lessThan=''
           handler: (data) => {
             console.log('Confirm Ok');
             console.log('Data:', data)
-            this.lessThan = data.lessThan
-            this.moreThan = data.moreThan
+            console.log(this.lessThan.match(/^\d{4}$/))
+            // match(/^\d{4}$/)
+            if (data.lessThan.match(/^\d{4}$/)) {
+              if (parseInt(data.lessThan) > 1968 && parseInt(data.lessThan) < 2021) {
+                console.log('Match. >1970. <2019')
+                this.lessThan = data.lessThan
+              }
+            }
+
+            if (data.moreThan.match(/^\d{4}$/)) {
+              if (parseInt(data.moreThan) > 1968 && parseInt(data.moreThan) < 2021) {
+                console.log('Match. >1970. <2019')
+                this.moreThan = data.moreThan
+              }
+            }
+            if ((this.lessThan === '' && data.lessThan !== '') || (this.moreThan === '' && data.moreThan !== '')) {
+              this.presentQuerySummary('Invaild Date Range.')
+            }
+
+
           }
         }
       ]
     });
 
     await alert.present();
+  }
+
+  async presentModal(message,queryString) {
+    const modal = await this.modalCtrl.create({
+      component: ModalPage,
+      componentProps: { value: message,queryString:queryString }
+    });
+    return await modal.present();
   }
 
 

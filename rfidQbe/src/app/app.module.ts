@@ -16,9 +16,11 @@ import { HttpProvider } from './providers/http/http'
 import { CalendarModule } from 'ion2-calendar';
  import { IonicSelectableModule } from 'ionic-selectable';
 
+ import {ModalPage} from './modal/modal.page'
+
 @NgModule({
-  declarations: [AppComponent],
-  entryComponents: [],
+  declarations: [AppComponent,ModalPage],
+  entryComponents: [ModalPage],
   imports: [BrowserModule,IonicSelectableModule,IonicModule.forRoot(), AppRoutingModule,HttpClientModule,CalendarModule],
   providers: [
 HttpProvider,
