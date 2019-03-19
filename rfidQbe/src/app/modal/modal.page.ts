@@ -20,6 +20,8 @@ export class ModalPage implements OnInit {
     vehicleType: ' which is of type ',
     serialNo: " having serial number ",
     dateUse: ' which was put into use on ',
+    dateUseLessThan: ' which was put into use before ',
+    dateUseMoreThan: ' which was put into use after ',
     vehicleMfcCode: ' manufactured by ',
   }
   messageArray=[]
@@ -37,7 +39,15 @@ export class ModalPage implements OnInit {
           message += this.map[k]
           message += navParams.data.queryString[k]
         }
-        else if (k !== 'serialNo' && k !== 'dateUse') {
+        else if (k === 'yearOfManufactureLessThan') {
+          message += this.map[k]
+          message += navParams.data.queryString[k]
+        }
+        else if (k === 'yearOfManufactureMoreThan') {
+          message += this.map[k]
+          message += navParams.data.queryString[k]
+        }
+        else if (k !== 'serialNo' && !k.match('dateUse')) {
           message = this.map[k]
           // console.log(message)
           for (var i = 0; i < navParams.data.queryString[k].length; i++) {

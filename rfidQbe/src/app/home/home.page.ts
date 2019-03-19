@@ -78,13 +78,18 @@ export class HomePage implements OnInit {
     "BVZI",]
 
   vehiclesTypeMapping = [
+    { id: "BCNA", name: "BCNA" },
     { id: "BCNHL", name: "BCNHL" },
     { id: "BFNS", name: "BFNS" },
+    { id: "BLCB", name: "BLCB" },
     { id: "BOBRNHSM1", name: "BOBRNHSM1" },
     { id: "BOBSN", name: "BOBSN" },
     { id: "BOBYN", name: "BOBYN" },
+    { id: "BOBYNHS", name: "BOBYNHS" },
     { id: "BOSTHSM2", name: "BOSTHSM2" },
+    { id: "BOXNHA", name: "BOXNHA" },
     { id: "BOXNHL", name: "BOXNHL" },
+    { id: "BOXNHS", name: "BOXNHS" },
     { id: "BOXNS", name: "BOXNS" },
     { id: "BRN22.9", name: "BRN22.9" },
     { id: "BTPGLN", name: "BTPGLN" },
@@ -265,9 +270,8 @@ export class HomePage implements OnInit {
   makeQueryFromFormValue() {
 
     var query = '{'
-
     var query2 = '{'
-
+    var dateUseSet: boolean = false
 
     Object.keys(this.formGroup.value).forEach(k => {
       if (this.formGroup.controls[k].value !== '') {
@@ -289,6 +293,7 @@ export class HomePage implements OnInit {
             query2 += '"' + k + '":"' + this.formGroup.controls[k].value[0].id + '",'
           }
           else if (k === 'yearOfManufacture') {
+            console.log('k=YOM and value is ', this.formGroup.controls[k].value)
             if (this.lessThan !== '' && this.moreThan !== '') {
               // "yearOfManufacture":{"gt": 18, "lt": 19},"
               query += '"yearOfManufacture":{"gt":"' + this.moreThan.substring(2, 4) + '","lt":"' + this.lessThan.substring(2, 4) + '"},'
@@ -311,23 +316,27 @@ export class HomePage implements OnInit {
             query += '"' + k + '":"' + this.formGroup.controls[k].value + '",'
             query2 += '"' + k + '":"' + this.formGroup.controls[k].value + '",'
           }
-          if (k === 'dateUse') {
+          else if (!dateUseSet) {
             if (this.formGroup.controls['dateUseLessThan'].value !== '' && this.formGroup.controls['dateUseMoreThan'].value !== '') {
               // "yearOfManufacture":{"gt": 18, "lt": 19},"
-              query += '"' + k + '":{"gt":"' + this.formGroup.controls['dateUseMoreThan'].value + '","lt":"' + this.formGroup.controls['dateUseLessThan'].value + '"},'
-              query2 += '"' + k + '":{"gt":"' + this.formGroup.controls['dateUseMoreThan'].value + '","lt":"' + this.formGroup.controls['dateUseLessThan'].value + '"},'
+              query += '"dateUse":{"gt":"' + this.formGroup.controls['dateUseMoreThan'].value + '","lt":"' + this.formGroup.controls['dateUseLessThan'].value + '"},'
+              query2 += '"dateUse":{"gt":"' + this.formGroup.controls['dateUseMoreThan'].value + '","lt":"' + this.formGroup.controls['dateUseLessThan'].value + '"},'
+              dateUseSet = true;
             }
             else if (this.formGroup.controls['dateUseLessThan'].value === '' && this.formGroup.controls['dateUseMoreThan'].value !== '') {
               query += '"dateUse":{"gt":"' + this.formGroup.controls['dateUseMoreThan'].value + '"},'
               query2 += '"dateUse":{"gt":"' + this.formGroup.controls['dateUseMoreThan'].value + '"},'
+              dateUseSet = true;
             }
             else if (this.formGroup.controls['dateUseMoreThan'].value === '' && this.formGroup.controls['dateUseLessThan'].value !== '') {
               query += '"dateUse":{"lt":"' + this.formGroup.controls['dateUseLessThan'].value + '"},'
               query2 += '"dateUse":{"lt":"' + this.formGroup.controls['dateUseLessThan'].value + '"},'
+              dateUseSet = true;
             }
-            else {
+            else if (k === 'dateUse') {
               query += '"' + k + '":"' + this.formGroup.controls[k].value + '",'
               query2 += '"' + k + '":"' + this.formGroup.controls[k].value + '",'
+              dateUseSet = true;
             }
           }
         }
@@ -473,19 +482,57 @@ export class HomePage implements OnInit {
       'vehicleMfcCode': [arr],
     },
       {
-        validator: this.customValidator
+        validator: this.customValidator.bind(this)
       }
     );
   }
 
 
-  two(a, b) {
-    return this.customValidator || (a !== '' && b !== "")
+  two() {
+    console.log('Two')
+  }
+
+
+  validateDate(formGroup, k) {
+    if (formGroup.controls[k].value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      //pattern is matching. 
+      //date maybe invalid like 50 Jan or 32 MMM
+      //date is jumping like 31 apr is treated as 1 may
+      if (new Date(formGroup.controls[k].value) + '' !== 'Invalid Date') {
+        //date is valid like 30 apr or 31 apr or 31 Feb
+        if (new Date(formGroup.controls[k].value).toISOString().slice(0, 10) !== formGroup.controls[k].value) {
+          // 31 Feb jumps to march
+          // for js, 30 Apr is valid. Also 31 Apr is valid but presented as 1 May. ie date jumps
+          formGroup.controls[k].setErrors({ incorrect: true })
+          console.log('Invalid Date: Date is Jumping.')
+          formGroup.controls['invalidDateRange'].setErrors({ incorrect: true })
+        }
+        // date is not jumping
+        else {
+          // valid pattern and valid date and no jumps
+          console.log('Pattern Matched. Valid Date. No Jumps.')
+        }
+      }
+      else {
+        //date is invalid eg 50 Feb
+        formGroup.controls[k].setErrors({ incorrect: true })
+        console.log('Invalid Date: Value like 32 Jan/50 Mar.')
+        formGroup.controls['invalidDateRange'].setErrors({ incorrect: true })
+      }
+    }
+    else {
+      //pattern not matching
+      formGroup.controls[k].setErrors({ incorrect: true })
+      console.log('Invalid Date: Format other than YYYY-MM-DD.')
+      formGroup.controls['invalidDateRange'].setErrors(null)
+    }
   }
 
 
 
+
   customValidator(formGroup: FormGroup) {
+    // this.two()
 
     var atLeastOneIsFilled: boolean = false
 
@@ -496,38 +543,13 @@ export class HomePage implements OnInit {
         } */
 
     if (formGroup.controls['dateUse'].value !== '') {
-      if (formGroup.controls['dateUse'].value.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        //pattern is matching. 
-        //date maybe invalid like 50 Jan or 32 MMM
-        //date is jumping like 31 apr is treated as 1 may
-        if (new Date(formGroup.controls['dateUse'].value) + '' !== 'Invalid Date') {
-          //date is valid like 30 apr or 31 apr or 31 Feb
-          if (new Date(formGroup.controls['dateUse'].value).toISOString().slice(0, 10) !== formGroup.controls['dateUse'].value) {
-            // 31 Feb jumps to march
-            // for js, 30 Apr is valid. Also 31 Apr is valid but presented as 1 May. ie date jumps
-            formGroup.controls['dateUse'].setErrors({ incorrect: true })
-            console.log('Invalid Date: Date is Jumping.')
-            formGroup.controls['invalidDateRange'].setErrors({ incorrect: true })
-          }
-          // date is not jumping
-          else {
-            // valid pattern and valid date and no jumps
-            console.log('Pattern Matched. Valid Date. No Jumps.')
-          }
-        }
-        else {
-          //date is invalid eg 50 Feb
-          formGroup.controls['dateUse'].setErrors({ incorrect: true })
-          console.log('Invalid Date: Value like 32 Jan/50 Mar.')
-          formGroup.controls['invalidDateRange'].setErrors({ incorrect: true })
-        }
-      }
-      else {
-        //pattern not matching
-        formGroup.controls['dateUse'].setErrors({ incorrect: true })
-        console.log('Invalid Date: Format other than YYYY-MM-DD.')
-        formGroup.controls['invalidDateRange'].setErrors(null)
-      }
+      this.validateDate(formGroup, 'dateUse')
+    }
+    if (formGroup.controls['dateUseLessThan'].value !== '') {
+      this.validateDate(formGroup, 'dateUseLessThan')
+    }
+    if (formGroup.controls['dateUseLessThan'].value !== '') {
+      this.validateDate(formGroup, 'dateUseLessThan')
     }
 
 
@@ -618,7 +640,7 @@ export class HomePage implements OnInit {
       let wait = setTimeout(() => {
         clearTimeout(wait);
         resolve('Connection Timed Out');
-      }, 10000)
+      }, 5000)
     })
 
     // let responsePromise = this.httpProvider.getMethod('/Tags/v1/EPC/qbe?filter=' + JSON.stringify(this.formGroup.value)).toPromise()
@@ -645,6 +667,7 @@ export class HomePage implements OnInit {
           this.results = data
           if (this.results.length > 0) {
             this.showResults(0)
+            this.showDatePutIntoUseFilter=false
             // this.removeDuplicates()
           }
           else {
@@ -677,12 +700,18 @@ export class HomePage implements OnInit {
 
 
   getItem(mapping, value) {
+    var found:boolean=false
     for (var i = 0; i < mapping.length; i++) {
       if (mapping[i].id === value) {
         console.log('Match found', mapping[i])
+        found=true
         return [mapping[i]]
       }
-
+    }
+    if(!found){
+      console.log('No Match Found. Returning:',[])
+      return []
+      return [{id:'INVALID MAPPING',name:'INVALID MAPPING'}]
     }
 
   }
@@ -920,6 +949,8 @@ export class HomePage implements OnInit {
         }
       })
 
+      
+
       //run check if the user has modified the form after hitting the search button and before hitting eye
       if (!arrayUndefined
         && result.assetType === formValue.assetType[0].id
@@ -1029,11 +1060,12 @@ export class HomePage implements OnInit {
       // this.openCalendar()
     } */
 
-  async openCalendar(k) {
+  async openCalendar(k, title) {
     const options: CalendarModalOptions = {
-      title: 'Date Use',
+      title: title,
       canBackwardsSelected: true,
       autoDone: true,
+      pickMode:'range'
     };
 
     const myCalendar = await this.modalCtrl.create({
@@ -1053,8 +1085,19 @@ export class HomePage implements OnInit {
   }
 
   showDateUseCalendar(k) {
-    if (this.formGroup.controls[k].value === '')
-      this.openCalendar(k)
+    if (this.formGroup.controls[k].value === '') {
+      var title = ''
+      if (k === 'dateUse') {
+        title = 'Date Put Into Use'
+      }
+      else if (k === 'dateUseLessThan') {
+        title = 'Date Put Into Use Before'
+      }
+      else {
+        title = 'Date Put Into Use After'
+      }
+      this.openCalendar(k, title)
+    }
   }
 
   //https://github.com/HsuanXyz/ion2-calendar
@@ -1216,15 +1259,5 @@ export class HomePage implements OnInit {
     });
     return await modal.present();
   }
-
-  async presentDatePutIntoUseFilterModal(message, queryString) {
-    const modal = await this.modalCtrl.create({
-      component: DatePutIntoUseFilterModalPage,
-      componentProps: { value: message, queryString: queryString }
-    });
-    return await modal.present();
-  }
-
-
 
 }
