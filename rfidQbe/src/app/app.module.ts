@@ -18,10 +18,12 @@ import { CalendarModule } from 'ion2-calendar';
 
  import {ModalPage} from './modal/modal.page'
 
+ import { FormsModule } from '@angular/forms';
+
 @NgModule({
   declarations: [AppComponent,ModalPage],
   entryComponents: [ModalPage],
-  imports: [BrowserModule,IonicSelectableModule,IonicModule.forRoot(), AppRoutingModule,HttpClientModule,CalendarModule],
+  imports: [BrowserModule,IonicSelectableModule,IonicModule.forRoot(), AppRoutingModule,HttpClientModule,CalendarModule,FormsModule],
   providers: [
 HttpProvider,
 // Xml2Ts,

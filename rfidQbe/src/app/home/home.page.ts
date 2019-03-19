@@ -667,7 +667,7 @@ export class HomePage implements OnInit {
           this.results = data
           if (this.results.length > 0) {
             this.showResults(0)
-            this.showDatePutIntoUseFilter=false
+            this.showDatePutIntoUseFilter = false
             // this.removeDuplicates()
           }
           else {
@@ -700,18 +700,18 @@ export class HomePage implements OnInit {
 
 
   getItem(mapping, value) {
-    var found:boolean=false
+    var found: boolean = false
     for (var i = 0; i < mapping.length; i++) {
       if (mapping[i].id === value) {
         console.log('Match found', mapping[i])
-        found=true
+        found = true
         return [mapping[i]]
       }
     }
-    if(!found){
-      console.log('No Match Found. Returning:',[])
+    if (!found) {
+      console.log('No Match Found. Returning:', [])
       return []
-      return [{id:'INVALID MAPPING',name:'INVALID MAPPING'}]
+      return [{ id: 'INVALID MAPPING', name: 'INVALID MAPPING' }]
     }
 
   }
@@ -949,7 +949,7 @@ export class HomePage implements OnInit {
         }
       })
 
-      
+
 
       //run check if the user has modified the form after hitting the search button and before hitting eye
       if (!arrayUndefined
@@ -1030,7 +1030,7 @@ export class HomePage implements OnInit {
     })
     message = message.split(' , ').join(' ')
     // this.presentQuerySummary(message + '.')
-    this.presentModal(message, queryString)
+    this.presentModal(message, queryString, 'querySummary','Query Summary')
   }
 
   async presentQuerySummary(message) {
@@ -1060,12 +1060,35 @@ export class HomePage implements OnInit {
       // this.openCalendar()
     } */
 
+  async openCalendarRange(k, title) {
+    const options: CalendarModalOptions = {
+      title: title,
+      canBackwardsSelected: true,
+      autoDone: true,
+      pickMode: 'range'
+    };
+
+    const myCalendar = await this.modalCtrl.create({
+      component: CalendarModal,
+      componentProps: { options }
+    });
+
+    myCalendar.present();
+
+    const event: any = await myCalendar.onDidDismiss();
+    const date: any = event.data;
+    if (date != null) {
+      console.log('Date Put into use Range value:', date)
+      console.log('Date Put into use From:', date.from.string)
+      console.log('Date Put into use To:', date.from.string)
+    }
+  }
+
   async openCalendar(k, title) {
     const options: CalendarModalOptions = {
       title: title,
       canBackwardsSelected: true,
       autoDone: true,
-      pickMode:'range'
     };
 
     const myCalendar = await this.modalCtrl.create({
@@ -1252,12 +1275,18 @@ export class HomePage implements OnInit {
     await alert.present();
   }
 
-  async presentModal(message, queryString) {
+  async presentModal(message, queryString, type, title) {
     const modal = await this.modalCtrl.create({
       component: ModalPage,
-      componentProps: { value: message, queryString: queryString }
+      componentProps: { value: message, queryString: queryString, type: type, title: title }
     });
-    return await modal.present();
+
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    console.log('Data AFter Moda Close:',data);
+    // return await modal.present();
+
   }
 
 }

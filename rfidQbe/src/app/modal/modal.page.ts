@@ -1,5 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ModalController, NavParams } from '@ionic/angular';
+import { CalendarModal, CalendarModalOptions, DayConfig, CalendarResult, CalendarComponentOptions } from 'ion2-calendar';
+
 
 @Component({
   selector: 'app-modal-page',
@@ -10,7 +12,12 @@ export class ModalPage implements OnInit {
 
   @Input() value:any;
   @Input() queryString:any;
+  @Input() type:string
+  @Input() title:string
 
+  dateUseLessThan=''
+  dateUseMoreThan=''
+  dateUseRange=''
    map = {
     assetType: ' type is ',
     yearOfManufacture: ' which was manufactured on ',
@@ -26,7 +33,7 @@ export class ModalPage implements OnInit {
   }
   messageArray=[]
 
-  constructor(public modalController : ModalController, public navParams:NavParams) { 
+  constructor(public modalController : ModalController, public navParams:NavParams,public modalCtrl: ModalController) { 
     var message=''
     console.log('Modal constructor:',navParams.data)
     Object.keys(navParams.data.queryString).forEach(k => {
@@ -71,10 +78,65 @@ export class ModalPage implements OnInit {
 
   closeModal(){
     console.log('closing Modal')
-    this.modalController.dismiss();
+    this.modalController.dismiss(this.dateUseRange);
   }
 
   ngOnInit() {
   }
+
+
+
+  async openCalendarRange(k, title) {
+    const options: CalendarModalOptions = {
+      title: title,
+      canBackwardsSelected: true,
+      autoDone: true,
+      pickMode:'range'
+    };
+
+    const myCalendar = await this.modalCtrl.create({
+      component: CalendarModal,
+      componentProps: { options }
+    });
+
+    myCalendar.present();
+
+    const event: any = await myCalendar.onDidDismiss();
+    const date: any = event.data;
+    if (date != null) {
+      console.log('Date Put into use Range value:',date)
+      this.dateUseRange=date.from.string+" - "+date.to.string
+    }
+  }
+
+
+  async openCalendar(k, title) {
+    const options: CalendarModalOptions = {
+      title: title,
+      canBackwardsSelected: true,
+      autoDone: true,
+    };
+
+    const myCalendar = await this.modalCtrl.create({
+      component: CalendarModal,
+      componentProps: { options }
+    });
+
+    myCalendar.present();
+
+    const event: any = await myCalendar.onDidDismiss();
+    const date: CalendarResult = event.data;
+    if (date != null) {
+      console.log('Date Value for:', date.string);
+      if(k==='dateUseLessThan'){
+        this.dateUseLessThan=date.string
+      }
+      else if(k==='dateUseMoreThan'){
+        this.dateUseMoreThan=date.string
+      }
+    }
+  }
+
+
 
 }
