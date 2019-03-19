@@ -12,13 +12,15 @@ export class ModalPage implements OnInit {
   @Input() queryString:any;
 
    map = {
-    assetType: ' Asset Type ',
-    yearOfManufacture: ' Asset was manufactured on ',
-    owner: ' Asset is owned by ',
-    vehicleType: ' Vehicle is of type ',
-    serialNo: " Asset serial number is ",
-    dateUse: ' Asset was put into use on ',
-    vehicleMfcCode: 'Asset is manufactured by ',
+    assetType: ' type is ',
+    yearOfManufacture: ' which was manufactured on ',
+    yearOfManufactureLessThan: ' which was manufactured before ',
+    yearOfManufactureMoreThan: ' which was manufactured after ',
+    owner: ' which is owned by ',
+    vehicleType: ' which is of type ',
+    serialNo: " having serial number ",
+    dateUse: ' which was put into use on ',
+    vehicleMfcCode: ' manufactured by ',
   }
   messageArray=[]
 
@@ -27,7 +29,15 @@ export class ModalPage implements OnInit {
     console.log('Modal constructor:',navParams.data)
     Object.keys(navParams.data.queryString).forEach(k => {
       if (navParams.data.queryString[k].length > 0) {
-        if (k !== 'serialNo' && k !== 'dateUse') {
+        if (k === 'yearOfManufactureLessThan') {
+          message += this.map[k]
+          message += navParams.data.queryString[k]
+        }
+        else if (k === 'yearOfManufactureMoreThan') {
+          message += this.map[k]
+          message += navParams.data.queryString[k]
+        }
+        else if (k !== 'serialNo' && k !== 'dateUse') {
           message = this.map[k]
           // console.log(message)
           for (var i = 0; i < navParams.data.queryString[k].length; i++) {

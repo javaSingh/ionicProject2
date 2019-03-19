@@ -96,14 +96,32 @@
             </ion-col>
             <ion-col>
               <ion-item style='--highlight-height:0;max-width:200px;'>
-                <ion-icon slot='end' name="options" style="margin-bottom:-20px" (click)='yearOfManufactureFilter()'>
+                <ion-icon slot='end' name="options" style="margin-bottom:-20px" (click)='enableDatePutIntoUseFilter()'>
                 </ion-icon>
                 <ion-label position='floating'>Date Put Into Use</ion-label>
-                <ion-input (click)='showDateUseCalendar()' type='text' clearInput formControlName='dateUse'></ion-input>
+                <ion-input (click)='showDateUseCalendar("dateUse")' type='text' clearInput formControlName='dateUse'></ion-input>
 
                 <!-- <ion-icon name="create"></ion-icon> -->
               </ion-item>
+
+
             </ion-col>
+          </ion-row>
+          <ion-row *ngIf='showDatePutIntoUseFilter'>
+            <ion-item style='    --highlight-height: 0;
+            max-width: 220px;
+            padding-right: 10px;'>
+              <ion-label position='floating'>Date Put Into Use Before</ion-label>
+              <ion-input (click)='showDateUseCalendar("dateUseLessThan")' type='text' clearInput formControlName='dateUseLessThan'>
+              </ion-input>
+              <!-- <ion-icon name="create"></ion-icon> -->
+            </ion-item>
+            <ion-item style='--highlight-height:0;max-width:200px;'>
+              <ion-label position='floating'>Date Put Into Use After</ion-label>
+              <ion-input (click)='showDateUseCalendar("dateUseMoreThan")' type='text' clearInput formControlName='dateUseMoreThan'>
+              </ion-input>
+              <!-- <ion-icon name="create"></ion-icon> -->
+            </ion-item>
           </ion-row>
 
           <ion-row>
@@ -175,16 +193,16 @@
           </ion-row>
 
           <ion-item lines='none'>
-            <span *ngIf='lessThan==="" && moreThan===""'>
-              <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search
-              </ion-button>
-              <ion-button (click)='clearForm()' [disabled]='!formGroup.valid || isSearching'>Reset</ion-button>
-            </span>
-            <span *ngIf='lessThan!=="" || moreThan!==""'>
+            <!-- <span *ngIf='lessThan==="" && moreThan===""'> -->
+            <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search
+            </ion-button>
+            <ion-button (click)='clearForm()' [disabled]='!formGroup.valid || isSearching'>Reset</ion-button>
+            <!-- </span> -->
+            <!-- <span *ngIf='lessThan!=="" || moreThan!==""'>
               <ion-button type='submit' (click)='onSubmit()' [disabled]=' isSearching'>Search
               </ion-button>
               <ion-button (click)='clearForm()' [disabled]='isSearching'>Reset</ion-button>
-            </span>
+            </span> -->
             <!--         <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div> -->
             <span style='color:red' *ngIf='formGroup.controls["serialNo"].invalid'>
               Serial Number: Max 6 digits allowed.
