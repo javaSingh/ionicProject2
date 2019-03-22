@@ -36,6 +36,7 @@
 
 <ion-content>
 
+  <!-- (keyup.enter)="onSubmit()" -->
   <!--   <ion-item>
     <ion-label>Port</ion-label>
     <ionic-selectable
@@ -56,7 +57,7 @@
   <ion-grid>
     <ion-row>
       <ion-col offset-md='3' offset-lg='3' offset-xl='3'>
-        <form [formGroup]="formGroup">
+        <form [formGroup]="formGroup" (ngSubmit)='onSubmit()' >
           <ion-row>
             <ion-col style="max-width: 200px">
               <!-- <ion-item (click)='openSelect("assetType")' style='--highlight-height:0'>
@@ -67,7 +68,7 @@
               <!-- <ion-icon style='width:28px;height:28px' src='../../assets/icon/eye.svg'></ion-icon> -->
               <ion-item style="max-width: 200px">
                 <ion-label position='floating'>Asset Type</ion-label>
-                <ionic-selectable item-content formControlName='assetType' [items]="assetsTypeMapping"
+                <ionic-selectable type='text' item-content formControlName='assetType' [items]="assetsTypeMapping"
                   itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="portChange($event)"
                   [canClear]="true" [isMultiple]="true">
                 </ionic-selectable>
@@ -94,7 +95,7 @@
                 </ionic-selectable>
               </ion-item>
             </ion-col>
-<!--             <ion-col>
+            <ion-col>
               <ion-item style='--highlight-height:0;max-width:200px;'>
                 <ion-icon slot='end' name="options" style="margin-bottom:-20px"
                   (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
@@ -103,7 +104,7 @@
                 <ion-input (click)='showDateUseCalendar("dateUse")' type='text' clearInput formControlName='dateUse'>
                 </ion-input>
               </ion-item>
-            </ion-col> -->
+            </ion-col>
           </ion-row>
           <ion-row padding *ngIf='showDatePutIntoUseFilter'>
 
@@ -208,6 +209,7 @@
             <!-- <span *ngIf='lessThan==="" && moreThan===""'> -->
             <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search
             </ion-button>
+
             <ion-button (click)='clearForm()' [disabled]='!formGroup.valid || isSearching'>Reset</ion-button>
             <!-- </span> -->
             <!-- <span *ngIf='lessThan!=="" || moreThan!==""'>

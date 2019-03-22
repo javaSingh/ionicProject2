@@ -19,11 +19,13 @@ import { CalendarModule } from 'ion2-calendar';
  import {ModalPage} from './modal/modal.page'
 
  import { FormsModule } from '@angular/forms';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [AppComponent,ModalPage],
   entryComponents: [ModalPage],
-  imports: [BrowserModule,IonicSelectableModule,IonicModule.forRoot(), AppRoutingModule,HttpClientModule,CalendarModule,FormsModule],
+  imports: [BrowserModule,IonicSelectableModule,IonicModule.forRoot(), AppRoutingModule,HttpClientModule,CalendarModule,FormsModule, ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })],
   providers: [
 HttpProvider,
 // Xml2Ts,

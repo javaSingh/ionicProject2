@@ -20,6 +20,8 @@ import { saveAs } from 'file-saver';
 
 import { IonicSelectableComponent } from 'ionic-selectable'
 
+import { SwUpdate } from '@angular/service-worker';
+
 class Port {
   public id: number;
   public name: string;
@@ -297,7 +299,9 @@ export class HomePage implements OnInit {
             if (this.lessThan !== '' && this.moreThan !== '') {
               // "yearOfManufacture":{"gt": 18, "lt": 19},"
               query += '"yearOfManufacture":{"gt":"' + this.moreThan.substring(2, 4) + '","lt":"' + this.lessThan.substring(2, 4) + '"},'
-              query2 += '"yearOfManufacture":{"gt":"' + this.moreThan.substring(2, 4) + '","lt":"' + this.lessThan.substring(2, 4) + '"},'
+              // query2 += '"yearOfManufacture":{"gt":"' + this.moreThan.substring(2, 4) + '","lt":"' + this.lessThan.substring(2, 4) + '"},'
+              // {"where":{"dateUse": {"between": ["2013-07-17","2017-07-17"]},"yearOfManufacture":{"between":["16","17"]}}}
+              query2 += '"yearOfManufacture":{"between":["' + this.moreThan.substring(2, 4) + '","' + this.lessThan.substring(2, 4) + '"]},'
             }
             else if (this.lessThan === '' && this.moreThan !== '') {
               query += '"yearOfManufacture":{"gt":"' + this.moreThan.substring(2.4) + '"},'
@@ -320,7 +324,13 @@ export class HomePage implements OnInit {
             if (this.formGroup.controls['dateUseLessThan'].value !== '' && this.formGroup.controls['dateUseMoreThan'].value !== '') {
               // "yearOfManufacture":{"gt": 18, "lt": 19},"
               query += '"dateUse":{"gt":"' + this.formGroup.controls['dateUseMoreThan'].value + '","lt":"' + this.formGroup.controls['dateUseLessThan'].value + '"},'
-              query2 += '"dateUse":{"gt":"' + this.formGroup.controls['dateUseMoreThan'].value + '","lt":"' + this.formGroup.controls['dateUseLessThan'].value + '"},'
+              if (new Date(this.formGroup.controls['dateUseMoreThan'].value) > new Date(this.formGroup.controls['dateUseLessThan'].value)) {
+                query2 += '"dateUse":{"gt":"' + this.formGroup.controls['dateUseMoreThan'].value + '","lt":"' + this.formGroup.controls['dateUseLessThan'].value + '"},'
+              }
+              else {
+
+                query2 += '"dateUse":{"between":["' + this.formGroup.controls['dateUseMoreThan'].value + '","' + this.formGroup.controls['dateUseLessThan'].value + '"]},'
+              }
               dateUseSet = true;
             }
             else if (this.formGroup.controls['dateUseLessThan'].value === '' && this.formGroup.controls['dateUseMoreThan'].value !== '') {
@@ -374,7 +384,8 @@ export class HomePage implements OnInit {
     public toastController: ToastController,
     public alertController: AlertController,
     public modalCtrl: ModalController,
-    public httpProvider: HttpProvider
+    public httpProvider: HttpProvider,
+    public swUpdate: SwUpdate
   ) {
 
     // this.presentModal('Called from Constructor')
@@ -390,6 +401,10 @@ export class HomePage implements OnInit {
 
     console.log(yyToyyyy)
     console.log('Constructor')
+    this.swUpdate.available.subscribe(event => {
+      console.log('Update Available')
+      this.presentToast("Update Available. Kindly Refresh.")
+    })
 
 
     //making of yearsMapping. Should not be commented.
@@ -751,7 +766,7 @@ export class HomePage implements OnInit {
     this.formGroup.controls['owner'].setValue(this.getItem(this.ownersMapping, this.results[index].owner))
     this.formGroup.controls['vehicleType'].setValue(this.getItem(this.vehiclesTypeMapping, this.results[index].vehicleType))
     // this.formGroup.controls['serialNo'].setValue()
-    // this.formGroup.controls['dateUse'].setValue(this.results[index].dateUse.substring(0, 10))
+    this.formGroup.controls['dateUse'].setValue(this.results[index].dateUse.substring(0, 10))
 
     this.formGroup.controls['vehicleMfcCode'].setValue(this.getItem(this.manufacturersCodeMapping, this.results[index].vehicleMfcCode))
 
@@ -1246,14 +1261,7 @@ export class HomePage implements OnInit {
       header: 'Manufacture Year Filtering',
       // message: 'Format: YYYY',
       inputs: [
-        {
-          label: 'Before',
-          name: 'lessThan',
-          type: 'text',
-          id: 'name1-id',
-          value: this.lessThan,
-          placeholder: 'Before YYYY'
-        },
+
         {
           label: 'After',
           name: 'moreThan',
@@ -1261,6 +1269,13 @@ export class HomePage implements OnInit {
           id: 'name2-id',
           value: this.moreThan,
           placeholder: 'After YYYY'
+        }, {
+          label: 'Before',
+          name: 'lessThan',
+          type: 'text',
+          id: 'name1-id',
+          value: this.lessThan,
+          placeholder: 'Before YYYY'
         }],
       buttons: [
         {
@@ -1289,16 +1304,17 @@ export class HomePage implements OnInit {
             console.log(this.lessThan.match(/^\d{4}$/))
             // match(/^\d{4}$/)
             if (data.lessThan.match(/^\d{4}$/)) {
-              if (parseInt(data.lessThan) > 1968 && parseInt(data.lessThan) < 2021) {
-                console.log('Match. >1970. <2019')
+              if (parseInt(data.lessThan) > parseInt(new Date('1968-01-01').toISOString().slice(0.10)) && parseInt(data.lessThan) <= parseInt(new Date().toISOString().slice(0.10)) + 1) {
+                // if (parseInt(data.lessThan) > 1968 && parseInt(data.lessThan) < 2021) {
+                console.log('Match. >1970. <2020')
                 this.lessThan = data.lessThan
                 this.formGroup.controls['yearOfManufactureLessThan'].setValue(this.lessThan)
               }
             }
 
             if (data.moreThan.match(/^\d{4}$/)) {
-              if (parseInt(data.moreThan) > 1968 && parseInt(data.moreThan) < 2021) {
-                console.log('Match. >1970. <2019')
+              if (parseInt(data.moreThan) > 1968 && parseInt(data.moreThan) <= parseInt(new Date().toISOString().slice(0, 10)) + 1) {
+                console.log('Match. >1970. <2020')
                 this.moreThan = data.moreThan
                 this.formGroup.controls['yearOfManufactureMoreThan'].setValue(this.moreThan)
               }
