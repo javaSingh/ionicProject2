@@ -633,7 +633,8 @@ export class HomePage implements OnInit {
     this.formGroup.controls['yearOfManufactureMoreThan'].setValue(this.moreThan)
     var fields = ',"fields":{"owner":"true","dateUse":"true","yearOfManufacture":"true","assetType":"true","serialNo":"true","vehicleType":"true","vehicleMfcCode":"true"}'
 
-
+    //condemned Vehicle id is # which cannot be directly accessed by LB.
+    queryString = queryString.split('#').join('%23')
     console.log('This is query:', '{"where":' + queryString + fields + '}')
 
     let timeoutPromise = new Promise((resolve, reject) => {
@@ -710,7 +711,7 @@ export class HomePage implements OnInit {
     }
     if (!found) {
       console.log('No Match Found. Returning:', [])
-      return []
+      return [{ id: value, name: value }]
       return [{ id: 'INVALID MAPPING', name: 'INVALID MAPPING' }]
     }
 
@@ -750,7 +751,7 @@ export class HomePage implements OnInit {
     this.formGroup.controls['owner'].setValue(this.getItem(this.ownersMapping, this.results[index].owner))
     this.formGroup.controls['vehicleType'].setValue(this.getItem(this.vehiclesTypeMapping, this.results[index].vehicleType))
     // this.formGroup.controls['serialNo'].setValue()
-    this.formGroup.controls['dateUse'].setValue(this.results[index].dateUse.substring(0, 10))
+    // this.formGroup.controls['dateUse'].setValue(this.results[index].dateUse.substring(0, 10))
 
     this.formGroup.controls['vehicleMfcCode'].setValue(this.getItem(this.manufacturersCodeMapping, this.results[index].vehicleMfcCode))
 
@@ -953,6 +954,7 @@ export class HomePage implements OnInit {
 
       //run check if the user has modified the form after hitting the search button and before hitting eye
       if (!arrayUndefined
+        && result !== undefined
         && result.assetType === formValue.assetType[0].id
         && result.yearOfManufacture === formValue.yearOfManufacture[0].id
         && result.owner === formValue.owner[0].id
@@ -1030,7 +1032,7 @@ export class HomePage implements OnInit {
     })
     message = message.split(' , ').join(' ')
     // this.presentQuerySummary(message + '.')
-    this.presentModal(message, queryString, 'querySummary','Query Summary')
+    this.presentModal(message, queryString, 'querySummary', 'Query Summary')
   }
 
   async presentQuerySummary(message) {
@@ -1125,10 +1127,49 @@ export class HomePage implements OnInit {
 
   //https://github.com/HsuanXyz/ion2-calendar
 
+  assetMapping(value) {
+    var found = false
+    for (var j = 0; j < this.assetsTypeMapping.length; j++) {
+      if (this.assetsTypeMapping[j].id === value) {
+        found = true
+        return this.assetsTypeMapping[j].name
+      }
+    }
+    if (!found) {
+      return value
+    }
+  }
 
+  vehicleMfcCodeMapping(value) {
+    var found = false
+    for (var j = 0; j < this.manufacturersCodeMapping.length; j++) {
+      if (this.manufacturersCodeMapping[j].id === value) {
+        return this.manufacturersCodeMapping[j].name
+      }
+    }
+    if (!found) {
+      return value
+    }
+  }
   makeExcel() {
     console.log('Download Start' + new Date())
-    let sheet = XLSX.utils.json_to_sheet(this.results);
+    var excelResult = []
+    for (var i = 0; i < this.results.length; i++) {
+      excelResult.push(
+        {
+          'Asset Type': this.assetMapping(this.results[i].assetType) + '',
+          'Owner': this.results[i].owner,
+          'Serial No.': this.results[i].serialNo,
+          'Manufacturer Code': this.vehicleMfcCodeMapping(this.results[i].vehicleMfcCode) + '',
+          'Vehicle Type': this.results[i].vehicleType,
+          'Manufacture Year': this.results[i].yearOfManufacture
+
+        }
+      )
+    }
+    console.log('Mapped Excel Results:', excelResult)
+    // let sheet = XLSX.utils.json_to_sheet(this.results);
+    let sheet = XLSX.utils.json_to_sheet(excelResult);
     // let sheet = XLSX.utils.json_to_sheet(this.testArr);
     let wb = {
       SheetNames: ["export"],
@@ -1276,15 +1317,41 @@ export class HomePage implements OnInit {
   }
 
   async presentModal(message, queryString, type, title) {
+    console.log('Present Modal')
+    console.log(this.formGroup.controls['dateUseLessThan'])
+    console.log(this.formGroup.controls['dateUseLessThan'].value)
+    /*     if(this.formGroup.controls['dateUseLessThan'].value){
+          this.formGroup.controls['dateUseLessThan'].setValue('')
+        }
+        if(this.formGroup.controls['dateUseMoreThan']){
+          this.formGroup.controls['dateUseMoreThan'].setValue('')
+        } */
     const modal = await this.modalCtrl.create({
       component: ModalPage,
-      componentProps: { value: message, queryString: queryString, type: type, title: title }
+      componentProps: {
+        value: message, queryString: queryString, type: type, title: title,
+        dateUseLessThan: this.formGroup.controls['dateUseLessThan'].value,
+        dateUseMoreThan: this.formGroup.controls['dateUseMoreThan'].value,
+
+      }
     });
 
     await modal.present();
 
     const { data } = await modal.onDidDismiss();
-    console.log('Data AFter Moda Close:',data);
+    console.log('Data AFter Moda Close:', data);
+    if (data.dateUseLessThan !== '') {
+      this.formGroup.controls['dateUseLessThan'].setValue(data.dateUseLessThan)
+    }
+    if (data.dateUseMoreThan !== '') {
+      this.formGroup.controls['dateUseMoreThan'].setValue(data.dateUseMoreThan)
+    }
+    if (data.dateUseFrom !== '') {
+      this.formGroup.controls['dateUseMoreThan'].setValue(data.dateUseFrom)
+    }
+    if (data.dateUseTo !== '') {
+      this.formGroup.controls['dateUseLessThan'].setValue(data.dateUseTo)
+    }
     // return await modal.present();
 
   }

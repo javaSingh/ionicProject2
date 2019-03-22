@@ -10,15 +10,19 @@ import { CalendarModal, CalendarModalOptions, DayConfig, CalendarResult, Calenda
 })
 export class ModalPage implements OnInit {
 
-  @Input() value:any;
-  @Input() queryString:any;
-  @Input() type:string
-  @Input() title:string
+  @Input() value: any;
+  @Input() queryString: any;
+  @Input() type: string
+  @Input() title: string
+  @Input() dateUseLessThan: string
+  @Input() dateUseMoreThan: string
+  // @Input() dateUseRange: string
 
-  dateUseLessThan=''
-  dateUseMoreThan=''
-  dateUseRange=''
-   map = {
+
+  dateUseRange = ''
+  dateUseFrom=''
+  dateUseTo=''
+  map = {
     assetType: ' type is ',
     yearOfManufacture: ' which was manufactured on ',
     yearOfManufactureLessThan: ' which was manufactured before ',
@@ -31,12 +35,17 @@ export class ModalPage implements OnInit {
     dateUseMoreThan: ' which was put into use after ',
     vehicleMfcCode: ' manufactured by ',
   }
-  messageArray=[]
+  messageArray = []
 
-  constructor(public modalController : ModalController, public navParams:NavParams,public modalCtrl: ModalController) { 
-    var message=''
-    console.log('Modal constructor:',navParams.data)
+  constructor(public modalController: ModalController, public navParams: NavParams, public modalCtrl: ModalController) {
+    var message = ''
+    console.log('Modal constructor:', navParams.data)
+    if(navParams.data.dateUseLessThan!=='' && navParams.data.dateUseMoreThan!==''){
+      this.dateUseRange=navParams.data.dateUseMoreThan+' - '+navParams.data.dateUseLessThan
+    }
+    
     Object.keys(navParams.data.queryString).forEach(k => {
+
       if (navParams.data.queryString[k].length > 0) {
         if (k === 'yearOfManufactureLessThan') {
           message += this.map[k]
@@ -63,22 +72,32 @@ export class ModalPage implements OnInit {
             if (navParams.data.queryString[k].length > 1 && i < navParams.data.queryString[k].length - 1) {
               message += ' OR '
             }
-            
+
           }
+          message="Asset "+message+'.'
           this.messageArray.push(message)
         }
         else {
           message = this.map[k] + navParams.data.queryString[k]
           // console.log(message)
+          message="Asset "+message+'.'
           this.messageArray.push(message)
         }
       }
     })
+
   }
 
-  closeModal(){
+  closeModal() {
     console.log('closing Modal')
-    this.modalController.dismiss(this.dateUseRange);
+    this.modalController.dismiss(
+      {
+        dateUseLessThan: this.dateUseLessThan,
+        dateUseMoreThan: this.dateUseMoreThan,
+        dateUseFrom: this.dateUseFrom,
+        dateUseTo: this.dateUseTo
+      }
+    );
   }
 
   ngOnInit() {
@@ -91,7 +110,7 @@ export class ModalPage implements OnInit {
       title: title,
       canBackwardsSelected: true,
       autoDone: true,
-      pickMode:'range'
+      pickMode: 'range'
     };
 
     const myCalendar = await this.modalCtrl.create({
@@ -104,8 +123,10 @@ export class ModalPage implements OnInit {
     const event: any = await myCalendar.onDidDismiss();
     const date: any = event.data;
     if (date != null) {
-      console.log('Date Put into use Range value:',date)
-      this.dateUseRange=date.from.string+" - "+date.to.string
+      console.log('Date Put into use Range value:', date)
+      this.dateUseRange = date.from.string + " - " + date.to.string
+      this.dateUseFrom=date.from.string
+      this.dateUseTo=date.to.string
     }
   }
 
@@ -128,11 +149,11 @@ export class ModalPage implements OnInit {
     const date: CalendarResult = event.data;
     if (date != null) {
       console.log('Date Value for:', date.string);
-      if(k==='dateUseLessThan'){
-        this.dateUseLessThan=date.string
+      if (k === 'dateUseLessThan') {
+        this.dateUseLessThan = date.string
       }
-      else if(k==='dateUseMoreThan'){
-        this.dateUseMoreThan=date.string
+      else if (k === 'dateUseMoreThan') {
+        this.dateUseMoreThan = date.string
       }
     }
   }
