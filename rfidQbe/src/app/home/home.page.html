@@ -6,7 +6,7 @@
   </ion-toolbar>
   <ion-toolbar>
     <ion-row>
-      <ion-col offset-md='3' offset-lg='3' offset-xl='3'>
+      <ion-col offset-lg='3' offset-xl='3'>
 
         <ion-item lines='none'>
           <ion-icon *ngIf='formGroup.valid || results.length>0 || lessThan!=="" || moreThan!==""'
@@ -28,6 +28,7 @@
           </ion-button>
         </ion-item>
       </ion-col>
+      <ion-col></ion-col>
     </ion-row>
   </ion-toolbar>
 
@@ -80,8 +81,11 @@
             <ion-input (keypress)="numberOnly($event)" clearInput formControlName='yearOfManufacture'></ion-input>
           </ion-item> -->
               <ion-item>
-                <ion-icon slot='end' name="options" style="margin-bottom:-20px;margin-top: 0px;
-                margin-left: 8px;" (click)='yearOfManufactureFilter()'>
+<!--                 <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;margin-top: 0px;
+                margin-left: 8px;height:20px;" (click)='yearOfManufactureFilter()'>
+                </ion-icon> -->
+                <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;margin-top: 0px;
+                margin-left: 8px;height:20px;" (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
                 </ion-icon>
                 <ion-label position='floating' *ngIf='lessThan==="" && moreThan===""'>Manufacture Year</ion-label>
                 <ion-label position='floating' *ngIf='lessThan!=="" && moreThan===""'>M/f Before {{lessThan}}
@@ -94,47 +98,31 @@
                   [canClear]="true" [isMultiple]="true">
                 </ionic-selectable>
               </ion-item>
+
             </ion-col>
             <ion-col>
-              <ion-item style='--highlight-height:0;max-width:200px;'>
-                <ion-icon slot='end' name="options" style="margin-bottom:-20px"
+              <ion-item style='--highlight-height:0;max-width:200px;' *ngIf='!((this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput)'>
+                <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;height:20px;"
                   (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
                 </ion-icon>
-                <ion-label position='floating'>Date Put Into Use</ion-label>
-                <ion-input (click)='showDateUseCalendar("dateUse")' type='text' clearInput formControlName='dateUse'>
+                <ion-label position='floating'>
+                    <span style='color:red'
+                    *ngIf='formGroup.controls["dateUse"].invalid ||formGroup.controls["dateUseLessThan"].invalid || formGroup.controls["dateUseMoreThan"].invalid'>
+                    Invalid Date.</span>
+                  Date Put Into Use</ion-label>
+                <ion-input (click)='showDateUseCalendar()' type='text' clearInput formControlName='dateUse'>
                 </ion-input>
               </ion-item>
+              <ion-item style='--highlight-height:0;max-width:200px;' *ngIf='(this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput'>
+                  <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;height:20px;"
+                    (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
+                  </ion-icon>
+                  <ion-label position='floating'>
+                    Date Put Into Use</ion-label>
+                  <ion-input type='text' clearInput value='Before {{this.formGroup.controls["dateUseLessThan"].value}} After {{this.formGroup.controls["dateUseMoreThan"].value}}'>
+                  </ion-input>
+                </ion-item>
             </ion-col>
-          </ion-row>
-          <ion-row padding *ngIf='showDatePutIntoUseFilter'>
-
-            <ion-item style='    --highlight-height: 0;
-            max-width: 220px;
-            padding-right: 10px;'>
-              <ion-label position='floating'>Used Before</ion-label>
-              <ion-input (click)='showDateUseCalendar("dateUseLessThan")' type='text' clearInput
-                formControlName='dateUseLessThan'>
-              </ion-input>
-              <!-- <ion-icon name="create"></ion-icon> -->
-            </ion-item>
-            <ion-item style='--highlight-height:0;max-width:200px;'>
-              <ion-label position='floating'>Used After</ion-label>
-              <ion-input (click)='showDateUseCalendar("dateUseMoreThan")' type='text' clearInput
-                formControlName='dateUseMoreThan'>
-              </ion-input>
-              <!-- <ion-icon name="create"></ion-icon> -->
-            </ion-item>
-            <ion-item style='    --highlight-height: 0;
-            max-width: 220px;
-            padding-right: 10px;'>
-              <ion-label position='floating'>Date Put Into Use Range</ion-label>
-              <ion-input (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'
-                type='text' clearInput formControlName='dateUseLessThan'>
-              </ion-input>
-              <!-- <ion-icon name="create"></ion-icon> -->
-            </ion-item>
-
-
           </ion-row>
 
           <ion-row>
@@ -143,7 +131,7 @@
             <ion-label position="floating">Owner</ion-label>
             <ion-input type='text' formControlName='owner'></ion-input>
           </ion-item>
- -->
+                    -->
 
               <ion-item>
                 <ion-label position='floating'>Owner</ion-label>
@@ -168,9 +156,14 @@
                 </ionic-selectable>
               </ion-item>
             </ion-col>
-            <ion-col style='    max-width: 145px;'>
+            <ion-col style='    max-width: 160px;'>
               <ion-item text-wrap style='--highlight-height:0'>
-                <ion-label primary position="floating">Serial Number </ion-label>
+                <ion-label primary position="floating">
+                    <span style='color:red' *ngIf='formGroup.controls["serialNo"].invalid'>
+                        Max 6 digits.
+                      </span>
+                  Serial Number             
+  </ion-label>
                 <ion-input inputmod='numeric' type='text' (keypress)="numberOnly($event)" clearInput
                   formControlName='serialNo'></ion-input>
               </ion-item>
@@ -184,7 +177,7 @@
             <ion-datetime style='--padding-top:0' formControlName='dateUse' displayFormat="D MMM YYYY"
               [pickerOptions]="customOptions">
             </ion-datetime> 
-</ion-item>-->
+            </ion-item>-->
 
             <!-- </ion-col> -->
 
@@ -205,17 +198,18 @@
             </ion-col>
           </ion-row>
 
-          <!-- margin: auto;
-          margin-right: -109px; 
-        not working with error message
-        -->
+                  <!-- margin: auto;
+                  margin-right: -109px; 
+                      not working with error message
+                -->
 
           <ion-item lines='none'>
             <!-- <span *ngIf='lessThan==="" && moreThan===""'> -->
+<!--             <ion-button (click)='clearForm()' [disabled]='isSearching'>Clear</ion-button>
             <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search
-            </ion-button>
+            </ion-button> -->
 
-            <ion-button (click)='clearForm()' [disabled]='!formGroup.dirty || isSearching'>Reset</ion-button>
+
             <!-- </span> -->
             <!-- <span *ngIf='lessThan!=="" || moreThan!==""'>
               <ion-button type='submit' (click)='onSubmit()' [disabled]=' isSearching'>Search
@@ -257,11 +251,19 @@
               [format]="'YYYY-MM-DD'"
               [options]='fromInfinite'
               >
-</ion-calendar> -->
+      </ion-calendar> -->
       </ion-col>
       <!-- <ion-col></ion-col> -->
     </ion-row>
   </ion-grid>
+  <div margin-top="" style="color:grey" text-center="">
+
+      <ion-button (click)='clearForm()' [disabled]='isSearching'>Clear</ion-button>
+      <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search
+      </ion-button>
+  
+  
+    </div>
   <div margin-top="" style="color:grey" text-center="">
 
     <span>Version - 0.0.1</span>
@@ -269,6 +271,6 @@
 
   </div>
   <div *ngIf='updateAvailable' margin-top="" style="color:grey" text-center="">
-  <span>Update Available. Kindly Refresh.</span>
-</div>
+    <span>Update Available. Kindly Refresh.</span>
+  </div>
 </ion-content>

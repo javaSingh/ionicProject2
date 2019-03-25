@@ -1,8 +1,10 @@
 <ion-header>
   <ion-toolbar>
+
     <ion-item lines='none'>
+      <ion-icon name="arrow-back" (click)='closeModal()'></ion-icon>
       <ion-title>{{title}} </ion-title>
-      <ion-icon name='close' (click)="closeModal()"></ion-icon>
+      <!-- <ion-icon name='close' (click)="closeModal()"></ion-icon> -->
     </ion-item>
   </ion-toolbar>
 </ion-header>
@@ -20,36 +22,34 @@
         <ion-label text-wrap>{{item}}</ion-label>
       </ion-item>
     </ion-list>
-    <ion-item lines='none'>
-      <ion-button (click)='closeModal()'>Close</ion-button>
-    </ion-item>
+
   </div>
+  <div *ngIf='type==="DateUseFilter"'>
+    <ion-row padding>
+      <ion-col offset-md='3' offset-lg='3' offset-xl='3'>
+        <ion-row>
+          <!-- <ion-col> -->
+          <ion-item style='--highlight-height:0;max-width:270px;padding-right:10px;'>
+            <ion-label position='floating'>Used After</ion-label>
+            <ion-input [(ngModel)]='dateUseMoreThan' (click)='openCalendar("dateUseMoreThan","Used After")' type='text'>
+            </ion-input>
+            <ion-icon *ngIf='dateUseMoreThan!==""' slot='end' style='margin-bottom:-15px'
+              (click)='clearDate("dateUseMoreThan")' name='close'></ion-icon>
+          </ion-item>
+          <ion-item style='--highlight-height:0;max-width:270px;padding-right:10px;'>
+            <ion-label position='floating'>Used Before</ion-label>
+            <ion-input [(ngModel)]='dateUseLessThan' (click)='openCalendar("dateUseLessThan","Used Before")'
+              type='text'>
+            </ion-input>
+            <ion-icon *ngIf='dateUseLessThan!==""' slot='end' style='margin-bottom:-15px'
+              (click)='clearDate("dateUseLessThan")' name='close'></ion-icon>
+          </ion-item>
+          <!-- </ion-col> -->
+          <!-- <ion-col> -->
 
-  <ion-row padding *ngIf='type==="DateUseFilter"'>
-    <ion-col offset-md='3' offset-lg='3' offset-xl='3'>
-      <ion-row>
-        <!-- <ion-col> -->
-        <ion-item style='--highlight-height:0;max-width:270px;padding-right:10px;'>
-          <ion-label position='floating'>Used After</ion-label>
-          <ion-input [(ngModel)]='dateUseMoreThan' (click)='openCalendar("dateUseMoreThan","Used After")' type='text'>
-          </ion-input>
-          <ion-icon *ngIf='dateUseMoreThan!==""' slot='end' style='margin-bottom:-15px'
-            (click)='clearDate("dateUseMoreThan")' name='close'></ion-icon>
-        </ion-item>
-        <ion-item style='--highlight-height:0;max-width:270px;padding-right:10px;'>
-          <ion-label position='floating'>Used Before</ion-label>
-          <ion-input [(ngModel)]='dateUseLessThan' (click)='openCalendar("dateUseLessThan","Used Before")' type='text'
-            >
-          </ion-input>
-          <ion-icon *ngIf='dateUseLessThan!==""' slot='end' style='margin-bottom:-15px'
-            (click)='clearDate("dateUseLessThan")' name='close'></ion-icon>
-        </ion-item>
-        <!-- </ion-col> -->
-        <!-- <ion-col> -->
-
-        <!-- </ion-col> -->
-      </ion-row>
-      <ion-item style='    --highlight-height: 0;
+          <!-- </ion-col> -->
+        </ion-row>
+        <!--       <ion-item style='    --highlight-height: 0;
             max-width: 300px;
             padding-right: 10px;'>
         <ion-label position='floating'>Date Put Into Use Range</ion-label>
@@ -58,18 +58,61 @@
         </ion-input>
         <ion-icon *ngIf='dateUseRange!==""' slot='end' style='margin-bottom:-15px' (click)='clearDate("dateUseRange")'
           name='close'></ion-icon>
-      </ion-item>
-      <ion-item lines='none'>
-        <ion-button (click)='closeModal()'
-          [disabled]='(dateUseRange!=="" ||dateUseLessThan!=="" || dateUseMoreThan!=="")'>Close</ion-button>
+      </ion-item> -->
+        <!--       <ion-item lines='none'>
+
         <ion-button (click)='closeModal()'
           [disabled]='!(dateUseRange!=="" ||dateUseLessThan!=="" || dateUseMoreThan!=="")'>Okay</ion-button>
         <ion-button (click)='resetValues()'
-          [disabled]='!(dateUseRange!=="" ||dateUseLessThan!=="" || dateUseMoreThan!=="")'>Reset</ion-button>
-      </ion-item>
+          [disabled]='!(dateUseRange!=="" ||dateUseLessThan!=="" || dateUseMoreThan!=="")'>Clear</ion-button>
+      </ion-item> -->
 
-    </ion-col>
-  </ion-row>
+      </ion-col>
+
+    </ion-row>
+    <div margin-top="" style="color:grey" text-center="">
+      <ion-button (click)='closeModal()'
+        [disabled]='!(dateUseRange!=="" ||dateUseLessThan!=="" || dateUseMoreThan!=="")'>
+        Okay</ion-button>
+      <ion-button (click)='resetValues()'
+        [disabled]='!(dateUseRange!=="" ||dateUseLessThan!=="" || dateUseMoreThan!=="")'>Clear</ion-button>
+    </div>
+  </div>
+
+
+
+  <div *ngIf='type==="ManufactureYearFilter"'>
+    <ion-row padding>
+      <ion-col offset-md='3' offset-lg='3' offset-xl='3'>
+        <ion-row>
+          <ion-item style='--highlight-height:0;max-width:270px;padding-right:10px;'>
+            <ion-label position='floating'>Manufactured After</ion-label>
+            <ion-input [(ngModel)]='manufacturedAfter' type='text'>
+            </ion-input>
+            <ion-icon *ngIf='manufacturedAfter!==""' slot='end' style='margin-bottom:-15px'
+              (click)='clearManufactureYear("manufacturedAfter")' name='close'></ion-icon>
+          </ion-item>
+          <ion-item style='--highlight-height:0;max-width:270px;padding-right:10px;'>
+            <ion-label position='floating'>Manufactured Before</ion-label>
+            <ion-input [(ngModel)]='manufacturedBefore' type='text'>
+            </ion-input>
+            <ion-icon *ngIf='manufacturedBefore!==""' slot='end' style='margin-bottom:-15px'
+              (click)='clearManufactureYear("manufacturedBefore")' name='close'></ion-icon>
+          </ion-item>
+        </ion-row>
+      </ion-col>
+    </ion-row>
+    <div margin-top="" style="color:grey" text-center="">
+      <ion-button (click)='closeModal()'
+        [disabled]='!(manufacturedBefore!=="" ||manufacturedAfter!=="" )'>
+        Okay</ion-button>
+      <ion-button (click)='clearManufactureYear("both")'>Clear</ion-button>
+    </div>
+  </div>
+
+
+
+
 </ion-content>
 <!-- <ion-footer>
 

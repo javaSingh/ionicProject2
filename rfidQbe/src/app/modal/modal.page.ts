@@ -20,6 +20,8 @@ export class ModalPage implements OnInit {
   dateUseRange = ''
   dateUseFrom = ''
   dateUseTo = ''
+  manufacturedBefore = ''
+  manufacturedAfter = ''
 
   map = {
     assetType: ' type is ',
@@ -42,14 +44,14 @@ export class ModalPage implements OnInit {
     console.log('Modal constructor:', navParams.data)
     console.log(navParams.data.dateUseLessThan)
     console.log(navParams.data.dateUseMoreThan)
-    console.log(new Date(''+navParams.data.dateUseLessThan+''))
-    console.log(new Date(''+navParams.data.dateUseMoreThan+''))
-    console.log(new Date(''+navParams.data.dateUseLessThan+'') < new Date(''+navParams.data.dateUseMoreThan+''))
-    console.log(new Date(''+navParams.data.dateUseLessThan+'') > new Date(''+navParams.data.dateUseMoreThan+''))
+    console.log(new Date('' + navParams.data.dateUseLessThan + ''))
+    console.log(new Date('' + navParams.data.dateUseMoreThan + ''))
+    console.log(new Date('' + navParams.data.dateUseLessThan + '') < new Date('' + navParams.data.dateUseMoreThan + ''))
+    console.log(new Date('' + navParams.data.dateUseLessThan + '') > new Date('' + navParams.data.dateUseMoreThan + ''))
     if (navParams.data.dateUseLessThan !== ''
       && navParams.data.dateUseMoreThan !== ''
-      && new Date(''+navParams.data.dateUseLessThan+'') > new Date(''+navParams.data.dateUseMoreThan+'')) {
-        console.log('setting Range as well')
+      && new Date('' + navParams.data.dateUseLessThan + '') > new Date('' + navParams.data.dateUseMoreThan + '')) {
+      console.log('setting Range as well')
       this.dateUseRange = navParams.data.dateUseMoreThan + ' - ' + navParams.data.dateUseLessThan
     }
 
@@ -114,7 +116,9 @@ export class ModalPage implements OnInit {
         dateUseLessThan: this.dateUseLessThan,
         dateUseMoreThan: this.dateUseMoreThan,
         dateUseFrom: this.dateUseFrom,
-        dateUseTo: this.dateUseTo
+        dateUseTo: this.dateUseTo,
+        manufacturedBefore:this.manufacturedBefore,
+        manufacturedAfter:this.manufacturedAfter
       }
     );
   }
@@ -198,6 +202,19 @@ export class ModalPage implements OnInit {
     this.dateUseRange = ''
     this.dateUseFrom = ''
     this.dateUseTo = ''
+  }
+
+  clearManufactureYear(k) {
+    if (k === 'manufacturedBefore') {
+      this.manufacturedBefore = ''
+    }
+    if (k === 'manufacturedAfter') {
+      this.manufacturedAfter = ''
+    }
+    if (k === 'both') {
+      this.clearManufactureYear('manufacturedBefore')
+      this.clearManufactureYear('manufacturedAfter')
+    }
   }
 
 }
