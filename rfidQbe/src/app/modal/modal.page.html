@@ -20,29 +20,30 @@
         <ion-label text-wrap>{{item}}</ion-label>
       </ion-item>
     </ion-list>
+    <ion-item lines='none'>
+      <ion-button (click)='closeModal()'>Close</ion-button>
+    </ion-item>
   </div>
 
   <ion-row padding *ngIf='type==="DateUseFilter"'>
     <ion-col offset-md='3' offset-lg='3' offset-xl='3'>
       <ion-row>
         <!-- <ion-col> -->
-            <ion-item style='--highlight-height:0;max-width:270px;padding-right:10px;'>
-                <ion-label position='floating'>Used After</ion-label>
-                <ion-input [(ngModel)]='dateUseMoreThan' (click)='openCalendar("dateUseMoreThan","Used After")' type='text'>
-                </ion-input>
-                <ion-icon *ngIf='dateUseMoreThan!==""' slot='end' style='margin-bottom:-15px'
-                  (click)='clearDate("dateUseMoreThan")' name='close'></ion-icon>
-              </ion-item>
-          <ion-item style='    --highlight-height: 0;
-            max-width: 270px;
-            padding-right: 10px;'>
-            <ion-label position='floating'>Used Before</ion-label>
-            <ion-input [(ngModel)]='dateUseLessThan' (click)='openCalendar("dateUseLessThan","Used Before")' type='text'
-              clearInput>
-            </ion-input>
-            <ion-icon *ngIf='dateUseLessThan!==""' slot='end' style='margin-bottom:-15px'
-              (click)='clearDate("dateUseLessThan")' name='close'></ion-icon>
-          </ion-item>
+        <ion-item style='--highlight-height:0;max-width:270px;padding-right:10px;'>
+          <ion-label position='floating'>Used After</ion-label>
+          <ion-input [(ngModel)]='dateUseMoreThan' (click)='openCalendar("dateUseMoreThan","Used After")' type='text'>
+          </ion-input>
+          <ion-icon *ngIf='dateUseMoreThan!==""' slot='end' style='margin-bottom:-15px'
+            (click)='clearDate("dateUseMoreThan")' name='close'></ion-icon>
+        </ion-item>
+        <ion-item style='--highlight-height:0;max-width:270px;padding-right:10px;'>
+          <ion-label position='floating'>Used Before</ion-label>
+          <ion-input [(ngModel)]='dateUseLessThan' (click)='openCalendar("dateUseLessThan","Used Before")' type='text'
+            >
+          </ion-input>
+          <ion-icon *ngIf='dateUseLessThan!==""' slot='end' style='margin-bottom:-15px'
+            (click)='clearDate("dateUseLessThan")' name='close'></ion-icon>
+        </ion-item>
         <!-- </ion-col> -->
         <!-- <ion-col> -->
 
@@ -59,14 +60,14 @@
           name='close'></ion-icon>
       </ion-item>
       <ion-item lines='none'>
-          <ion-button (click)='closeModal()'
+        <ion-button (click)='closeModal()'
           [disabled]='(dateUseRange!=="" ||dateUseLessThan!=="" || dateUseMoreThan!=="")'>Close</ion-button>
         <ion-button (click)='closeModal()'
           [disabled]='!(dateUseRange!=="" ||dateUseLessThan!=="" || dateUseMoreThan!=="")'>Okay</ion-button>
-          <ion-button (click)='resetValues()'
+        <ion-button (click)='resetValues()'
           [disabled]='!(dateUseRange!=="" ||dateUseLessThan!=="" || dateUseMoreThan!=="")'>Reset</ion-button>
       </ion-item>
-      
+
     </ion-col>
   </ion-row>
 </ion-content>

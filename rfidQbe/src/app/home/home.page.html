@@ -57,7 +57,7 @@
   <ion-grid>
     <ion-row>
       <ion-col offset-md='3' offset-lg='3' offset-xl='3'>
-        <form [formGroup]="formGroup" (ngSubmit)='onSubmit()' >
+        <form [formGroup]="formGroup" (ngSubmit)='onSubmit()'>
           <ion-row>
             <ion-col style="max-width: 200px">
               <!-- <ion-item (click)='openSelect("assetType")' style='--highlight-height:0'>
@@ -205,12 +205,17 @@
             </ion-col>
           </ion-row>
 
+          <!-- margin: auto;
+          margin-right: -109px; 
+        not working with error message
+        -->
+
           <ion-item lines='none'>
             <!-- <span *ngIf='lessThan==="" && moreThan===""'> -->
             <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search
             </ion-button>
 
-            <ion-button (click)='clearForm()' [disabled]='!formGroup.valid || isSearching'>Reset</ion-button>
+            <ion-button (click)='clearForm()' [disabled]='!formGroup.dirty || isSearching'>Reset</ion-button>
             <!-- </span> -->
             <!-- <span *ngIf='lessThan!=="" || moreThan!==""'>
               <ion-button type='submit' (click)='onSubmit()' [disabled]=' isSearching'>Search
@@ -237,6 +242,7 @@
 
 
 
+
         </form>
 
 
@@ -256,5 +262,13 @@
       <!-- <ion-col></ion-col> -->
     </ion-row>
   </ion-grid>
+  <div margin-top="" style="color:grey" text-center="">
 
+    <span>Version - 0.0.1</span>
+
+
+  </div>
+  <div *ngIf='updateAvailable' margin-top="" style="color:grey" text-center="">
+  <span>Update Available. Kindly Refresh.</span>
+</div>
 </ion-content>

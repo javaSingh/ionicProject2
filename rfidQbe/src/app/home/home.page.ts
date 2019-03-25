@@ -42,6 +42,7 @@ export class HomePage implements OnInit {
   // ?filter={"where":{"or":[{"owner":"ECOR"},{"owner":"ECR"}]}}
 
   isSearching: boolean = false
+  updateAvailable:boolean=false
 
   formGroup: FormGroup
   validFormCustomStatus = false
@@ -301,7 +302,13 @@ export class HomePage implements OnInit {
               query += '"yearOfManufacture":{"gt":"' + this.moreThan.substring(2, 4) + '","lt":"' + this.lessThan.substring(2, 4) + '"},'
               // query2 += '"yearOfManufacture":{"gt":"' + this.moreThan.substring(2, 4) + '","lt":"' + this.lessThan.substring(2, 4) + '"},'
               // {"where":{"dateUse": {"between": ["2013-07-17","2017-07-17"]},"yearOfManufacture":{"between":["16","17"]}}}
-              query2 += '"yearOfManufacture":{"between":["' + this.moreThan.substring(2, 4) + '","' + this.lessThan.substring(2, 4) + '"]},'
+              if (parseInt(this.moreThan.substring(2, 4)) < parseInt(this.lessThan.substring(2, 4))) {
+                query2 += '"yearOfManufacture":{"between":["' + this.moreThan.substring(2, 4) + '","' + this.lessThan.substring(2, 4) + '"]},'
+              }
+              else {
+                query2 += '"yearOfManufacture":{"gt":"' + this.moreThan.substring(2, 4) + '","lt":"' + this.lessThan.substring(2, 4) + '"},'
+              }
+
             }
             else if (this.lessThan === '' && this.moreThan !== '') {
               query += '"yearOfManufacture":{"gt":"' + this.moreThan.substring(2.4) + '"},'
@@ -398,12 +405,13 @@ export class HomePage implements OnInit {
 
     var yyToyyyy = []
 
-
+    console.log("Some Update")
     console.log(yyToyyyy)
     console.log('Constructor')
     this.swUpdate.available.subscribe(event => {
+      this.updateAvailable=true
       console.log('Update Available')
-      this.presentToast("Update Available. Kindly Refresh.")
+      this.presentToast("Update Available. Kindly Refresh.",2000)
     })
 
 
@@ -672,7 +680,7 @@ export class HomePage implements OnInit {
       console.log('Race Response: ', data)
       if (data === 'Connection Timed Out') {
         console.log(data)
-        this.presentToast('Unable to Connect now.')
+        this.presentToast('Unable to Connect now.',2000)
       }
       else {
         // console.log('response has win the race')
@@ -687,14 +695,14 @@ export class HomePage implements OnInit {
             // this.removeDuplicates()
           }
           else {
-            this.presentToast('No Result Found')
+            this.presentToast('No Result Found',1500)
           }
         }
       }
     }, error => {
       console.log("Error: ")
       console.log(error)
-      this.presentToast('Unable to Connect.')
+      this.presentToast('Unable to Connect.',1500)
     }).finally(() => {
       this.isSearching = false
     })
@@ -808,16 +816,16 @@ export class HomePage implements OnInit {
     this.showResults(this.index + 1)
   }
 
-  async presentToast(msg: string) {
+  async presentToast(msg: string,duration) {
     const toast = await this.toastController.create({
       message: msg,
       translucent: false,
-      showCloseButton: true,
-      closeButtonText: 'CLOSE',
-      duration: 1500,
+
+      duration: duration,
       position: "top"
     });
     toast.present();
+    // toast.onclose({})
   }
 
   clearSelection(key) {
