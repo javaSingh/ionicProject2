@@ -28,7 +28,7 @@
           </ion-button>
         </ion-item>
       </ion-col>
-      <ion-col></ion-col>
+      <!-- <ion-col></ion-col> -->
     </ion-row>
   </ion-toolbar>
 
@@ -71,7 +71,7 @@
                 <ion-label position='floating'>Asset Type</ion-label>
                 <ionic-selectable type='text' item-content formControlName='assetType' [items]="assetsTypeMapping"
                   itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="portChange($event)"
-                  [canClear]="true" [isMultiple]="true">
+                  [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
                 </ionic-selectable>
               </ion-item>
             </ion-col>
@@ -81,11 +81,12 @@
             <ion-input (keypress)="numberOnly($event)" clearInput formControlName='yearOfManufacture'></ion-input>
           </ion-item> -->
               <ion-item>
-<!--                 <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;margin-top: 0px;
+                <!--                 <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;margin-top: 0px;
                 margin-left: 8px;height:20px;" (click)='yearOfManufactureFilter()'>
                 </ion-icon> -->
                 <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;margin-top: 0px;
-                margin-left: 8px;height:20px;" (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
+                margin-left: 8px;height:20px;"
+                  (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
                 </ion-icon>
                 <ion-label position='floating' *ngIf='lessThan==="" && moreThan===""'>Manufacture Year</ion-label>
                 <ion-label position='floating' *ngIf='lessThan!=="" && moreThan===""'>M/f Before {{lessThan}}
@@ -95,33 +96,43 @@
                 </ion-label>
                 <ionic-selectable item-content formControlName='yearOfManufacture' [items]="yearsMapping"
                   itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="yomChange($event)"
-                  [canClear]="true" [isMultiple]="true">
+                  [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
                 </ionic-selectable>
               </ion-item>
 
             </ion-col>
             <ion-col>
-              <ion-item style='--highlight-height:0;max-width:200px;' *ngIf='!((this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput)'>
+              <ion-item style='--highlight-height:0;max-width:230px;'
+                *ngIf='!((this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput)'>
+                <ion-icon (click)='clearDateUse("dateUse")' *ngIf='formGroup.controls["dateUse"].value.length>0'
+                  slot='end' style='margin-bottom:-18px;margin-left: 0px;' name='close'></ion-icon>
                 <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;height:20px;"
                   (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
                 </ion-icon>
+
                 <ion-label position='floating'>
-                    <span style='color:red'
+                  <span style='color:red'
                     *ngIf='formGroup.controls["dateUse"].invalid ||formGroup.controls["dateUseLessThan"].invalid || formGroup.controls["dateUseMoreThan"].invalid'>
                     Invalid Date.</span>
                   Date Put Into Use</ion-label>
-                <ion-input (click)='showDateUseCalendar()' type='text' clearInput formControlName='dateUse'>
+                <ion-input (click)='showDateUseCalendar()' type='text' formControlName='dateUse'>
                 </ion-input>
               </ion-item>
-              <ion-item style='--highlight-height:0;max-width:200px;' *ngIf='(this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput'>
-                  <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;height:20px;"
-                    (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
-                  </ion-icon>
-                  <ion-label position='floating'>
-                    Date Put Into Use</ion-label>
-                  <ion-input type='text' clearInput value='Before {{this.formGroup.controls["dateUseLessThan"].value}} After {{this.formGroup.controls["dateUseMoreThan"].value}}'>
-                  </ion-input>
-                </ion-item>
+              <ion-item style='--highlight-height:0;max-width:400px;'
+                *ngIf='(this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput'>
+                <ion-icon (click)='clearDateUse("dateUseFilterValue")' slot='end'
+                style='margin-bottom:-18px;margin-left: 0px;' name='close'></ion-icon>
+                <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;height:20px;"
+                  (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
+                </ion-icon>
+
+                <ion-label position='floating'>
+                  Date Put Into Use</ion-label>
+                <ion-input type='text'
+                  (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'
+                  value='{{dateUseFilterValue}}'>
+                </ion-input>
+              </ion-item>
             </ion-col>
           </ion-row>
 
@@ -137,7 +148,7 @@
                 <ion-label position='floating'>Owner</ion-label>
                 <ionic-selectable item-content formControlName='owner' [items]="ownersMapping" itemValueField="id"
                   itemTextField="name" [canSearch]="true" (onChange)="portChange($event)" [canClear]="true"
-                  [isMultiple]="true">
+                  [isMultiple]="true" [shouldFocusSearchbar]="true">
                 </ionic-selectable>
               </ion-item>
 
@@ -152,18 +163,18 @@
                 <ion-label position='floating'>Vehicle Type</ion-label>
                 <ionic-selectable item-content formControlName='vehicleType' [items]="vehiclesTypeMapping"
                   itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="portChange($event)"
-                  [canClear]="true" [isMultiple]="true">
+                  [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
                 </ionic-selectable>
               </ion-item>
             </ion-col>
             <ion-col style='    max-width: 160px;'>
               <ion-item text-wrap style='--highlight-height:0'>
                 <ion-label primary position="floating">
-                    <span style='color:red' *ngIf='formGroup.controls["serialNo"].invalid'>
-                        Max 6 digits.
-                      </span>
-                  Serial Number             
-  </ion-label>
+                  <span style='color:red' *ngIf='formGroup.controls["serialNo"].invalid'>
+                    Max 6 digits.
+                  </span>
+                  Serial Number
+                </ion-label>
                 <ion-input inputmod='numeric' type='text' (keypress)="numberOnly($event)" clearInput
                   formControlName='serialNo'></ion-input>
               </ion-item>
@@ -192,20 +203,20 @@
                 <ion-label position='floating'>Manufacturer Code</ion-label>
                 <ionic-selectable item-content formControlName='vehicleMfcCode' [items]="manufacturersCodeMapping"
                   itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="portChange($event)"
-                  [canClear]="true" [isMultiple]="true">
+                  [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
                 </ionic-selectable>
               </ion-item>
             </ion-col>
           </ion-row>
 
-                  <!-- margin: auto;
+          <!-- margin: auto;
                   margin-right: -109px; 
                       not working with error message
                 -->
 
           <ion-item lines='none'>
             <!-- <span *ngIf='lessThan==="" && moreThan===""'> -->
-<!--             <ion-button (click)='clearForm()' [disabled]='isSearching'>Clear</ion-button>
+            <!--             <ion-button (click)='clearForm()' [disabled]='isSearching'>Clear</ion-button>
             <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search
             </ion-button> -->
 
@@ -258,12 +269,12 @@
   </ion-grid>
   <div margin-top="" style="color:grey" text-center="">
 
-      <ion-button (click)='clearForm()' [disabled]='isSearching'>Clear</ion-button>
-      <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search
-      </ion-button>
-  
-  
-    </div>
+    <ion-button (click)='clearForm()' [disabled]='isSearching'>Clear</ion-button>
+    <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search
+    </ion-button>
+
+
+  </div>
   <div margin-top="" style="color:grey" text-center="">
 
     <span>Version - 0.0.1</span>

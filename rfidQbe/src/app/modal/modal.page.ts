@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { ModalController, NavParams } from '@ionic/angular';
 import { CalendarModal, CalendarModalOptions, DayConfig, CalendarResult, CalendarComponentOptions } from 'ion2-calendar';
+import { IonicSelectableComponent } from 'ionic-selectable'
 
 
 @Component({
@@ -16,12 +17,15 @@ export class ModalPage implements OnInit {
   @Input() title: string
   @Input() dateUseLessThan: string
   @Input() dateUseMoreThan: string
-
+  @Input() manufacturedBefore: string
+  @Input() manufacturedAfter: string
+  
+yearsMapping=[]
   dateUseRange = ''
   dateUseFrom = ''
   dateUseTo = ''
-  manufacturedBefore = ''
-  manufacturedAfter = ''
+/*   manufacturedBefore = ''
+  manufacturedAfter = '' */
 
   map = {
     assetType: ' type is ',
@@ -40,6 +44,12 @@ export class ModalPage implements OnInit {
   messageArray = []
 
   constructor(public modalController: ModalController, public navParams: NavParams, public modalCtrl: ModalController) {
+    for (var i = 2019; i > 1969; i--) {
+      var year = i + ''
+      this.yearsMapping.push(i++)
+    }
+    // console.log(this.yearsMapping)
+
     var message = ''
     console.log('Modal constructor:', navParams.data)
     console.log(navParams.data.dateUseLessThan)
@@ -111,6 +121,7 @@ export class ModalPage implements OnInit {
       && new Date(this.dateUseLessThan) > new Date(this.dateUseMoreThan)) {
       console.log('Invalid Dates From : To')
     }
+
     this.modalController.dismiss(
       {
         dateUseLessThan: this.dateUseLessThan,
@@ -215,6 +226,10 @@ export class ModalPage implements OnInit {
       this.clearManufactureYear('manufacturedBefore')
       this.clearManufactureYear('manufacturedAfter')
     }
+  }
+
+  yomChange(event){
+    console.log('YOM Change:',event)
   }
 
 }

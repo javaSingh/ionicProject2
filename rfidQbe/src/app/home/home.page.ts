@@ -25,29 +25,50 @@ export class HomePage implements OnInit {
   yearsMapping = []
 
   isSearching: boolean = false
-  updateAvailable:boolean=false
-  validFormCustomStatus:boolean = false
+  updateAvailable: boolean = false
+  validFormCustomStatus: boolean = false
   showDatePutIntoUseFilter: boolean = false
   showDatePutIntoUseFilterInput: boolean = true
 
   formGroup: FormGroup
-  
+
   results: any[] = []
   index
 
-  owners = ["CR","ECOR","ECR","ER","KR","NCR","NER","NFR","NR","NWR","SCR","SECR","SER","SR","SWR","WCR", "WR"]
-  vehiclesType = ["BCNHL","BFNS","BOBRNHSM1","BOBSN","BOBYN","BOSTHSM2","BOXNHL","BOXNS",'BRN22.9',"BTPGLN","BVCM","BVZI",]
-  vehiclesTypeMapping = [{ id: "BCNA", name: "BCNA" },{ id: "BCNHL", name: "BCNHL" },{ id: "BFNS", name: "BFNS" },{ id: "BLCB", name: "BLCB" },{ id: "BOBRNHSM1", name: "BOBRNHSM1" },{ id: "BOBSN", name: "BOBSN" },{ id: "BOBYN", name: "BOBYN" },{ id: "BOBYNHS", name: "BOBYNHS" },{ id: "BOSTHSM2", name: "BOSTHSM2" },{ id: "BOXNHA", name: "BOXNHA" },{ id: "BOXNHL", name: "BOXNHL" },{ id: "BOXNHS", name: "BOXNHS" },{ id: "BOXNS", name: "BOXNS" },{ id: "BRN22.9", name: "BRN22.9" },{ id: "BTPGLN", name: "BTPGLN" },{ id: "BVCM", name: "BVCM" },{ id: "BVZI", name: "BVZI" }]
+  owners = ["CR", "ECOR", "ECR", "ER", "KR", "NCR", "NER", "NFR", "NR", "NWR", "SCR", "SECR", "SER", "SR", "SWR", "WCR", "WR"]
+  vehiclesType = ["BCNHL", "BFNS", "BOBRNHSM1", "BOBSN", "BOBYN", "BOSTHSM2", "BOXNHL", "BOXNS", 'BRN22.9', "BTPGLN", "BVCM", "BVZI",]
+  vehiclesTypeMapping = [{ id: "BCNA", name: "BCNA" }, { id: "BCNHL", name: "BCNHL" }, { id: "BFNS", name: "BFNS" }, { id: "BLCB", name: "BLCB" }, { id: "BOBRNHSM1", name: "BOBRNHSM1" }, { id: "BOBSN", name: "BOBSN" }, { id: "BOBYN", name: "BOBYN" }, { id: "BOBYNHS", name: "BOBYNHS" }, { id: "BOSTHSM2", name: "BOSTHSM2" }, { id: "BOXNHA", name: "BOXNHA" }, { id: "BOXNHL", name: "BOXNHL" }, { id: "BOXNHS", name: "BOXNHS" }, { id: "BOXNS", name: "BOXNS" }, { id: "BRN22.9", name: "BRN22.9" }, { id: "BTPGLN", name: "BTPGLN" }, { id: "BVCM", name: "BVCM" }, { id: "BVZI", name: "BVZI" }]
   manufacturersCode = ["ARC", "ASRW", "BESF", "BESWL", "BESWR", "BUR", "BWELK", "BWELZ", "BWT", "CIM", "CLW", "DLW", "DMW", "GOCW", "HEIB", "HEIS", "ICFW", "JMPW", "JRIL", "JWL", "MCFW", "MI", "OFPL", "RCFW", "SPJW", "SR", "TEXB", "TEXS", "TWL",]
-  manufacturersCodeMapping = [{ id: "ARC", name: "Amtek Railcar Industries Pvt. Ltd." },{ id: "ASRW", name: "Amritsar Workshop   " },{ id: "BESF", name: "BESCO Ltd (Foundry), Kolkata " },{ id: "BESWL", name: "BESCO Ltd. (Wagon), Kolkata " },{ id: "BESWR", name: "BESCO Ltd (Wagon), Kolkata " },{ id: "BUR", name: "Burn Standard Co. Ltd. " },{ id: "BURH", name: "BUR Howrah" },{ id: "BWELK", name: "Bharat Wagon & Engineering Ltd." },{ id: "BWELZ", name: "Bharat Wagon & Engineering Ltd." },{ id: "BWT", name: "Braithwate & Co. Ltd., Kolkata" },{ id: "CIM", name: "CIMMCO Ltd, Bharatpur  " },{ id: "CLW", name: "Chittaranjan Locomotive Works  " },{ id: "DLW", name: "Diesel Locomotive Works  " },{ id: "DMW", name: "Diesel Loco Modernisation Works " },{ id: "GOCW", name: "Golden Rock Workshop, Trichurapalli " },{ id: "HEIB", name: "Hindustan Engineering Industries Ltd., Kolkata" },{ id: "HEIS", name: "Hindustan Engineering Industries Ltd., Kolkata" },{ id: "ICFW", name: "Integral Coach factory  " },{ id: "JMPW", name: "Jamalpur Workshop   " },{ id: "JRIL", name: "Jindal Rail Infrastructure Ltd, Vadodara Miyagam " },{ id: "JWL", name: "Jupiter Wagons Ltd, Chinsura, Hoogly" },{ id: "MCFW", name: "Modern Coach Factory  " },{ id: "MI", name: "Modern Industries (UP)  " },{ id: "OFPL", name: "Oriental Foundry Pvt Ltd " },{ id: "RCFW", name: "Rail Coach Factory  " },{ id: "SPJW", name: "Samastipur Workshop   " },{ id: "SR", name: "Sail RITES Bengal Wagon Industry Pvt. Ltd." },{ id: "TEXB", name: "Texmaco Rail and Engineering Ltd., Kolkata " },{ id: "TEXS", name: "Texmaco Rail and Engineering Ltd., Kolkata " },{ id: "TWL", name: "Titagarh, Howrah" },]
-  assetsTypeMapping = [{ id: "#", name: "Condemned Vehicle" },{ id: "A", name: "Ancillary vehicles, i.e., non-earning vehicles nec…Guard Vans in freight, Generator Cars in coaching" },{ id: "C", name: "Coaching (Passenger Carrying ONLY)" },{ id: "D", name: "DEMU" },{ id: "E", name: "EMU" },{ id: "F", name: "Freight (Earning vehicles ONLY)" },{ id: "L", name: "Electric Locos" },{ id: "M", name: "Maintenance related vehicles, e.g., Tower cars" },{ id: "P", name: "Part, i.e., an assembly/ subassembly, e.g., LHB bogie" },{ id: "R", name: "Rescue and safety related Vehicles, e.g., SPART/ SPARME, Cranes etc" },{ id: "S", name: "Diesel Locos" },{ id: "X", name: "Experimental, Vehicles on trial, e.g., the Talgo rake" },{ id: "Y", name: "Departmental (Freight)" },{ id: "Z", name: "Departmental (Coaching) includes saloons" },]
-  ownersMapping = [{ id: "CR", name: "CR" },{ id: "ECOR", name: "ECOR" },{ id: "ECR", name: "ECR" },{ id: "ER", name: "ER" },{ id: "KR", name: "KR" },{ id: "NCR", name: "NCR" },{ id: "NER", name: "NER" },{ id: "NFR", name: "NFR" },{ id: "NR", name: "NR" },{ id: "NWR", name: "NWR" },{ id: "SCR", name: "SCR" },{ id: "SECR", name: "SECR" },{ id: "SER", name: "SER" },{ id: "SR", name: "SR" },{ id: "SWR", name: "SWR" },{ id: "WCR", name: "WCR" },{ id: "WR", name: "WR" }]
 
-  portChange(event: {component: IonicSelectableComponent,value: any}) {
+  manufacturersCodeMapping = [{ id: "ARC", name: "Amtek Railcar Industries Pvt. Ltd." }, { id: "ASRW", name: "Amritsar Workshop   " }, { id: "BESF", name: "BESCO Ltd (Foundry), Kolkata " }, { id: "BESWL", name: "BESCO Ltd. (Wagon), Kolkata " }, { id: "BESWR", name: "BESCO Ltd (Wagon), Kolkata " }, { id: "BUR", name: "Burn Standard Co. Ltd. " }, { id: "BURH", name: "BUR Howrah" }, { id: "BWELK", name: "Bharat Wagon & Engineering Ltd." }, { id: "BWELZ", name: "Bharat Wagon & Engineering Ltd." }, { id: "BWT", name: "Braithwate & Co. Ltd., Kolkata" }, { id: "CIM", name: "CIMMCO Ltd, Bharatpur  " }, { id: "CLW", name: "Chittaranjan Locomotive Works  " }, { id: "DLW", name: "Diesel Locomotive Works  " }, { id: "DMW", name: "Diesel Loco Modernisation Works " }, { id: "GOCW", name: "Golden Rock Workshop, Trichurapalli " }, { id: "HEIB", name: "Hindustan Engineering Industries Ltd., Kolkata" }, { id: "HEIS", name: "Hindustan Engineering Industries Ltd., Kolkata" }, { id: "ICFW", name: "Integral Coach factory  " }, { id: "JMPW", name: "Jamalpur Workshop   " }, { id: "JRIL", name: "Jindal Rail Infrastructure Ltd, Vadodara Miyagam " }, { id: "JWL", name: "Jupiter Wagons Ltd, Chinsura, Hoogly" }, { id: "MCFW", name: "Modern Coach Factory  " }, { id: "MI", name: "Modern Industries (UP)  " }, { id: "OFPL", name: "Oriental Foundry Pvt Ltd " }, { id: "RCFW", name: "Rail Coach Factory  " }, { id: "SPJW", name: "Samastipur Workshop   " }, { id: "SR", name: "Sail RITES Bengal Wagon Industry Pvt. Ltd." }, { id: "TEXB", name: "Texmaco Rail and Engineering Ltd., Kolkata " }, { id: "TEXS", name: "Texmaco Rail and Engineering Ltd., Kolkata " }, { id: "TWL", name: "Titagarh, Howrah" },]
+
+  /*  assetsTypeMapping = [{ id: "#", name: "Condemned Vehicle" }, { id: "A", name: "Ancillary vehicles, i.e., non-earning vehicles nec…Guard Vans in freight, Generator Cars in coaching" }, { id: "C", name: "Coaching (Passenger Carrying ONLY)" }, { id: "D", name: "DEMU" }, { id: "E", name: "EMU" }, { id: "F", name: "Freight (Earning vehicles ONLY)" }, { id: "L", name: "Electric Locos" }, { id: "M", name: "Maintenance related vehicles, e.g., Tower cars" }, { id: "P", name: "Part, i.e., an assembly/ subassembly, e.g., LHB bogie" }, { id: "R", name: "Rescue and safety related Vehicles, e.g., SPART/ SPARME, Cranes etc" }, { id: "S", name: "Diesel Locos" }, { id: "X", name: "Experimental, Vehicles on trial, e.g., the Talgo rake" }, { id: "Y", name: "Departmental (Freight)" }, { id: "Z", name: "Departmental (Coaching) includes saloons" },] */
+
+
+
+  assetsTypeMapping = [{ id: "A", name: "Ancillary Vehicles" },
+  { id: "C", name: "Coaching (Passenger Carrying ONLY)"},
+  { id: "#", name: "Condemned Vehicle"},
+  { id: "D", name: "DEMU"},
+  { id: "Z", name: "Departmental (Coaching) includes saloons"},
+  { id: "Y", name: "Departmental (Freight)"},
+  { id: "S", name: "Diesel Locos"},
+  { id: "L", name: "Electric Locos"},
+  { id: "E", name: "EMU"},
+  { id: "X", name: "Experimental Vehicles on trial"},
+  { id: "F", name: "Freight (Earning vehicles ONLY)"},
+  { id: "M", name: "Maintenance related vehicles"},
+  { id: "P", name: "Part i.e. an assembly/ subassembly"},
+  { id: "R", name: "Rescue and safety related Vehicles"}
+  ]
+
+  ownersMapping = [{ id: "CR", name: "CR" }, { id: "ECOR", name: "ECOR" }, { id: "ECR", name: "ECR" }, { id: "ER", name: "ER" }, { id: "KR", name: "KR" }, { id: "NCR", name: "NCR" }, { id: "NER", name: "NER" }, { id: "NFR", name: "NFR" }, { id: "NR", name: "NR" }, { id: "NWR", name: "NWR" }, { id: "SCR", name: "SCR" }, { id: "SECR", name: "SECR" }, { id: "SER", name: "SER" }, { id: "SR", name: "SR" }, { id: "SWR", name: "SWR" }, { id: "WCR", name: "WCR" }, { id: "WR", name: "WR" }]
+
+  portChange(event: { component: IonicSelectableComponent, value: any }) {
     console.log('port:', event.value);
   }
 
-  yomChange(event: {component: IonicSelectableComponent,value: any}) {
+  yomChange(event: { component: IonicSelectableComponent, value: any }) {
     console.log('YOM Change Event:', event.value);
     this.lessThan = ''
     this.moreThan = ''
@@ -133,13 +154,13 @@ export class HomePage implements OnInit {
     return query2
   }
 
-  constructor(public fb: FormBuilder,public http: HttpClient,public toastController: ToastController,public alertController: AlertController,public modalCtrl: ModalController,public httpProvider: HttpProvider,public swUpdate: SwUpdate
+  constructor(public fb: FormBuilder, public http: HttpClient, public toastController: ToastController, public alertController: AlertController, public modalCtrl: ModalController, public httpProvider: HttpProvider, public swUpdate: SwUpdate
   ) {
     console.log('Constructor')
     this.swUpdate.available.subscribe(event => {
-      this.updateAvailable=true
+      this.updateAvailable = true
       console.log('Update Available')
-      this.presentToast("Update Available. Kindly Refresh.",2000)
+      this.presentToast("Update Available. Kindly Refresh.", 2000)
     })
 
     //making of yearsMapping. Should not be commented.
@@ -291,7 +312,7 @@ export class HomePage implements OnInit {
       console.log('Race Response: ', data)
       if (data === 'Connection Timed Out') {
         console.log(data)
-        this.presentToast('Unable to Connect now.',2000)
+        this.presentToast('Unable to Connect now.', 2000)
       }
       else {
         console.log('HTTP GET Result: ', data)
@@ -302,18 +323,18 @@ export class HomePage implements OnInit {
           if (this.results.length > 0) {
             this.showResults(0)
             this.showDatePutIntoUseFilter = false
-            this.showDatePutIntoUseFilterInput=false
+            this.showDatePutIntoUseFilterInput = false
             // this.removeDuplicates()
           }
           else {
-            this.presentToast('No Result Found',1500)
+            this.presentToast('No Result Found', 1500)
           }
         }
       }
     }, error => {
       console.log("Error: ")
       console.log(error)
-      this.presentToast('Unable to Connect.',1500)
+      this.presentToast('Unable to Connect.', 1500)
     }).finally(() => {
       this.isSearching = false
     })
@@ -365,7 +386,7 @@ export class HomePage implements OnInit {
     this.showResults(this.index + 1)
   }
 
-  async presentToast(msg: string,duration) {
+  async presentToast(msg: string, duration) {
     const toast = await this.toastController.create({
       message: msg,
       translucent: false,
@@ -480,9 +501,9 @@ export class HomePage implements OnInit {
   }
 
   showDateUseCalendar(k) {
-    if (this.formGroup.controls['dateUse'].value === '') {
-      this.openCalendar('dateUse', 'Date Put Into Use')
-    }
+    // if (this.formGroup.controls['dateUse'].value === '') {
+    this.openCalendar('dateUse', 'Date Put Into Use')
+    // }
   }
 
   //https://github.com/HsuanXyz/ion2-calendar
@@ -584,7 +605,7 @@ export class HomePage implements OnInit {
     this.presentYearOfManufactureFilter()
   }
 
-  
+
   enableDatePutIntoUseFilter() {
     console.log('Date Put Into Use Filter')
     if (this.showDatePutIntoUseFilter) {
@@ -672,7 +693,7 @@ export class HomePage implements OnInit {
     });
     await alert.present();
   }
-
+  dateUseFilterValue = ''
   async presentModal(message, queryString, type, title) {
     console.log('Present Modal')
     const modal = await this.modalCtrl.create({
@@ -681,22 +702,53 @@ export class HomePage implements OnInit {
         value: message, queryString: queryString, type: type, title: title,
         dateUseLessThan: this.formGroup.controls['dateUseLessThan'].value,
         dateUseMoreThan: this.formGroup.controls['dateUseMoreThan'].value,
+        manufacturedBefore:this.formGroup.controls['yearOfManufactureLessThan'].value,
+        manufacturedAfter:this.formGroup.controls['yearOfManufactureMoreThan'].value
       }
     });
     await modal.present();
     const { data } = await modal.onDidDismiss();
     console.log('Data AFter Moda Close:', data);
-    if(this.formGroup.controls['dateUseLessThan'].value!==data.dateUseLessThan || this.formGroup.controls['dateUseMoreThan'].value!==data.dateUseMoreThan){
+    if (this.formGroup.controls['dateUseLessThan'].value !== data.dateUseLessThan || this.formGroup.controls['dateUseMoreThan'].value !== data.dateUseMoreThan) {
       console.log('Date Use Filter Change Detected')
-      this.showDatePutIntoUseFilterInput=true
+      this.showDatePutIntoUseFilterInput = true
     }
+    this.formGroup.controls['dateUseLessThan'].setValue(data.dateUseLessThan)
+    this.formGroup.controls['dateUseMoreThan'].setValue(data.dateUseMoreThan)
+    this.lessThan = data.manufacturedBefore
+    this.moreThan = data.manufacturedAfter
+    console.log(this.lessThan, this.moreThan)
+    if (data.dateUseLessThan !== '' && data.dateUseMoreThan !== '') {
+      this.dateUseFilterValue = 'After: ' + data.dateUseMoreThan + ' Before: ' + data.dateUseLessThan
+    }
+    if (data.dateUseLessThan === '' && data.dateUseMoreThan !== '') {
+      this.dateUseFilterValue = 'After: ' + data.dateUseMoreThan
+    }
+    if (data.dateUseLessThan !== '' && data.dateUseMoreThan === '') {
+      this.dateUseFilterValue = 'Before: ' + data.dateUseLessThan
+    }
+    this.formGroup.controls['yearOfManufactureLessThan'].setValue(this.lessThan)
+    this.formGroup.controls['yearOfManufactureMoreThan'].setValue(this.moreThan)
+  }
 
-      this.formGroup.controls['dateUseLessThan'].setValue(data.dateUseLessThan)
-      this.formGroup.controls['dateUseMoreThan'].setValue(data.dateUseMoreThan)
-      this.lessThan=data.manufacturedBefore
-      this.moreThan=data.manufacturedAfter
-      console.log(this.lessThan,this.moreThan)
-      this.formGroup.controls['yearOfManufactureLessThan'].setValue(this.lessThan)
-      this.formGroup.controls['yearOfManufactureMoreThan'].setValue(this.moreThan)
+  test = [{ id: 'Init Value', name: 'Init Value' }]
+  changeDetected(event) {
+    // this.ownersMapping.push(this.test[0])
+    console.log('Change Detected:', event)
+  }
+
+  inputClicked() {
+    console.log('Input Clicked')
+  }
+
+  clearDateUse(k) {
+    if (k === 'dateUse') {
+      this.formGroup.controls['dateUse'].setValue('')
+    }
+    if (k === 'dateUseFilterValue') {
+      this.formGroup.controls['dateUseLessThan'].setValue("")
+      this.formGroup.controls['dateUseMoreThan'].setValue("")
+      this.dateUseFilterValue = ''
+    }
   }
 }

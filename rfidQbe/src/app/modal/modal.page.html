@@ -71,11 +71,11 @@
 
     </ion-row>
     <div margin-top="" style="color:grey" text-center="">
+      <ion-button (click)='resetValues()' >Clear</ion-button>
       <ion-button (click)='closeModal()'
         [disabled]='!(dateUseRange!=="" ||dateUseLessThan!=="" || dateUseMoreThan!=="")'>
         Okay</ion-button>
-      <ion-button (click)='resetValues()'
-        [disabled]='!(dateUseRange!=="" ||dateUseLessThan!=="" || dateUseMoreThan!=="")'>Clear</ion-button>
+
     </div>
   </div>
 
@@ -89,6 +89,10 @@
             <ion-label position='floating'>Manufactured After</ion-label>
             <ion-input [(ngModel)]='manufacturedAfter' type='text'>
             </ion-input>
+            <ionic-selectable item-content [items]="yearsMapping"
+             [canSearch]="true" (onChange)="yomChange($event)"
+            [canClear]="true" [shouldFocusSearchbar]="true">
+          </ionic-selectable>
             <ion-icon *ngIf='manufacturedAfter!==""' slot='end' style='margin-bottom:-15px'
               (click)='clearManufactureYear("manufacturedAfter")' name='close'></ion-icon>
           </ion-item>
@@ -103,10 +107,11 @@
       </ion-col>
     </ion-row>
     <div margin-top="" style="color:grey" text-center="">
+      <ion-button (click)='clearManufactureYear("both")'>Clear</ion-button>
       <ion-button (click)='closeModal()'
         [disabled]='!(manufacturedBefore!=="" ||manufacturedAfter!=="" )'>
         Okay</ion-button>
-      <ion-button (click)='clearManufactureYear("both")'>Clear</ion-button>
+
     </div>
   </div>
 

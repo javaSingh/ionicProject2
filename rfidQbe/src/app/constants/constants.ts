@@ -7,4 +7,6 @@ export const CONTEXT_ROOT= 'api/';
 // export const BASE_URL= '';  
 
 //for offline deployment
-export const BASE_URL='http://172.16.22.64:3000';
+export const BASE_URL='http://10.60.201.247:3002';
+// export const BASE_URL='http://172.16.22.64:3000';
+
