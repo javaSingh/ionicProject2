@@ -80,7 +80,8 @@
             <ion-label position="floating">Manufacture Year (YY)</ion-label>
             <ion-input (keypress)="numberOnly($event)" clearInput formControlName='yearOfManufacture'></ion-input>
           </ion-item> -->
-              <ion-item>
+              <!-- {{manufacturedYearFilterValue}} -->
+              <ion-item *ngIf='!((lessThan!=="" || moreThan!=="") && showManufactureYearFilterInput)'>
                 <!--                 <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;margin-top: 0px;
                 margin-left: 8px;height:20px;" (click)='yearOfManufactureFilter()'>
                 </ion-icon> -->
@@ -88,16 +89,27 @@
                 margin-left: 8px;height:20px;"
                   (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
                 </ion-icon>
-                <ion-label position='floating' *ngIf='lessThan==="" && moreThan===""'>Manufacture Year</ion-label>
-                <ion-label position='floating' *ngIf='lessThan!=="" && moreThan===""'>M/f Before {{lessThan}}
+                <ion-label position='floating' >Manufacture Year</ion-label>
+<!--                 <ion-label position='floating' *ngIf='!(lessThan==="" && moreThan==="")'>{{manufacturedYearFilterValue}}
+                </ion-label> -->
+                <!--                 <ion-label position='floating' *ngIf='lessThan!=="" && moreThan===""'>M/f Before {{lessThan}}
                 </ion-label>
                 <ion-label position='floating' *ngIf='lessThan==="" && moreThan!==""'>M/f After {{moreThan}}</ion-label>
-                <ion-label position='floating' *ngIf='lessThan!=="" && moreThan!==""'>M/f B/w {{lessThan}}-{{moreThan}}
-                </ion-label>
+                <ion-label position='floating' *ngIf='lessThan!=="" && moreThan!=="" '>M/f B/w {{lessThan}}-{{moreThan}}
+                </ion-label> -->
                 <ionic-selectable item-content formControlName='yearOfManufacture' [items]="yearsMapping"
                   itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="yomChange($event)"
                   [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
                 </ionic-selectable>
+              </ion-item>
+
+              <ion-item *ngIf='(lessThan!=="" || moreThan!=="") && showManufactureYearFilterInput'>
+                <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;margin-top: 0px;
+                margin-left: 8px;height:20px;"
+                  (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
+                </ion-icon>
+                <ion-label position='floating' >Manufacture Year</ion-label>
+                <ion-input (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")' type='text' value='{{manufacturedYearFilterValue}}'></ion-input>
               </ion-item>
 
             </ion-col>
@@ -121,7 +133,7 @@
               <ion-item style='--highlight-height:0;max-width:400px;'
                 *ngIf='(this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput'>
                 <ion-icon (click)='clearDateUse("dateUseFilterValue")' slot='end'
-                style='margin-bottom:-18px;margin-left: 0px;' name='close'></ion-icon>
+                  style='margin-bottom:-18px;margin-left: 0px;' name='close'></ion-icon>
                 <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;height:20px;"
                   (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
                 </ion-icon>

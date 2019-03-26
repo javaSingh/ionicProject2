@@ -46,7 +46,7 @@ yearsMapping=[]
   constructor(public modalController: ModalController, public navParams: NavParams, public modalCtrl: ModalController) {
     for (var i = 2019; i > 1969; i--) {
       var year = i + ''
-      this.yearsMapping.push(i++)
+      this.yearsMapping.push(i+'')
     }
     // console.log(this.yearsMapping)
 

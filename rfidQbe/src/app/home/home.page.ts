@@ -29,6 +29,7 @@ export class HomePage implements OnInit {
   validFormCustomStatus: boolean = false
   showDatePutIntoUseFilter: boolean = false
   showDatePutIntoUseFilterInput: boolean = true
+  showManufactureYearFilterInput: boolean = true
 
   formGroup: FormGroup
 
@@ -47,19 +48,19 @@ export class HomePage implements OnInit {
 
 
   assetsTypeMapping = [{ id: "A", name: "Ancillary Vehicles" },
-  { id: "C", name: "Coaching (Passenger Carrying ONLY)"},
-  { id: "#", name: "Condemned Vehicle"},
-  { id: "D", name: "DEMU"},
-  { id: "Z", name: "Departmental (Coaching) includes saloons"},
-  { id: "Y", name: "Departmental (Freight)"},
-  { id: "S", name: "Diesel Locos"},
-  { id: "L", name: "Electric Locos"},
-  { id: "E", name: "EMU"},
-  { id: "X", name: "Experimental Vehicles on trial"},
-  { id: "F", name: "Freight (Earning vehicles ONLY)"},
-  { id: "M", name: "Maintenance related vehicles"},
-  { id: "P", name: "Part i.e. an assembly/ subassembly"},
-  { id: "R", name: "Rescue and safety related Vehicles"}
+  { id: "C", name: "Coaching (Passenger Carrying ONLY)" },
+  { id: "#", name: "Condemned Vehicle" },
+  { id: "D", name: "DEMU" },
+  { id: "Z", name: "Departmental (Coaching) includes saloons" },
+  { id: "Y", name: "Departmental (Freight)" },
+  { id: "S", name: "Diesel Locos" },
+  { id: "L", name: "Electric Locos" },
+  { id: "E", name: "EMU" },
+  { id: "X", name: "Experimental Vehicles on trial" },
+  { id: "F", name: "Freight (Earning vehicles ONLY)" },
+  { id: "M", name: "Maintenance related vehicles" },
+  { id: "P", name: "Part i.e. an assembly/ subassembly" },
+  { id: "R", name: "Rescue and safety related Vehicles" }
   ]
 
   ownersMapping = [{ id: "CR", name: "CR" }, { id: "ECOR", name: "ECOR" }, { id: "ECR", name: "ECR" }, { id: "ER", name: "ER" }, { id: "KR", name: "KR" }, { id: "NCR", name: "NCR" }, { id: "NER", name: "NER" }, { id: "NFR", name: "NFR" }, { id: "NR", name: "NR" }, { id: "NWR", name: "NWR" }, { id: "SCR", name: "SCR" }, { id: "SECR", name: "SECR" }, { id: "SER", name: "SER" }, { id: "SR", name: "SR" }, { id: "SWR", name: "SWR" }, { id: "WCR", name: "WCR" }, { id: "WR", name: "WR" }]
@@ -98,7 +99,7 @@ export class HomePage implements OnInit {
             console.log('k=YOM and value is ', this.formGroup.controls[k].value)
             if (this.lessThan !== '' && this.moreThan !== '') {
               if (parseInt(this.moreThan.substring(2, 4)) < parseInt(this.lessThan.substring(2, 4))) {
-                query2 += '"yearOfManufacture":{"between":["' + this.moreThan.substring(2, 4) + '","' + this.lessThan.substring(2, 4) + '"]},'
+                query2 += '"yearOfManufacture":{"between":["' + (parseInt(this.moreThan.substring(2, 4))+1) + '","' + (parseInt(this.lessThan.substring(2, 4))-1) + '"]},'
               }
               else {
                 query2 += '"yearOfManufacture":{"gt":"' + this.moreThan.substring(2, 4) + '","lt":"' + this.lessThan.substring(2, 4) + '"},'
@@ -324,6 +325,7 @@ export class HomePage implements OnInit {
             this.showResults(0)
             this.showDatePutIntoUseFilter = false
             this.showDatePutIntoUseFilterInput = false
+            this.showManufactureYearFilterInput = false
             // this.removeDuplicates()
           }
           else {
@@ -356,6 +358,7 @@ export class HomePage implements OnInit {
 
   }
   showResults(index: any) {
+
     console.log('Showing Reults. Index is: ', index)
     this.index = index
     console.log(this.results[0].yearOfManufacture)
@@ -401,6 +404,8 @@ export class HomePage implements OnInit {
     var arr = []
     this.moreThan = ''
     this.lessThan = ''
+    this.manufacturedYearFilterValue = ''
+    this.dateUseFilterValue = ''
     this.formInit()
   }
 
@@ -694,6 +699,8 @@ export class HomePage implements OnInit {
     await alert.present();
   }
   dateUseFilterValue = ''
+  manufacturedYearFilterValue = ''
+
   async presentModal(message, queryString, type, title) {
     console.log('Present Modal')
     const modal = await this.modalCtrl.create({
@@ -702,33 +709,58 @@ export class HomePage implements OnInit {
         value: message, queryString: queryString, type: type, title: title,
         dateUseLessThan: this.formGroup.controls['dateUseLessThan'].value,
         dateUseMoreThan: this.formGroup.controls['dateUseMoreThan'].value,
-        manufacturedBefore:this.formGroup.controls['yearOfManufactureLessThan'].value,
-        manufacturedAfter:this.formGroup.controls['yearOfManufactureMoreThan'].value
+        manufacturedBefore: this.formGroup.controls['yearOfManufactureLessThan'].value,
+        manufacturedAfter: this.formGroup.controls['yearOfManufactureMoreThan'].value
       }
     });
     await modal.present();
     const { data } = await modal.onDidDismiss();
     console.log('Data AFter Moda Close:', data);
-    if (this.formGroup.controls['dateUseLessThan'].value !== data.dateUseLessThan || this.formGroup.controls['dateUseMoreThan'].value !== data.dateUseMoreThan) {
-      console.log('Date Use Filter Change Detected')
-      this.showDatePutIntoUseFilterInput = true
+    console.log(data === undefined)
+    // console.log(data===undefined)
+    if (data !== undefined) {
+      if (this.formGroup.controls['dateUseLessThan'].value !== data.dateUseLessThan || this.formGroup.controls['dateUseMoreThan'].value !== data.dateUseMoreThan) {
+        console.log('Date Use Filter Change Detected')
+        this.showDatePutIntoUseFilterInput = true
+      }
+      if (this.formGroup.controls['yearOfManufactureLessThan'].value !== data.manufacturedBefore || this.formGroup.controls['yearOfManufactureMoreThan'].value !== data.manufacturedAfter) {
+        console.log('Date Use Filter Change Detected')
+        this.showManufactureYearFilterInput = true
+      }
+      this.formGroup.controls['dateUseLessThan'].setValue(data.dateUseLessThan)
+      this.formGroup.controls['dateUseMoreThan'].setValue(data.dateUseMoreThan)
+      this.lessThan = data.manufacturedBefore
+      this.moreThan = data.manufacturedAfter
+      console.log(this.lessThan, this.moreThan)
+      if (data.dateUseLessThan !== '' && data.dateUseMoreThan !== '') {
+        this.dateUseFilterValue = 'After: ' + data.dateUseMoreThan + ' Before: ' + data.dateUseLessThan
+      }
+      if (data.dateUseLessThan === '' && data.dateUseMoreThan !== '') {
+        this.dateUseFilterValue = 'After: ' + data.dateUseMoreThan
+      }
+      if (data.dateUseLessThan !== '' && data.dateUseMoreThan === '') {
+        this.dateUseFilterValue = 'Before: ' + data.dateUseLessThan
+      }
     }
-    this.formGroup.controls['dateUseLessThan'].setValue(data.dateUseLessThan)
-    this.formGroup.controls['dateUseMoreThan'].setValue(data.dateUseMoreThan)
-    this.lessThan = data.manufacturedBefore
-    this.moreThan = data.manufacturedAfter
-    console.log(this.lessThan, this.moreThan)
-    if (data.dateUseLessThan !== '' && data.dateUseMoreThan !== '') {
-      this.dateUseFilterValue = 'After: ' + data.dateUseMoreThan + ' Before: ' + data.dateUseLessThan
-    }
-    if (data.dateUseLessThan === '' && data.dateUseMoreThan !== '') {
-      this.dateUseFilterValue = 'After: ' + data.dateUseMoreThan
-    }
-    if (data.dateUseLessThan !== '' && data.dateUseMoreThan === '') {
-      this.dateUseFilterValue = 'Before: ' + data.dateUseLessThan
-    }
+
     this.formGroup.controls['yearOfManufactureLessThan'].setValue(this.lessThan)
     this.formGroup.controls['yearOfManufactureMoreThan'].setValue(this.moreThan)
+
+
+    if (this.lessThan !== '' && this.moreThan !== '') {
+      if (parseInt(this.lessThan) > parseInt(this.moreThan)) {
+        this.manufacturedYearFilterValue = 'M/f B/w: ' + this.moreThan + '-' + this.lessThan
+      }
+      else {
+        this.manufacturedYearFilterValue = 'Before: ' + this.moreThan + ' After: ' + this.lessThan
+      }
+    }
+    if (this.lessThan === '' && this.moreThan !== '') {
+      this.manufacturedYearFilterValue = 'After: ' + this.moreThan
+    }
+    if (this.lessThan !== '' && this.moreThan === '') {
+      this.manufacturedYearFilterValue = ' Before: ' + this.lessThan
+    }
   }
 
   test = [{ id: 'Init Value', name: 'Init Value' }]
