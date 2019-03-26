@@ -30,14 +30,14 @@
         <ion-row>
           <!-- <ion-col> -->
           <ion-item style='--highlight-height:0;max-width:270px;padding-right:10px;'>
-            <ion-label position='floating'>Put Into Use From</ion-label>
+            <ion-label position='stacked'>Put Into Use From</ion-label>
             <ion-input [(ngModel)]='dateUseMoreThan' (click)='openCalendar("dateUseMoreThan","Used After")' type='text'>
             </ion-input>
             <ion-icon *ngIf='dateUseMoreThan!==""' slot='end' style='margin-bottom:-15px'
               (click)='clearDate("dateUseMoreThan")' name='close'></ion-icon>
           </ion-item>
           <ion-item style='--highlight-height:0;max-width:270px;padding-right:10px;'>
-            <ion-label position='floating'>Put Into Use To</ion-label>
+            <ion-label position='stacked'>Put Into Use To</ion-label>
             <ion-input [(ngModel)]='dateUseLessThan' (click)='openCalendar("dateUseLessThan","Used Before")'
               type='text'>
             </ion-input>
@@ -86,7 +86,7 @@
       <ion-col offset-md='3' offset-lg='3' offset-xl='3'>
         <!-- <ion-row> -->
           <ion-item style='--highlight-height:0;max-width:300px;padding-right:10px;'>
-            <ion-label position='floating'>Manufactured After</ion-label>
+            <ion-label position='stacked'>Manufactured After</ion-label>
 <!--             <ion-input [(ngModel)]='manufacturedAfter' type='text'>
             </ion-input> -->
 
@@ -99,7 +99,7 @@
               (click)='clearManufactureYear("manufacturedAfter")' name='close'></ion-icon>
           </ion-item>
           <ion-item style='--highlight-height:0;max-width:300px;padding-right:10px;'>
-            <ion-label position='floating'>Manufactured Before</ion-label>
+            <ion-label position='stacked'>Manufactured Before</ion-label>
 <!--             <ion-input [(ngModel)]='manufacturedBefore' type='text'>
             </ion-input> -->
 

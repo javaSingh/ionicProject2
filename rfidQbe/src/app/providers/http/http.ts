@@ -10,11 +10,11 @@ export class HttpProvider {
 
     constructor(private httpClient: HttpClient) { }
     public getMethod(url) {
-
-        return this.httpClient.get(constants.BASE_URL+ url)
+        console.log('GET URL:', constants.BASE_URL + url)
+        return this.httpClient.get(constants.BASE_URL + url)
     }
 
-    publicInitOwners(){
+    publicInitOwners() {
         return this.httpClient.get('../../assets/data/data.json')
     }
 

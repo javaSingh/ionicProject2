@@ -307,7 +307,7 @@ export class HomePage implements OnInit {
         resolve('Connection Timed Out');
       }, 5000)
     })
-    let responsePromise = this.httpProvider.getMethod('/Tags/v2/EPC/qbe?filter=' + '{"where":' + queryString + fields + '}').toPromise()
+    let responsePromise = this.httpProvider.getMethod('/Tags/v1/EPC/qbe?filter=' + '{"where":' + queryString + fields + '}').toPromise()
     let race = Promise.race([timeoutPromise, responsePromise])
     race.then((data: any) => {
       console.log('Race Response: ', data)
@@ -326,7 +326,8 @@ export class HomePage implements OnInit {
             this.showDatePutIntoUseFilter = false
             this.showDatePutIntoUseFilterInput = false
             this.showManufactureYearFilterInput = false
-            // this.removeDuplicates()
+            if(this.results.length  < 100)
+            this.removeDuplicates()
           }
           else {
             this.presentToast('No Result Found', 1500)
