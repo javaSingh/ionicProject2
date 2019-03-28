@@ -20,7 +20,7 @@ import { environment } from '../environments/environment';
 // npm install @ionic/storage --save
 
 // npm install @ionic-native/secure-storage
-
+import { Device } from '@ionic-native/device/ngx';
 
 
 
@@ -32,6 +32,7 @@ import { environment } from '../environments/environment';
     HeroGuardServiceService,
     StatusBar,
     SplashScreen,
+    Device,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]
