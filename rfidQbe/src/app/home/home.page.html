@@ -5,157 +5,114 @@
     </ion-title>
   </ion-toolbar>
   <ion-toolbar>
-    <ion-row>
-      <ion-col offset-lg='3' offset-xl='3'>
-
-        <ion-item lines='none'>
-          <ion-icon *ngIf='formGroup.valid || results.length>0 || lessThan!=="" || moreThan!==""'
-            style='width:28px;height:28px;margin-right:5px;' src='../../assets/icon/eye.svg'
-            (click)='showQuerySummary()'></ion-icon>
-
-          <ion-button *ngIf='results.length>0' size='small' ion-button small (click)='makeExcel()'
-            style="background:green;width:30px;">
-            <img src="../../assets/icon/excel.png" style="height:100%;max-width:30px;">
-          </ion-button>
-          <ion-icon *ngIf='results.length>0' src='../../assets/icon/excel.png'></ion-icon>
-          <!-- <ion-button *ngIf='formGroup.valid' size='small' (click)='clearForm()'>Clear Form</ion-button> -->
-          <ion-button *ngIf='results.length>0' size='small' (click)='showPrevious()' [disabled]='index+1<=1'>
-            <ion-icon name="arrow-dropleft"></ion-icon>
-          </ion-button>
-          <span *ngIf='results.length>0'>{{index+1}} of {{results.length}} </span>
-          <ion-button *ngIf='results.length>0' size='small' (click)='showNext()' [disabled]='index+1>=results.length'>
-            <ion-icon name="arrow-dropright"></ion-icon>
-          </ion-button>
-        </ion-item>
-      </ion-col>
-      <!-- <ion-col></ion-col> -->
-    </ion-row>
+    <ion-grid style='--ion-grid-padding :0'>
+      <ion-row>
+        <ion-col style='padding :0' col-12 col-sm style='max-width:0px'>
+        </ion-col>
+        <ion-col style='padding :0' col-12 col-sm style='max-width:480px;margin:auto'>
+          <ion-row justify-content-center style='text-align:center'>
+            <ion-col style='--ion-grid-column-padding :0' col-3>
+              <ion-icon *ngIf='formGroup.valid || results.length>0 || lessThan!=="" || moreThan!==""'
+                style='width:28px;height:28px;margin-right:5px;margin-top:5px' src='../../assets/icon/eye.svg'
+                (click)='showQuerySummary()'></ion-icon>
+            </ion-col>
+            <ion-col style='--ion-grid-column-padding :0;max-width: 65px' col-3>
+              <ion-item lines='none'>
+                <ion-button *ngIf='results.length>0' size='small' ion-button small (click)='makeExcel()'
+                  style="background:green;width:30px;margin-bottom: 15px;">
+                  <img src="../../assets/icon/excel.png" style="height:100%;max-width:30px;">
+                </ion-button>
+                <ion-icon *ngIf='results.length>0' src='../../assets/icon/excel.png'></ion-icon>
+              </ion-item>
+            </ion-col>
+            <ion-col style='--ion-grid-column-padding :0;min-width:200px' col-6>
+              <ion-button *ngIf='results.length>0' size='small' (click)='showPrevious()' [disabled]='index+1<=1'>
+                <ion-icon name="arrow-dropleft"></ion-icon>
+              </ion-button>
+              <span *ngIf='results.length>0'>{{index+1}} of {{results.length}} </span>
+              <ion-button *ngIf='results.length>0' size='small' (click)='showNext()'
+                [disabled]='index+1>=results.length'>
+                <ion-icon name="arrow-dropright"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-col>
+        <ion-col style='padding :0' col-12 col-sm style='max-width:0px'>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   </ion-toolbar>
-
-
 </ion-header>
 
 <ion-content>
-
-  <!-- (keyup.enter)="onSubmit()" -->
-  <!--   <ion-item>
-    <ion-label>Port</ion-label>
-    <ionic-selectable
-      item-content 
-      [(ngModel)]="port"
-      [items]="ports"
-      itemValueField="id"
-      itemTextField="name"
-
-      [canSearch]="true"
-      (onChange)="portChange($event)"
-      [canClear]="true"
-      [isMultiple]="true">
-    </ionic-selectable>
-  </ion-item>
- -->
-
   <ion-grid>
-    <ion-row>
-      <ion-col offset-md='3' offset-lg='3' offset-xl='3'>
-        <form [formGroup]="formGroup" (ngSubmit)='onSubmit()'>
-          <ion-row>
-            <ion-col style="max-width: 200px">
-              <!-- <ion-item (click)='openSelect("assetType")' style='--highlight-height:0'>
-            <ion-label position="floating">Asset Type</ion-label>
-            <ion-input style="--padding-start:0" type='text' formControlName="assetType"></ion-input>
-          </ion-item> -->
-
-              <!-- <ion-icon style='width:28px;height:28px' src='../../assets/icon/eye.svg'></ion-icon> -->
-              <ion-item style="max-width: 200px">
-                <ion-label position='stacked'>Asset Type</ion-label>
-                <ionic-selectable type='text' item-content formControlName='assetType' [items]="assetsTypeMapping"
-                  itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="portChange($event)"
-                  [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
-                </ionic-selectable>
-              </ion-item>
-            </ion-col>
-            <ion-col style="max-width: 230px">
-              <!-- <ion-item style='--highlight-height:0'>
-            <ion-label position="floating">Manufacture Year (YY)</ion-label>
-            <ion-input (keypress)="numberOnly($event)" clearInput formControlName='yearOfManufacture'></ion-input>
-          </ion-item> -->
-              <!-- {{manufacturedYearFilterValue}} -->
-              <ion-item *ngIf='!((lessThan!=="" || moreThan!=="") && showManufactureYearFilterInput)'>
-                <!--                 <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;margin-top: 0px;
-                margin-left: 8px;height:20px;" (click)='yearOfManufactureFilter()'>
-                </ion-icon> -->
-                <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;margin-top: 0px;
-                margin-left: 8px;height:20px;"
-                  (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
-                </ion-icon>
-                <ion-label position='stacked' >Manufacture Year</ion-label>
-<!--                 <ion-label position='floating' *ngIf='!(lessThan==="" && moreThan==="")'>{{manufacturedYearFilterValue}}
-                </ion-label> -->
-                <!--                 <ion-label position='floating' *ngIf='lessThan!=="" && moreThan===""'>M/f Before {{lessThan}}
-                </ion-label>
-                <ion-label position='floating' *ngIf='lessThan==="" && moreThan!==""'>M/f After {{moreThan}}</ion-label>
-                <ion-label position='floating' *ngIf='lessThan!=="" && moreThan!=="" '>M/f B/w {{lessThan}}-{{moreThan}}
-                </ion-label> -->
-                <ionic-selectable item-content formControlName='yearOfManufacture' [items]="yearsMapping"
-                  itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="yomChange($event)"
-                  [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
-                </ionic-selectable>
-              </ion-item>
-
-              <ion-item *ngIf='(lessThan!=="" || moreThan!=="") && showManufactureYearFilterInput'>
-                <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;margin-top: 0px;
-                margin-left: 8px;height:20px;"
-                  (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
-                </ion-icon>
-                <ion-label position='stacked' >Manufacture Year</ion-label>
-                <ion-input (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")' type='text' value='{{manufacturedYearFilterValue}}'></ion-input>
-              </ion-item>
-
-            </ion-col>
-            <ion-col>
-              <ion-item style='--highlight-height:0;max-width:230px;'
-                *ngIf='!((this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput)'>
-                <ion-icon (click)='clearDateUse("dateUse")' *ngIf='formGroup.controls["dateUse"].value.length>0'
-                  slot='end' style='margin-bottom:-18px;margin-left: 0px;' name='close'></ion-icon>
-                <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;height:20px;"
-                  (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
-                </ion-icon>
-
-                <ion-label position='stacked'>
-                  <span style='color:red'
-                    *ngIf='formGroup.controls["dateUse"].invalid ||formGroup.controls["dateUseLessThan"].invalid || formGroup.controls["dateUseMoreThan"].invalid'>
-                    Invalid Date.</span>
-                  Date Put Into Use</ion-label>
-                <ion-input (click)='showDateUseCalendar()' type='text' formControlName='dateUse'>
-                </ion-input>
-              </ion-item>
-              <ion-item style='--highlight-height:0;max-width:400px;'
-                *ngIf='(this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput'>
-                <ion-icon (click)='clearDateUse("dateUseFilterValue")' slot='end'
-                  style='margin-bottom:-18px;margin-left: 0px;' name='close'></ion-icon>
-                <ion-icon slot='end' src='../../assets/icon/showMore.svg' style="margin-bottom:-20px;height:20px;"
-                  (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
-                </ion-icon>
-
-                <ion-label position='stacked'>
-                  Date Put Into Use</ion-label>
-                <ion-input type='text'
-                  (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'
-                  value='{{dateUseFilterValue}}'>
-                </ion-input>
-              </ion-item>
-            </ion-col>
-          </ion-row>
-
-          <ion-row>
-            <ion-col style='    max-width: 120px;'>
-              <!--           <ion-item text-wrap (click)='openSelect("owner")' style='--highlight-height:0'>
-            <ion-label position="floating">Owner</ion-label>
-            <ion-input type='text' formControlName='owner'></ion-input>
+    <form [formGroup]="formGroup" (ngSubmit)='onSubmit()'>
+      <ion-row>
+        <ion-col col-12 col-sm style='max-width:0px'>
+        </ion-col>
+        <ion-col col-12 col-sm style='max-width:480px;margin:auto'>
+          <ion-item>
+            <ion-label position='stacked'>Asset Type</ion-label>
+            <ionic-selectable type='text' item-content formControlName='assetType' [items]="assetsTypeMapping"
+              itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="portChange($event)"
+              [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
+            </ionic-selectable>
           </ion-item>
-                    -->
+          <ion-item *ngIf='!((lessThan!=="" || moreThan!=="") && showManufactureYearFilterInput)'>
+            <ion-icon slot='end' name="more" style="margin-bottom:-20px;margin-top: 0px;
+              margin-left: 8px"
+              (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
+            </ion-icon>
+            <ion-label position='stacked'>Manufacture Year</ion-label>
+            <ionic-selectable item-content formControlName='yearOfManufacture' [items]="yearsMapping"
+              itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="yomChange($event)"
+              [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
+            </ionic-selectable>
+          </ion-item>
 
+          <ion-item *ngIf='(lessThan!=="" || moreThan!=="") && showManufactureYearFilterInput'>
+            <ion-icon slot='end' name='more' style="margin-bottom:-20px;margin-top: 0px;
+              margin-left: 8px;"
+              (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
+            </ion-icon>
+            <ion-label position='stacked'>Manufacture Year</ion-label>
+            <ion-input
+              (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'
+              type='text' value='{{manufacturedYearFilterValue}}'></ion-input>
+          </ion-item>
+          <ion-item style='--highlight-height:0;'
+            *ngIf='!((this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput)'>
+            <ion-icon (click)='clearDateUse("dateUse")' *ngIf='formGroup.controls["dateUse"].value.length>0' slot='end'
+              style='margin-bottom:-18px;margin-right: -11px;' name='close'></ion-icon>
+            <ion-icon slot='end' name='more' style="margin-bottom:-20px;"
+              (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
+            </ion-icon>
+
+            <ion-label position='stacked'>
+              <span style='color:red'
+                *ngIf='formGroup.controls["dateUse"].invalid ||formGroup.controls["dateUseLessThan"].invalid || formGroup.controls["dateUseMoreThan"].invalid'>
+                Invalid Date.</span>
+              Date Put Into Use</ion-label>
+            <ion-input (click)='showDateUseCalendar()' type='text' formControlName='dateUse'>
+            </ion-input>
+          </ion-item>
+          <ion-item style='--highlight-height:0;'
+            *ngIf='(this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput'>
+            <ion-icon (click)='clearDateUse("dateUseFilterValue")' slot='end'
+              style='margin-bottom:-18px;margin-left: 0px;' name='close'></ion-icon>
+            <ion-icon slot='end' name='more' style="margin-bottom:-20px;"
+              (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
+            </ion-icon>
+
+            <ion-label position='stacked'>
+              Date Put Into Use</ion-label>
+            <ion-input type='text'
+              (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'
+              value='{{dateUseFilterValue}}'>
+            </ion-input>
+          </ion-item>
+          <ion-row>
+            <ion-col>
               <ion-item>
                 <ion-label position='stacked'>Owner</ion-label>
                 <ionic-selectable item-content formControlName='owner' [items]="ownersMapping" itemValueField="id"
@@ -163,14 +120,8 @@
                   [isMultiple]="true" [shouldFocusSearchbar]="true">
                 </ionic-selectable>
               </ion-item>
-
             </ion-col>
-            <ion-col style='    max-width: 165px;'>
-              <!--           <ion-item text-wrap (click)='openSelect("vehicleType")' style='--highlight-height:0'>
-            <ion-label position="floating">Vehicle Type</ion-label>
-            <ion-input type='text' formControlName='vehicleType'></ion-input>
-          </ion-item> -->
-
+            <ion-col>
               <ion-item>
                 <ion-label position='stacked'>Vehicle Type</ion-label>
                 <ionic-selectable item-content formControlName='vehicleType' [items]="vehiclesTypeMapping"
@@ -179,7 +130,7 @@
                 </ionic-selectable>
               </ion-item>
             </ion-col>
-            <ion-col style='    max-width: 160px;'>
+            <ion-col>
               <ion-item text-wrap style='--highlight-height:0'>
                 <ion-label primary position="stacked">
                   <span style='color:red' *ngIf='formGroup.controls["serialNo"].invalid'>
@@ -192,106 +143,32 @@
               </ion-item>
             </ion-col>
           </ion-row>
-
-          <ion-row>
-            <!-- <ion-col> -->
-            <!-- <ion-item>
-            <ion-label position="floating">Date Of Use</ion-label>
-            <ion-datetime style='--padding-top:0' formControlName='dateUse' displayFormat="D MMM YYYY"
-              [pickerOptions]="customOptions">
-            </ion-datetime> 
-            </ion-item>-->
-
-            <!-- </ion-col> -->
-
-            <ion-col style='max-width: 433px;'>
-              <!--           <ion-item (click)='openSelect("vehicleMfcCode")' style='--highlight-height:0'>
-            <ion-label position="floating">Manufacturer Code</ion-label>
-            <ion-input type='text' formControlName='vehicleMfcCode'></ion-input>
-          </ion-item> -->
-
-
-              <ion-item>
-                <ion-label position='stacked'>Manufacturer Code</ion-label>
-                <ionic-selectable item-content formControlName='vehicleMfcCode' [items]="manufacturersCodeMapping"
-                  itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="portChange($event)"
-                  [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
-                </ionic-selectable>
-              </ion-item>
+          <ion-item>
+            <ion-label position='stacked'>Manufacturer Code</ion-label>
+            <ionic-selectable item-content formControlName='vehicleMfcCode' [items]="manufacturersCodeMapping"
+              itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="portChange($event)"
+              [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
+            </ionic-selectable>
+          </ion-item>
+          <ion-row justify-content-center style='text-align:center'>
+            <ion-col col-3>
+              <ion-button style='width: 75px;height: 30px;' (click)='clearForm()' [disabled]='isSearching'>Clear
+              </ion-button>
+            </ion-col>
+            <ion-col col-3>
+              <ion-button style='width: 80px;height: 30px;' type='submit' (click)='onSubmit()'
+                [disabled]='!formGroup.valid || isSearching'>Search
+              </ion-button>
             </ion-col>
           </ion-row>
-
-          <!-- margin: auto;
-                  margin-right: -109px; 
-                      not working with error message
-                -->
-
-          <ion-item lines='none'>
-            <!-- <span *ngIf='lessThan==="" && moreThan===""'> -->
-            <!--             <ion-button (click)='clearForm()' [disabled]='isSearching'>Clear</ion-button>
-            <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search
-            </ion-button> -->
-
-
-            <!-- </span> -->
-            <!-- <span *ngIf='lessThan!=="" || moreThan!==""'>
-              <ion-button type='submit' (click)='onSubmit()' [disabled]=' isSearching'>Search
-              </ion-button>
-              <ion-button (click)='clearForm()' [disabled]='isSearching'>Reset</ion-button>
-            </span> -->
-            <!--         <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div> -->
-            <span style='color:red' *ngIf='formGroup.controls["serialNo"].invalid'>
-              Serial Number: Max 6 digits allowed.
-            </span>
-            <span style='color:red' *ngIf='formGroup.controls["yearOfManufacture"].invalid'>
-              Manufacture Year Invalid.
-            </span>
-            <span style='color:red'
-              *ngIf='formGroup.controls["dateUse"].invalid ||formGroup.controls["dateUseLessThan"].invalid || formGroup.controls["dateUseMoreThan"].invalid'>
-              Invalid Date.
-              <span *ngIf='!formGroup.controls["invalidDateRange"].invalid'>Valid format is YYYY-MM-DD.</span>
-            </span>
-
-            <!-- <ion-icon slot='end' name="information-circle-outline" (click)='showQuerySummary()' *ngIf='formGroup.valid'>
-            </ion-icon> -->
-            <!-- <ion-icon slot='end' name="funnel"></ion-icon> -->
-          </ion-item>
-
-
-
-
-        </form>
-
-
-
-
-
-
-
-        <!--     <ion-calendar [(ngModel)]="date"
-              (change)="onChange($event)"
-              [type]="type"
-              [format]="'YYYY-MM-DD'"
-              [options]='fromInfinite'
-              >
-      </ion-calendar> -->
-      </ion-col>
-      <!-- <ion-col></ion-col> -->
-    </ion-row>
+        </ion-col>
+        <ion-col col-12 col-sm style='max-width:0px'>
+        </ion-col>
+      </ion-row>
+    </form>
   </ion-grid>
   <div margin-top="" style="color:grey" text-center="">
-
-    <ion-button (click)='clearForm()' [disabled]='isSearching'>Clear</ion-button>
-    <ion-button type='submit' (click)='onSubmit()' [disabled]='!formGroup.valid || isSearching'>Search
-    </ion-button>
-
-
-  </div>
-  <div margin-top="" style="color:grey" text-center="">
-
     <span>Version - 0.0.1</span>
-
-
   </div>
   <div *ngIf='updateAvailable' margin-top="" style="color:grey" text-center="">
     <span>Update Available. Kindly Refresh.</span>
