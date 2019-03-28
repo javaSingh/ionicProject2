@@ -8,7 +8,7 @@ export const CONTEXT_ROOT = 'api/';
 
 //for offline deployment
 // http://10.60.201.247:3002/  -> https://roams.cris.org.in/rfidApi/
-// export const BASE_URL = 'https://roams.cris.org.in/rfidApi'
-export const BASE_URL='http://10.60.201.247:3002';
+export const BASE_URL = 'https://roams.cris.org.in/rfidApi'
+// export const BASE_URL='http://10.60.201.247:3002';
 // export const BASE_URL='http://172.16.22.64:3000';
 

@@ -58,59 +58,65 @@
               [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
             </ionic-selectable>
           </ion-item>
-          <ion-item *ngIf='!((lessThan!=="" || moreThan!=="") && showManufactureYearFilterInput)'>
-            <ion-icon slot='end' name="more" style="margin-bottom:-20px;margin-top: 0px;
+          <ion-row>
+            <ion-col>
+              <ion-item *ngIf='!((lessThan!=="" || moreThan!=="") && showManufactureYearFilterInput)'>
+                <ion-icon slot='end' name="more" style="margin-bottom:-20px;margin-top: 0px;
               margin-left: 8px"
-              (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
-            </ion-icon>
-            <ion-label position='stacked'>Manufacture Year</ion-label>
-            <ionic-selectable item-content formControlName='yearOfManufacture' [items]="yearsMapping"
-              itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="yomChange($event)"
-              [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
-            </ionic-selectable>
-          </ion-item>
+                  (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
+                </ion-icon>
+                <ion-label position='stacked'>Manufacture Year</ion-label>
+                <ionic-selectable item-content formControlName='yearOfManufacture' [items]="yearsMapping"
+                  itemValueField="id" itemTextField="name" [canSearch]="true" (onChange)="yomChange($event)"
+                  [canClear]="true" [isMultiple]="true" [shouldFocusSearchbar]="true">
+                </ionic-selectable>
+              </ion-item>
 
-          <ion-item *ngIf='(lessThan!=="" || moreThan!=="") && showManufactureYearFilterInput'>
-            <ion-icon slot='end' name='more' style="margin-bottom:-20px;margin-top: 0px;
+              <ion-item *ngIf='(lessThan!=="" || moreThan!=="") && showManufactureYearFilterInput'>
+                <ion-icon slot='end' name='more' style="margin-bottom:-20px;margin-top: 0px;
               margin-left: 8px;"
-              (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
-            </ion-icon>
-            <ion-label position='stacked'>Manufacture Year</ion-label>
-            <ion-input
-              (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'
-              type='text' value='{{manufacturedYearFilterValue}}'></ion-input>
-          </ion-item>
-          <ion-item style='--highlight-height:0;'
-            *ngIf='!((this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput)'>
-            <ion-icon (click)='clearDateUse("dateUse")' *ngIf='formGroup.controls["dateUse"].value.length>0' slot='end'
-              style='margin-bottom:-18px;margin-right: -11px;' name='close'></ion-icon>
-            <ion-icon slot='end' name='more' style="margin-bottom:-20px;"
-              (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
-            </ion-icon>
+                  (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'>
+                </ion-icon>
+                <ion-label position='stacked'>Manufacture Year</ion-label>
+                <ion-input
+                  (click)='presentModal("message", "queryString","ManufactureYearFilter","Manufacture Year Filter")'
+                  type='text' value='{{manufacturedYearFilterValue}}'></ion-input>
+              </ion-item>
+            </ion-col>
+            <ion-col>
+              <ion-item style='--highlight-height:0;'
+                *ngIf='!((this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput)'>
+                <ion-icon (click)='clearDateUse("dateUse")' *ngIf='formGroup.controls["dateUse"].value.length>0'
+                  slot='end' style='margin-bottom:-18px;margin-right: -11px;' name='close'></ion-icon>
+                <ion-icon slot='end' name='more' style="margin-bottom:-20px;"
+                  (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
+                </ion-icon>
 
-            <ion-label position='stacked'>
-              <span style='color:red'
-                *ngIf='formGroup.controls["dateUse"].invalid ||formGroup.controls["dateUseLessThan"].invalid || formGroup.controls["dateUseMoreThan"].invalid'>
-                Invalid Date.</span>
-              Date Put Into Use</ion-label>
-            <ion-input (click)='showDateUseCalendar()' type='text' formControlName='dateUse'>
-            </ion-input>
-          </ion-item>
-          <ion-item style='--highlight-height:0;'
-            *ngIf='(this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput'>
-            <ion-icon (click)='clearDateUse("dateUseFilterValue")' slot='end'
-              style='margin-bottom:-18px;margin-left: 0px;' name='close'></ion-icon>
-            <ion-icon slot='end' name='more' style="margin-bottom:-20px;"
-              (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
-            </ion-icon>
+                <ion-label position='stacked'>
+                  <span style='color:red'
+                    *ngIf='formGroup.controls["dateUse"].invalid ||formGroup.controls["dateUseLessThan"].invalid || formGroup.controls["dateUseMoreThan"].invalid'>
+                    Invalid Date.</span>
+                  Date Put Into Use</ion-label>
+                <ion-input (click)='showDateUseCalendar()' type='text' formControlName='dateUse'>
+                </ion-input>
+              </ion-item>
+              <ion-item style='--highlight-height:0;'
+                *ngIf='(this.formGroup.controls["dateUseLessThan"].value!=="" || this.formGroup.controls["dateUseMoreThan"].value!="") && showDatePutIntoUseFilterInput'>
+                <ion-icon (click)='clearDateUse("dateUseFilterValue")' slot='end'
+                  style='margin-bottom:-18px;margin-left: 0px;' name='close'></ion-icon>
+                <ion-icon slot='end' name='more' style="margin-bottom:-20px;"
+                  (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'>
+                </ion-icon>
 
-            <ion-label position='stacked'>
-              Date Put Into Use</ion-label>
-            <ion-input type='text'
-              (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'
-              value='{{dateUseFilterValue}}'>
-            </ion-input>
-          </ion-item>
+                <ion-label position='stacked'>
+                  Date Put Into Use</ion-label>
+                <ion-input type='text'
+                  (click)='presentModal("message", "queryString","DateUseFilter","Date Put Into Use Filter")'
+                  value='{{dateUseFilterValue}}'>
+                </ion-input>
+              </ion-item>
+            </ion-col>
+          </ion-row>
           <ion-row>
             <ion-col>
               <ion-item>
