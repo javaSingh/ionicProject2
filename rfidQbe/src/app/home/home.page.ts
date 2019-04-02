@@ -784,4 +784,8 @@ export class HomePage implements OnInit {
       this.dateUseFilterValue = ''
     }
   }
+  refresh(){
+    console.log('Refreshing.....')
+    window.location.reload()
+  }
 }

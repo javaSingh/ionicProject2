@@ -22,6 +22,8 @@ import { CalendarModule } from 'ion2-calendar';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 
+import { IonicStorageModule } from '@ionic/storage';
+
 @NgModule({
   declarations: [AppComponent,ModalPage],
   entryComponents: [ModalPage],
